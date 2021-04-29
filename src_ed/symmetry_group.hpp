@@ -5,7 +5,6 @@
 #include <vector>
 #include <typeinfo>
 
-
 #include "qcm_ED.hpp"
 #include "matrix.hpp"
 #include "binary_state.hpp"
@@ -104,9 +103,8 @@ template<typename HilbertField>
 void symmetry_group::check_invariance(const map<index_pair,HilbertField> &elements, const string& name, bool interaction)
 {
   if(g==1) return;
-  int i,a,b,ap,bp;
   
-  for(i=0; i<generator.size(); i++){
+  for(int i=0; i<generator.size(); i++){
     for(auto &x : elements){
       auto A = map_orbital(generator[i], x.first.r);
       A.second *= -1; // sign because c_a^\dg is a creation operator
@@ -123,7 +121,7 @@ void symmetry_group::check_invariance(const map<index_pair,HilbertField> &elemen
       Complex ratio = x.second*phaseC[f]/y->second;
       if(abs(ratio-1.0) > 1e-8){
         ostringstream sout;
-        sout << "Term " << x.first << " of parameter " << name << " is incompatible with symmetry generator " << i+1 << ", which maps it into " << xp << " but with value " << y->second << " instead of " << x.second;
+        sout << "Term " << x.first << " of parameter " << name << " is incompatible with symmetry generator " << i+1 << ", which maps it into " << xp << " but with value " << phaseC[f]*y->second << " instead of " << x.second;
         qcm_ED_throw(sout.str());
       }
     }

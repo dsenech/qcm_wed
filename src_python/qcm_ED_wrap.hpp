@@ -398,10 +398,8 @@ static PyObject* new_model_python(PyObject *self, PyObject *args)
   int bath_irrep=0;
   PyArrayObject *gen_pyobj=nullptr;
   try{
-  cout << "KillRoy was HERE : "  << "  " << n_sites << "  " << n_bath << "  " << gen_pyobj << endl; // TEMPO
     if(!PyArg_ParseTuple(args, "sii|Oi", &S1, &n_sites, &n_bath, &gen_pyobj, &bath_irrep))
       qcm_ED_throw("failed to read parameters in call to new_model (python)");
-  cout << "KillRoy was HERE : "  << S1 << "  " << n_sites << "  " << n_bath << "  " << gen_pyobj << endl; // TEMPO
     if(gen_pyobj != nullptr) gen = intmatrix_from_Py(gen_pyobj);
     int n_orb = n_sites+n_bath;
     for(int j=0; j<gen.size(); j++){

@@ -6,16 +6,16 @@ COMPILER	= c++
 LINKER	= $(COMPILER)
 
 #dynamic link library will vary quite a bit from one platform to the other
-PYPREFIX = $(shell python3-config --prefix)
-LINK	= -framework Accelerate $(shell python3-config --ldflags) -lomp -lpython3.9
+LINK	= $(shell python3-config --ldflags) -L/usr/local/lib/ -lcuba  -L/opt/homebrew/Caskroom/miniforge/base/lib -lomp -lpython3.9 -llapack -lblas 
 
 #include path, should be left empty for most platform
-LOCAL_INCLUDE 	= $(shell python3-config --includes)  -I$(shell python3 -c 'import numpy; print(numpy.get_include())')/numpy 
+LOCAL_INCLUDE 	= $(shell python3-config --includes)  \
+	-I$(shell python3 -c 'import numpy; print(numpy.get_include())')/numpy
 
 #options and macro for the compilation. Do not put optimisation
 #or debug option in there as it will interfere with the debug task and all task defined
 # in the common parts of the makefiles
-OPTIONS	= -std=c++14 -mtune=native -fPIC  -Xpreprocessor -fopenmp
+OPTIONS	= -std=c++14 -fPIC -Xpreprocessor -fopenmp 
 
 #flags and search path for the linker.
 LDFLAGS 	= -shared  -fPIC

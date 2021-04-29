@@ -3,6 +3,8 @@
  */
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#define PY_ARRAY_UNIQUE_SYMBOL QCM_ARRAY_API
+#define NO_IMPORT_ARRAY
 
 #include <memory>
 #include <array>
@@ -269,14 +271,12 @@ map<string,double> py_dict_to_map(PyObject *D){
 vector<vector<int>> intmatrix_from_Py(PyArrayObject *k_pyobj)
 {
   vector<vector<int>> k;
-  cout << "KillRoy was HERE : "  << k_pyobj << endl; // TEMPO
   if(PyArray_Check(k_pyobj)){
     if(PyArray_NDIM(k_pyobj)!=2)
       qcm_ED_throw("generators or positions should form a two-dimensional array!");
     vector<npy_intp> dims(2);
     dims[0] = *PyArray_DIMS(k_pyobj);
     dims[1] = *(PyArray_DIMS(k_pyobj)+1);
-    
     k.assign(dims[0], vector<int>(dims[1]));
     
     for(size_t i=0; i<dims[0]; i++){

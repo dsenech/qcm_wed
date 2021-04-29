@@ -302,7 +302,6 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<double> 
     sector target_sec = group->shift_sector(x.sec, pm, a.spin, a.irrep);
     auto T = basis.at(target_sec);
     if(y.size() != T->dim) y.resize(T->dim);
-    int n = group->N;
 
     if(pm==1){ // creation
       if(Hamiltonian_format == H_FORMAT::H_format_onthefly){
@@ -390,7 +389,6 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
     sector target_sec = group->shift_sector(x.sec, pm, a.spin, a.irrep);
     auto T = basis.at(target_sec);
     if(y.size() != T->dim) y.resize(T->dim);
-    int n = group->N;
 
     if(pm==1){ // creation
       if(Hamiltonian_format == H_FORMAT::H_format_onthefly){

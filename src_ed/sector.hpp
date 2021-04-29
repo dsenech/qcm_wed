@@ -16,10 +16,10 @@ void qcm_ED_throw(const std::string& s);
 
 //! represents a sector of the Hilbert space
 struct sector{
-	const static int not_conserved = 9999; //!< value of N or S if not conserved
-	const static int unspecified = 10000; //!< value of N or S or irrep if unspecified
-	int N; //!< the total number of particles in the sector (N_1 + N_2).  = not_conserved is particle number is not conserved
-	int S; //!< the total spin in the sector (N_1 - N_2). = not_conserved if spin is not conserved.
+	const static int odd = 9999; //!< value of N or S if not conserved but odd
+	const static int even = 10000; //!< value of N or S if not conserved but even
+	int N; //!< the total number of particles in the sector (N_1 + N_2).  = even or odd is particle number is not conserved
+	int S; //!< the total spin in the sector (N_1 - N_2). = even or odd if spin is not conserved.
 	size_t irrep; //!< the label of the point group representation used (from 0 to g-1)
 	
 	sector(): N(0), S(0), irrep(0) {}
@@ -29,14 +29,16 @@ struct sector{
   // returns the number of up spins
   // N = Nup+Ndw, S = Nup-Ndw ---> Nup = (N+S)/2
   int Nup() const{
-    if(N==not_conserved or S==not_conserved) return not_conserved;
+    if(N==even or S==even) return even;
+    else if(N==odd or S==odd) return odd;
     else return (N+S)/2;
   }
 
   // returns the number of down spins
   // N = Nup+Ndw, S = Nup-Ndw ---> Ndw = (N-S)/2
   int Ndw() const{
-    if(N==not_conserved or S==not_conserved) return not_conserved;
+    if(N==even or S==even) return even;
+    else if(N==odd or S==odd) return odd;
     else return (N-S)/2;
   }
 
@@ -46,69 +48,55 @@ struct sector{
    */
 	sector(const string &str) {
 		
-		if(str.find("R") == string::npos) irrep = 0;
-		if(str.find("S") == string::npos) S = not_conserved;
-		if(str.find("N") == string::npos) N = not_conserved;
-		
-    bool valid = true;
+		bool valid = true;
     int nel=0;
-    if(str.find("R") == string::npos){
-      if(str.find("S") == string::npos){
-        if(str.find("N") == string::npos){
-          valid = false;
-        }
-        else{
-          nel = sscanf(str.c_str(),"N%d",&N);
-          if(nel!=1) valid = false;
-        }
-      }
-      else{
-        if(str.find('N') == string::npos){
-          nel = sscanf(str.c_str(),"S%d",&S);
-          if(nel!=1) valid = false;
-        }
-        else{
-          nel = sscanf(str.c_str(),"N%d:S%d",&N,&S);
-          if(nel!=2) valid = false;
-        }
-      }
+    string tmp_str;
+
+    // reading N
+    int loc = str.find("N");
+    if(loc != string::npos){
+      tmp_str = str.substr(loc);
+      nel = sscanf(tmp_str.c_str(),"N%d",&N);
+      if(nel == 0) valid = false;
     }
-    else{
-      if(str.find("S") == string::npos){
-        if(str.find("N") == string::npos){
-          nel = sscanf(str.c_str(),"R%ld",&irrep);
-          if(nel!=1) valid = false;
-        }
-        else{
-          nel = sscanf(str.c_str(),"R%ld:N%d",&irrep,&N);
-          if(nel!=2) valid = false;
-        }
-      }
-      else{
-        if(str.find("N") == string::npos){
-          nel = sscanf(str.c_str(),"R%ld:S%d",&irrep,&S);
-          if(nel!=2) valid = false;
-        }
-        else{
-          nel = sscanf(str.c_str(),"R%ld:N%d:S%d",&irrep,&N,&S);
-          if(nel!=3) valid = false;
-          if((S+N)%2) qcm_ED_throw("sector string " + str + " makes no sense: N + S should be even!");
-        }
-      }
+    else N = even;
+
+    // reading S
+    loc = str.find("S");
+    if(loc != string::npos){
+      tmp_str = str.substr(loc);
+      nel = sscanf(tmp_str.c_str(),"S%d",&S);
+      if(nel == 0) valid = false;
     }
-    
+    else S = even;
+
+    // reading R
+    loc = str.find("R");
+    if(loc != string::npos){
+      tmp_str = str.substr(loc);
+      nel = sscanf(tmp_str.c_str(),"R%ld",&irrep);
+      if(nel == 0) valid = false;
+    }
+    else irrep = 0;
+
     if(!valid){
       qcm_ED_throw("sector string " + str + " does not conform to standard!");
     }
+
+		if(str.find("O") != string::npos) N = S = odd;
+    if(S == even && N != even && N%2) S = odd;
+    if(N == even && S != even && S%2) N = odd;
+
   }
 		
 	
 	
 	
 	friend std::ostream & operator<<(std::ostream &flux, const sector &s){
+		if(s.S == s.odd && s.N == s.odd) flux << "O";
 		flux << "R" << s.irrep;
-		if(s.N != s.not_conserved) flux << ":N" << s.N;
-		if(s.S != s.not_conserved) flux << ":S" << s.S;
+		if(s.N != s.even && s.N != s.odd) flux << ":N" << s.N;
+		if(s.S != s.even && s.S != s.odd) flux << ":S" << s.S;
 		return flux;
 	}
 	
@@ -122,14 +110,16 @@ struct sector{
 		
 		if(strchr(tmp_str,'R')!=nullptr){
 			if(strchr(tmp_str,'S')==nullptr){
-				s.S = s.not_conserved;
-				if(strchr(tmp_str,'N')==nullptr) s.N = s.not_conserved;
+				s.S = s.even;
+				if(strchr(tmp_str,'N')==nullptr) s.N = s.even;
 				else sscanf(tmp_str,"R:%ld,N:%d",&s.irrep,&s.N);
+        if(s.S == even && s.N != even && s.N%2) s.S = odd;
 			}
 			else{
 				if(strchr(tmp_str,'N')==nullptr){
-					s.N = s.not_conserved;
+					s.N = s.even;
 					sscanf(tmp_str,"R:%ld,S:%d",&s.irrep,&s.S);
+          if(s.S%2) s.N = odd;
 				}
 				else sscanf(tmp_str,"R:%ld,N:%d,S:%d",&s.irrep,&s.N,&s.S);
 			}

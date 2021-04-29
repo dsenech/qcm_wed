@@ -139,9 +139,7 @@ void Q_matrix<HilbertField>::append(Q_matrix &q)
  */
 template<typename HilbertField>
 void Q_matrix<HilbertField>::Green_function(const Complex &z, matrix<Complex> &G)
-{
-  Complex tmp;
-  
+{  
   for(size_t i=0; i<M; ++i){
     Complex u = (1.0/(z-e[i]));
     for(size_t a=0; a<L; ++a){
@@ -162,8 +160,6 @@ void Q_matrix<HilbertField>::Green_function(const Complex &z, matrix<Complex> &G
 template<typename HilbertField>
 void Q_matrix<HilbertField>::integrated_Green_function(matrix<Complex> &G)
 {
-  Complex tmp;
-  
   for(size_t i=0; i<M; ++i){
     if(e[i] >= 0.0) continue;
     for(size_t a=0; a<L; ++a){
@@ -186,8 +182,6 @@ void Q_matrix<HilbertField>::integrated_Green_function(matrix<Complex> &G)
 template<typename HilbertField>
 void Q_matrix<HilbertField>::Spectral_function(const Complex &z, matrix<Complex> &G)
 {
-  Complex tmp;
-  
   G.zero();
   for(size_t i=0; i<M; ++i){
     double u = -(1.0/(z-e[i])).imag();

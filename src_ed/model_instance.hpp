@@ -130,8 +130,6 @@ pair<double, double> model_instance<HilbertField>::cluster_averages(shared_ptr<H
     }
   }
   else{
-    // M = Green_function_average(false);
-    // if(mixing & HS_mixing::up_down) M_down = Green_function_average(true);
     for(auto& gs : states) h->expectation_value(*gs, ave, var);
     var -= ave*ave;
   }
@@ -457,10 +455,8 @@ matrix<Complex> model_instance<HilbertField>::Green_function_average(bool spin_d
 {
   if(spin_down and !(mixing&HS_mixing::up_down)) qcm_ED_throw("spin_down=True impossible with Hilbert space mixing "+to_string(mixing));
   if(!gf_solved and !gf_read) Green_function_solve();
-  matrix<Complex>& Gint = M;
-  if(spin_down) Gint = M_down;
-  Gint.set_size(n_mixed*(the_model->n_orb));
 
+  matrix<Complex> Gint(n_mixed*(the_model->n_orb));
   block_matrix<Complex> G(the_model->group->site_irrep_dim*n_mixed);
   if(spin_down and mixing&HS_mixing::up_down){
     for(auto& x : states) x->gf_down->integrated_Green_function(G);
@@ -469,8 +465,7 @@ matrix<Complex> model_instance<HilbertField>::Green_function_average(bool spin_d
     for(auto& x : states) x->gf->integrated_Green_function(G);
   }
   the_model->group->to_site_basis(G, Gint, n_mixed);
-  if(spin_down) return M_down;
-  else return M;
+  return Gint;
 }
 
 

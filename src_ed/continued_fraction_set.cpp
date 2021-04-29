@@ -10,8 +10,8 @@ Green_function_set(_group, mixing), sec(_sec)
   h.assign(group->site_irrep_dim.size(), matrix<continued_fraction>());
   for(size_t r=0; r<group->site_irrep_dim.size(); ++r){
     size_t n = group->site_irrep_dim[r];
-    if(sec.S == sector::not_conserved) n *= 2;
-    if(sec.N == sector::not_conserved) n *= 2;
+    if(sec.S >= sector::odd) n *= 2;
+    if(sec.N >= sector::odd) n *= 2;
     e[r].set_size(n);
     h[r].set_size(n);
   }
@@ -29,8 +29,8 @@ Green_function_set(_group, mixing), sec(_sec)
   h.resize(group->site_irrep_dim.size());
   for(size_t r=0; r<group->site_irrep_dim.size(); ++r){
     size_t n = group->site_irrep_dim[r];
-    if(sec.S == sector::not_conserved) n *= 2;
-    if(sec.N == sector::not_conserved) n *= 2;
+    if(sec.S >= sector::odd) n *= 2;
+    if(sec.N >= sector::odd) n *= 2;
     e[r].set_size(n);
     h[r].set_size(n);
   }
@@ -59,8 +59,8 @@ Green_function_set(_group, mixing), sec(_sec)
   h.assign(group->site_irrep_dim.size(), matrix<continued_fraction>());
   for(size_t r=0; r<group->site_irrep_dim.size(); ++r){
     size_t n = group->site_irrep_dim[r];
-    if(sec.S == sector::not_conserved) n *= 2;
-    if(sec.N == sector::not_conserved) n *= 2;
+    if(sec.S >= sector::odd) n *= 2;
+    if(sec.N >= sector::odd) n *= 2;
     e[r].set_size(n);
     h[r].set_size(n);
   }

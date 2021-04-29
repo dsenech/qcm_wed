@@ -1,3 +1,5 @@
+#define PY_ARRAY_UNIQUE_SYMBOL QCM_ARRAY_API
+
 #include "qcm_wrap.hpp"
 #include "qcm_ED_wrap.hpp"
 
@@ -116,39 +118,50 @@ PyInit_qcm(void)
   QCM::qcm_init();
 
   PyObject *module = PyModule_Create(&qcm);
+  if(module == NULL) return NULL;
   
   qcm_Error = PyErr_NewException("qcm.error", NULL, NULL);
   Py_INCREF(qcm_Error);
-  PyModule_AddObject(module, "error", qcm_Error);
+  if(PyModule_AddObject(module, "error", qcm_Error) < 0){
+    Py_XDECREF(qcm_Error);
+    Py_CLEAR(qcm_Error);
+    Py_DECREF(module);
+    return NULL;
+  };
 
   qcm_ED_Error = PyErr_NewException("qcm_ED.error", NULL, NULL);
   Py_INCREF(qcm_ED_Error);
-  PyModule_AddObject(module, "error", qcm_ED_Error);
+  if(PyModule_AddObject(module, "error", qcm_ED_Error) < 0){
+    Py_XDECREF(qcm_ED_Error);
+    Py_CLEAR(qcm_ED_Error);
+    Py_DECREF(module);
+    return NULL;
+  };
 
   return module;
 }
 
 
 
-  /**
-   initialization of the library. Must be called before the first call to the library.
-   */
-  void QCM::qcm_init()
-  {
-    qcm_model = make_shared<lattice_model>();
-    setenv("CUBACORES","0",0); // IMPORTANT: always set this to zero. Use vectorization instead, via openMP.
-    QCM::global_parameter_init();
+/**
+  initialization of the library. Must be called before the first call to the library.
+  */
+void QCM::qcm_init()
+{
+  qcm_model = make_shared<lattice_model>();
+  setenv("CUBACORES","0",0); // IMPORTANT: always set this to zero. Use vectorization instead, via openMP.
+  QCM::global_parameter_init();
 
-    #ifdef _OPENMP
-    char* omp_num_threads = getenv("OMP_NUM_THREADS");
-    if(omp_num_threads == nullptr){
-      max_num_threads = 1;
-      setenv("OMP_NUM_THREADS","1",0);
-    }
-    else max_num_threads = from_string<int>(string(omp_num_threads));
-    omp_set_max_active_levels(2);
-    #endif    
+  #ifdef _OPENMP
+  char* omp_num_threads = getenv("OMP_NUM_THREADS");
+  if(omp_num_threads == nullptr){
+    max_num_threads = 1;
+    setenv("OMP_NUM_THREADS","1",0);
   }
+  else max_num_threads = from_string<int>(string(omp_num_threads));
+  omp_set_max_active_levels(2);
+  #endif    
+}
 
 
 

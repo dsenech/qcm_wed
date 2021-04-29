@@ -16,8 +16,7 @@ symmetry_group::symmetry_group(int _N, int _n_sites, const vector<vector<int>> &
   bath_irrep = _bath_irrep;
   if(_bath_irrep) L = _n_sites;
   else L = N;
-
-
+  
   if(global_bool("nosym") or generator.size() == 0){
     bath_irrep = false;
     generator.resize(1);
@@ -187,7 +186,10 @@ void symmetry_group::build()
   }
   
   for(int i=0; i<(int)generator.size(); ++i){
-    if(!is_valid_element(generator[i])) qcm_ED_throw("generator " + to_string(i+1) + " is not valid!");
+    if(!is_valid_element(generator[i])){
+      cout << "generator " << generator[i] << " problematic" << endl;
+      qcm_ED_throw("generator " + to_string(i+1) + " is not valid!");
+    }
   }
 
   //..............................................................................
@@ -244,7 +246,7 @@ void symmetry_group::build()
   for(int i=0; i<g; ++i){
     auto p = identity();
     index(i);
-    uint32_t mask = 0;
+
     for(int j=0; j<generator.size(); ++j){
       for(int l=0; l<index.ind[j]; ++l) p = product(p, generator[j]);
     }
@@ -252,8 +254,9 @@ void symmetry_group::build()
     if(is_identity(p, true) and i != 0){
       qcm_ED_throw("The identity is generated as the non trivial element " + index.str());
     }
-    if(!is_valid_element(p, true)){
-      qcm_ED_throw("Element  " + index.str() + " is not valid");
+    if(!is_valid_element(p,true)){
+      cout << "element " << generator[i] << " problematic" << endl;
+      qcm_ED_throw("element " + to_string(i+1) + " is not valid!");
     }
     e.push_back(p);
   }
@@ -423,7 +426,6 @@ rep_map symmetry_group::Representative(const binary_state &b, int irrep)
 {
   int h=1; // size of the subgroup that leaves the state invariant
   rep_map M = {b, 0, 0};
-  int phase_current = 0;
 
   for(int elem=1; elem<g; ++elem){ // loop over group elements to find the representative
     auto X = apply(elem, b);
@@ -506,16 +508,16 @@ void symmetry_group::to_site_basis(int r, vector<double> &x, vector<double> &y, 
  output : true if valid, false otherwise
  */
 bool symmetry_group::sector_is_valid(const sector& sec){
-  if(sec.N != sec.not_conserved){
+  if(sec.N < sector::odd){
     if(sec.N < 0) return false;
     if(sec.N > 2*N) return false;
-    if(sec.S != sec.not_conserved){
+    if(sec.S < sector::odd){
       if(sec.S > sec.N) return false;
       if(sec.S < -sec.N) return false;
       if((sec.N+sec.S)%2) return false;
     }
   }
-  if(sec.S != sec.not_conserved){
+  if(sec.S < sector::odd){
     int norb((int)N);
     if(sec.S > norb) return false;
     if(sec.S < -norb) return false;
@@ -533,22 +535,20 @@ bool symmetry_group::sector_is_valid(const sector& sec){
 sector symmetry_group::shift_sector(const sector& _sec, int pm, int spin, int _irrep){
   
   sector sec = _sec;
-  if(pm==1){ // add a particle
-    if(sec.N != sector::not_conserved) sec.N++;
-    if(sec.S != sector::not_conserved){
-      if(spin) sec.S--;
-      else sec.S++;
-    }
-    sec.irrep = tensor(sec.irrep,_irrep);
+  if(sec.N == sector::odd) sec.N = sector::even;
+  else if(sec.N == sector::even) sec.N = sector::odd;
+  else sec.N += pm;
+
+  if(sec.S == sector::odd) sec.S = sector::even;
+  else if(sec.S == sector::even) sec.S = sector::odd;
+  else{
+    if(spin) sec.S -= pm;
+    else sec.S += pm;
   }
-  else{ // remove a particle
-    if(sec.N != sector::not_conserved) sec.N--;
-    if(sec.S != sector::not_conserved){
-      if(spin) sec.S++;
-      else sec.S--;
-    }
-    sec.irrep = tensor(sec.irrep, conjugate[_irrep]);
-  }
+
+  if(pm==1) sec.irrep = tensor(sec.irrep,_irrep);
+  else sec.irrep = tensor(sec.irrep, conjugate[_irrep]);
+
   return sec;
 }
 

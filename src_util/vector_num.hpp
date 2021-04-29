@@ -158,16 +158,17 @@ void erase(vector<T> &x){
 }
 
 
-
 /**
  prints to flux
  */
 template <typename T>
 ostream& operator << (ostream& flux, const vector<T>& x){
   if(x.size() > (size_t)global_int("dim_max_print")) return flux;
-	flux << "(" << chop(x[0], console::precision);
+	// flux << "(" << chop(x[0], console::precision);
+	flux << "(" << x[0];
 	for(size_t i=1; i<x.size(); ++i){
-		flux << ", " << chop(x[i], console::precision);
+		// flux << ", " << chop(x[i], console::precision);
+		flux << ", " <<x[i];
 	}
 	flux << ")";
 	return flux;

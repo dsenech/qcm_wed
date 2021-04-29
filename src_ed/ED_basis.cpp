@@ -195,7 +195,7 @@ ED_basis(_sec, _group->N), group(_group)
 	//..............................................................................
 	// Builds the basis in the completely mixed case
 	
-	if(sec.N == sector::not_conserved and sec.S == sector::not_conserved){
+	if(sec.N == sector::even and sec.S == sector::even){
 		size_t max_dimup = 1<<n_orb; // = 2^n
 		binlist.reserve(4096);
 		dim=0;
@@ -205,6 +205,24 @@ ED_basis(_sec, _group->N), group(_group)
 		for(uint32_t i=0; i<max_dimup; ++i){
 			for(uint32_t j=0; j<max_dimup; ++j){
 				binary_state b(i,j);
+				if(b.count()%2) continue; // reject if odd number of particles
+				binary_state b0=b;
+				auto R = group->Representative(b, sec.irrep);
+				if(R.length and  R.b == b0) binlist.push_back(R.b);
+			}
+		}
+	}
+	if(sec.N == sector::odd and sec.S == sector::odd){
+		size_t max_dimup = 1<<n_orb; // = 2^n
+		binlist.reserve(4096);
+		dim=0;
+		// Putting together
+		int phase;
+		int length;
+		for(uint32_t i=0; i<max_dimup; ++i){
+			for(uint32_t j=0; j<max_dimup; ++j){
+				binary_state b(i,j);
+				if(b.count()%2 == 0) continue; // reject if even number of particles
 				binary_state b0=b;
 				auto R = group->Representative(b, sec.irrep);
 				if(R.length and  R.b == b0) binlist.push_back(R.b);
@@ -215,7 +233,7 @@ ED_basis(_sec, _group->N), group(_group)
 	//..............................................................................
 	// Builds the basis in the anomalous case (no spin flip)
 	
-	else if(sec.N == sector::not_conserved and sec.S != sector::not_conserved){
+	else if(sec.N >= sector::odd and sec.S < sector::odd){
 		size_t max_dimup = 1<<n_orb; // = 2^n
 		dim=0;
 		for(size_t Nup=0; Nup <= n_orb; Nup++){
@@ -255,7 +273,7 @@ ED_basis(_sec, _group->N), group(_group)
 	//..............................................................................
 	// Builds the basis in the spin flip case (no anomalous terms)
 	
-	else if(sec.N != sector::not_conserved and sec.S == sector::not_conserved){
+	else if(sec.N < sector::odd and sec.S >= sector::odd){
 		uint32_t max_dimup = 1<<n_orb; // = 2^n
 		dim=0;
 		for(size_t Nup=0; Nup <= n_orb; Nup++){

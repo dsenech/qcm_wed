@@ -76,16 +76,16 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
   
   try{
     for(auto& s : target_sectors){
-      if(s.S == sector::not_conserved and (mixing&HS_mixing::spin_flip) == 0){
+      if(s.S >= sector::odd and (mixing&HS_mixing::spin_flip) == 0){
         qcm_ED_throw("sector string " + s.name() + " defines a non conserved spin, but spin is conserved in the model");
       }
-      if(s.N == sector::not_conserved and (mixing&HS_mixing::anomalous) == 0){
+      if(s.N >= sector::odd and (mixing&HS_mixing::anomalous) == 0){
         qcm_ED_throw("sector string " + s.name() + " defines a non conserved particle number, but particle number is conserved in the model");
       }
-      if(s.S != sector::not_conserved and (mixing&HS_mixing::spin_flip)){
+      if(s.S < sector::odd and (mixing&HS_mixing::spin_flip)){
         qcm_ED_throw("sector string " + s.name() + " defines a conserved spin, but spin is not conserved in the model");
       }
-      if(s.N != sector::not_conserved and (mixing&HS_mixing::anomalous)){
+      if(s.N < sector::odd and (mixing&HS_mixing::anomalous)){
         qcm_ED_throw("sector string " + s.name() + " defines a conserved particle number, but particle number is not conserved in the model");
       }
     }

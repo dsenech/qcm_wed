@@ -1,3 +1,5 @@
+#define PY_ARRAY_UNIQUE_SYMBOL QCM_ARRAY_API
+
 #include "qcm_ED_wrap.hpp"
 #include "qcm_ED_only.hpp"
 
