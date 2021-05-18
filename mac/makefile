@@ -7,10 +7,7 @@ LINKER	= $(COMPILER)
 
 #dynamic link library will vary quite a bit from one platform to the other
 PYPREFIX = $(shell python3-config --prefix)
-LINK	= -L/usr/local/lib/ -lcuba -framework Accelerate \
-						$(shell python3-config --ldflags) -lpython3.9 \
-						-lomp
-
+LINK	= -L/usr/local/lib/ -lcuba -framework Accelerate $(shell python3-config --ldflags) -lpython3.9 -lomp
 
 #include path, should be left empty for most platform
 LOCAL_INCLUDE 	= -I/usr/local/include/  -I${MKLROOT}/include \
