@@ -455,7 +455,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         if var2sef is None:
             for i in range(len(names)): 
                 pyqcm.set_parameter(names[i], x[i])
-                print('x = ', x) # new
+            print('x = ', x) # new
         else:
             var2sef(x)    
         pyqcm.new_model_instance()

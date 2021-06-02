@@ -855,12 +855,12 @@ def segment_dispersion(path='triangle', nk=64, label=0, file=None, plt_ax=None, 
     e = pyqcm.dispersion(k, label=label)
 
     for i in range(d):
-        plt.plot(e[:,i])
+        plt.plot(e[:,i], **kwargs)
 
     if pyqcm.mixing() == 4:
         e = pyqcm.dispersion(k, True)
         for i in range(d):
-            plt.plot(e[:,i])
+            plt.plot(e[:,i], **kwargs)
 
     
     for x in tick_pos:
@@ -872,9 +872,9 @@ def segment_dispersion(path='triangle', nk=64, label=0, file=None, plt_ax=None, 
 
     if file is not None:
         plt.savefig(file)
-    else:
+        plt.close()
+    elif plt_ax == None:
         plt.show()
-    plt.close()
 
 ################################################################################
 def Fermi_surface(nk=64, label=0, band=None, quadrant=False, plane='xy', k_perp=0.0, file=None, plt_ax=None, **kwargs):

@@ -147,7 +147,7 @@ def susceptibility_poles(op_name, label=0):
 
     :param str name: name of the operator
     :param int label: label of cluster model instance
-    :returns [(float,float)]: array of 2-tuple (residue, pole)
+    :returns [(float,float)]: array of 2-tuple (pole, residue)
 
     """
 
@@ -1044,7 +1044,7 @@ def density_wave(name, t, Q, **kwargs):
     Defines a density wave
 
     :param str name: name of operator
-    :param str t: type of density-wave -- one of 'Z', 'X', 'cdw', 'singlet', 'dz', 'dy', 'dx'
+    :param str t: type of density-wave -- one of 'Z', 'X', 'Y', 'cdw', 'singlet', 'dz', 'dy', 'dx'
     :param wavevector Q:  wavevector of the density wave (in multiple of :math:`pi`)
 
     :Keyword Arguments:

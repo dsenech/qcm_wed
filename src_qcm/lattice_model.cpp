@@ -986,6 +986,7 @@ void lattice_model::density_wave(const string &name, vector3D<int64_t> &cdw_link
   else if(type == "N") dw_type = 'N';
   else if(type == "Z") dw_type = 'Z';
   else if(type == "X") dw_type = 'X';
+  else if(type == "Y") dw_type = 'Y';
   else if(type == "singlet") tmp_op->type = latt_op_type::singlet;
   else if(type == "dz") tmp_op->type = latt_op_type::dz;
   else if(type == "dy") tmp_op->type = latt_op_type::dy;
@@ -1019,6 +1020,10 @@ void lattice_model::density_wave(const string &name, vector3D<int64_t> &cdw_link
       else if(dw_type=='X'){
         E.push_back({i,0,i,1,0,z});
         E.push_back({i,1,i,0,0,z});
+      }
+      else if(dw_type=='Y'){
+        E.push_back({i,0,i,1,0,z*Complex(0,-1.0)});
+        E.push_back({i,1,i,0,0,z*Complex(0,1.0)});
       }
       else if(dw_type=='N'){
         E.push_back({i,0,i,0,0,z});
