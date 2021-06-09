@@ -225,7 +225,7 @@ def __optimize(F, x, method='Nelder-Mead', initial_step=0.1, accur = 1e-4, accur
 ######################################################################
 # main CDMFT function
 
-def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4, accur_dist=1e-10, displaymin=False, method='CG', file='cdmft.tsv', skip_averages=False, eps_algo=0, initial_step = 0.1, hartree=None, check_sectors=None, grid_type = 'sharp', counterterms=None):
+def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4, accur_dist=1e-10, displaymin=False, method='CG', file='cdmft.tsv', skip_averages=False, eps_algo=0, initial_step = 0.1, hartree=None, check_sectors=None, grid_type = 'sharp', counterterms=None, SEF=False):
     """Performs the CDMFT procedure
 
     :param [str] varia: list of variational parameters 
@@ -247,6 +247,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
     :param [str] check_sectors: the ground state is checked against the ground states of the sectors contained in target_sectors
     :param str grid_type: type of frequency grid along the imaginary axis : 'sharp', 'ifreq', 'self'
     :param [str] counterterms: list of counterterms names (cluster operators that should strive to have zero average)
+    :param boolean SEF: if True, computes the Potthoff functional at the end
     :returns: None
 
     """
@@ -437,6 +438,10 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         if skip_averages is False:
             ave = pyqcm.averages()
             pyqcm.print_averages(ave)    
+
+        if SEF:
+            Potthoff_functional()
+
         if file != None:
             des = 'iterations\tdist_function\tdistance\tdiff_hybrid\t'
             val = '{:d}\t{:s}\t{: #.2e}\t{: #.2e}\t'.format(superiter, dist_function, dist_value, diffH)

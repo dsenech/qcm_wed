@@ -703,7 +703,7 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    * @param name name given to the operator
    * @param link bond vector on which the operator is defined
    * @param amplitude default amplitude of the operator, that multiplies all matrix elements and its given value
-   * @param band index of the first site of the pair (from 1 to nband)
+   * @param band index of the first site of the pair (from 1 to nband). 0 if all bands.
    * @param Q wavevector ($\times\pi$) of the density wave
    * @param phase constant phase (see general documentation for the formula)
    * @param type type of pairing: cdw, X, Z, singlet, dx, dy, dz

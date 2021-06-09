@@ -1773,7 +1773,7 @@ arguments:
 kwargs:
   4. link (3 component integer vector) for bond density waves
   5. amplitude (complex number)
-  6. 'band' : int. Band label (1 by default)
+  6. 'band' : int. Band label (0 by default = all bands)
   7. 'phase' : real phase (times pi)
 returns: None
 ){";
@@ -1783,7 +1783,7 @@ static PyObject* density_wave_python(PyObject *self, PyObject *args, PyObject *k
   char* name = nullptr;
   char* type = nullptr;
   complex<double> amplitude = 1.0;
-  int band=1;
+  int band=0;
   double phase = 0.0;
   PyArrayObject *link_pyobj = nullptr;
   PyArrayObject *Q_pyobj = nullptr;

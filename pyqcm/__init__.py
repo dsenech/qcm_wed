@@ -1044,14 +1044,14 @@ def density_wave(name, t, Q, **kwargs):
     Defines a density wave
 
     :param str name: name of operator
-    :param str t: type of density-wave -- one of 'Z', 'X', 'Y', 'cdw', 'singlet', 'dz', 'dy', 'dx'
+    :param str t: type of density-wave -- one of 'Z', 'X', 'Y', 'N'='cdw', 'singlet', 'dz', 'dy', 'dx'
     :param wavevector Q:  wavevector of the density wave (in multiple of :math:`pi`)
 
     :Keyword Arguments:
 
         * link (*[int]*) -- bond vector, for bond density waves
         * amplitude (*complex*) -- amplitude multiplier
-        * band (*int*) -- Band label (1 by default)
+        * band (*int*) -- Band label (0 by default = all bands)
         * phase (*float*) -- real phase (as a multiple of :math:`pi`)
 
     :return: None

@@ -984,6 +984,7 @@ void lattice_model::density_wave(const string &name, vector3D<int64_t> &cdw_link
   
   if(type == "spin") dw_type = 'Z';
   else if(type == "N") dw_type = 'N';
+  else if(type == "cdw") dw_type = 'N';
   else if(type == "Z") dw_type = 'Z';
   else if(type == "X") dw_type = 'X';
   else if(type == "Y") dw_type = 'Y';
@@ -1010,7 +1011,7 @@ void lattice_model::density_wave(const string &name, vector3D<int64_t> &cdw_link
   
   // loop over sites
   for(int i=0; i<sites.size(); i++){
-    if(sites[i].band != band) continue; // wrong band
+    if(band >= 0 && sites[i].band != band) continue; // wrong band
     Complex z = amplitude*cos(Q*sites[i].position+phase);
     if(abs(z) > 1e-8){
       if(dw_type=='Z'){
@@ -1035,7 +1036,7 @@ void lattice_model::density_wave(const string &name, vector3D<int64_t> &cdw_link
   // loop over sites (bond CDWs)
   if(dw_type=='L'){
     for(int s1=0; s1 < (int)sites.size(); s1++){
-      if(sites[s1].band != band) continue; // wrong band
+      if(band >= 0 && sites[s1].band != band) continue; // wrong band
       vector3D<int64_t>& r = sites[s1].position;
       int s2, ni, ni_opp;
       find_second_site(s1, cdw_link, s2, ni, ni_opp);
