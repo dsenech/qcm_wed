@@ -459,8 +459,12 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         else:
             var2sef(x)    
         pyqcm.new_model_instance()
-        return pyqcm.Potthoff_functional()
-
+        OM = pyqcm.Potthoff_functional()
+        if hartree != None:
+            for C in hartree:
+                OM += C.omega()
+        return OM
+        
     if hartree == None:
         pyqcm.banner('VCA procedure', '*')
     else:
@@ -511,6 +515,8 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
 
     if root:
         pyqcm.banner('VCA ended normally', '*')
+
+    return sol, 1.0/np.diag(iH)
 
 ################################################################################
 def plot_sef(param, prm, accur_SEF=1e-4, show=True):

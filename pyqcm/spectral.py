@@ -425,8 +425,12 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
         if(i % 20 == 0 and progress):
             print(np.round(w[i],4), A[i, :])
 
-    np.savetxt('dos.tsv', np.hstack((np.reshape(np.real(w), (nw, 1)), A)))
-    np.savetxt('dos_accum.tsv', np.hstack((np.reshape(np.real(w), (nw, 1)), accum)))
+    head = 'w\t'
+    for i in range(d//2):
+        head += 'up_{:d}\tdown_{:d}\t'.format(2*i+1, 2*i+1)
+    for i in range(d//2):
+        head += 'cumul_up_{:d}\tcumul_down_{:d}\t'.format(2*i+1, 2*i+1)
+    np.savetxt('dos.tsv', np.hstack((np.reshape(np.real(w), (nw, 1)), A, accum)), header=head, delimiter='\t', fmt='%1.6g', comments='')
     print('DoS totals: ', total)
     mix = pyqcm.mixing()
 

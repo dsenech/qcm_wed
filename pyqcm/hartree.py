@@ -71,6 +71,19 @@ class hartree:
         if pr:
             print('delta '+self.Vm+' = ', self.diff)
 
+    def omega(self):
+        """returns the constant contribution, added to the Potthoff functional
+        
+        """
+
+        par = pyqcm.parameters()
+        v = par[self.V]
+        vm0 = par[self.Vm]
+        if self.lattice == False:
+            self.ave = pyqcm.cluster_averages()[self.Vm][0]
+        else:
+            self.ave = pyqcm.averages()[self.Vm]
+        return -0.5*self.eig*v*self.ave*self.ave
 
     def converged(self):
         """Tests whether the mean-field procedure has converged

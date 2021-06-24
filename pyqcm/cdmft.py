@@ -440,7 +440,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
             pyqcm.print_averages(ave)    
 
         if SEF:
-            Potthoff_functional()
+            pyqcm.Potthoff_functional()
 
         if file != None:
             des = 'iterations\tdist_function\tdistance\tdiff_hybrid\t'
