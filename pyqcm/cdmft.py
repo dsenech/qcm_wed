@@ -414,13 +414,13 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
             raise pyqcm.TooManyIterationsError(maxiter)
 
         eps_length = 2*eps_algo + 1
-        if eps_algo and superiter>=3*eps_length and superiter%(3*eps_length) == 0:
+        if eps_algo and superiter>=2*eps_length and superiter%(2*eps_length) == 0:
             pyqcm.banner('applying the epsilon algorithm')
             for i in range(nvar):
                 z = epsilon(var_data[i,superiter-eps_length:superiter])
                 var_data[i,superiter] = z
                 pyqcm.set_parameter(var[i], z)
-            var_val = pyqcm.__(var,var_data[:,superiter])
+            var_val = pyqcm.__varia_table(var,var_data[:,superiter])
             print(var_val)
 
 
