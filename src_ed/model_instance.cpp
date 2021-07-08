@@ -20,7 +20,6 @@ matrix<Complex> model_instance<Complex>::hopping_matrix(bool spin_down)
 
 
 
-
 /**
  Constructs the continued fraction representation from the Lanczos method
  or full diagonalization if the dimension is small enough.

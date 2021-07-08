@@ -263,6 +263,39 @@ static PyObject* hopping_matrix_python(PyObject *self, PyObject *args)
   return out;
 }
 //==============================================================================
+const char* interaction_matrix_help =
+R"(
+Computes the hopping matrix of the model
+arguments:
+1. True for the spin down sector (optional)
+2. label of model_instance (optional, default=0)
+returns:
+The hopping matrix
+)";
+//------------------------------------------------------------------------------
+static PyObject* interaction_matrix_python(PyObject *self, PyObject *args)
+{
+  int label=0;
+  
+  try{
+    if(!PyArg_ParseTuple(args, "|i", &label))
+      qcm_ED_throw("failed to read parameters in call to interaction_matrix (python)");
+  } catch(const string& s) {qcm_ED_catch(s);}
+  
+  size_t d;
+  vector<double> g;
+  g = ED::interaction_matrix((size_t)label).v;
+  d = (size_t)sqrt(g.size());
+  
+  npy_intp dims[2];
+  dims[0] = dims[1] = d;
+  
+  PyObject *out = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+  memcpy(PyArray_DATA((PyArrayObject*) out), g.data(), g.size()*sizeof(double));
+  PyArray_ENABLEFLAGS((PyArrayObject*) out, NPY_ARRAY_OWNDATA);
+  return out;
+}
+//==============================================================================
 const char* hybridization_functionC_help =
 R"(
 Computes the hybridization function (for models with baths)

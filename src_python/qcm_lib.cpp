@@ -24,6 +24,7 @@ static PyMethodDef methods[] = {
   { "Green_function", Green_function_python, METH_VARARGS, Green_function_help },
   { "ground_state_solve", ground_state_solve_python, METH_VARARGS, ground_state_solve_help},
   { "hopping_matrix", hopping_matrix_python, METH_VARARGS, hopping_matrix_help },
+  { "interaction_matrix", interaction_matrix_python, METH_VARARGS, interaction_matrix_help },
   { "hybridization_functionC", hybridization_functionC_python, METH_VARARGS, hybridization_functionC_help },
   { "hybridization", hybridization_python, METH_VARARGS, hybridization_help },
   { "matrix_elements", matrix_elements_python, METH_VARARGS, matrix_elements_help },

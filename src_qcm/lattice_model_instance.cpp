@@ -321,11 +321,11 @@ matrix<complex<double>> lattice_model_instance::cluster_hopping_matrix(size_t i,
 
   if(model->mixing == mix) return g;
 
-  // combinaisons 0:2, 0:4, 1:3, 1:5
+  // combinations 0:2, 0:4, 1:3, 1:5
   else if(((model->mixing&1) == 0 and (mix&1) == 0) or ((model->mixing&1)==1 and (mix&1)==1)) {
     return upgrade_cluster_matrix(model->mixing, mix, g);
   }
-  // combinaisons 0:1, 0:3, 0:5, 2:3
+  // combinations 0:1, 0:3, 0:5, 2:3
   else if((model->mixing&1) == 1 and (mix&1) == 0){
     return upgrade_cluster_matrix_anomalous(model->mixing, mix, g, g);
   }

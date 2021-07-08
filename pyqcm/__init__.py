@@ -6,6 +6,10 @@ import time
 parameter_set_str = ''
 
 ################################################################################
+# GLOBAL MODULE VARIABLES
+solver = 'ED'
+
+################################################################################
 # EXCEPTIONS
 
 class OutOfBoundsError(Exception):
@@ -295,16 +299,31 @@ def cluster_info():
 
 
 ################################################################################
-def cluster_hopping_matrix(clus=0, spin_down=False, label=0):
+def cluster_hopping_matrix(clus=0, spin_down=False, label=0, full=0):
     """
     returns the one-body matrix of cluster no i for instance 'label'
 
     :param cluster: label of the cluster (0 to the number of clusters - 1)
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
+    :param boolean full: if True, returns the full hopping matrix, including bath
     :return: a complex-valued matrix
     """
-    return qcm.cluster_hopping_matrix(clus, spin_down, label)
+    if full:
+        return qcm.hopping_matrix(spin_down, clus, True)
+    else:
+        return qcm.cluster_hopping_matrix(clus, spin_down, label)
+
+################################################################################
+def interaction_matrix(clus=0):
+    """
+    returns the one-body matrix of cluster no i for instance 'label'
+
+    :param cluster: label of the cluster (0 to the number of clusters - 1)
+    :return: a real-valued matrix
+    """
+    return qcm.interaction_matrix(clus)
+
 
 ################################################################################
 def CPT_Green_function(z, k, spin_down=False, label=0):
@@ -509,9 +528,12 @@ def new_model_instance(label=0, record=False):
     :return (class model_instance): an instance of the class `model_instance`
 
     """
-
+    global solver
     the_instance = model_instance(the_model, label)
     qcm.new_model_instance(label)
+    if solver=='dvmc':
+        import pyqcm.dvmc
+        pyqcm.dvmc.dvmc_solver()
 
     if record:
         params = parameter_set(True)

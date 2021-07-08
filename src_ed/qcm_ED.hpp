@@ -163,7 +163,11 @@ namespace ED{
   matrix<complex<double>> hopping_matrix(bool spin_down = false, const size_t label=0);
   matrix<complex<double>> hopping_matrix_full(bool spin_down = false, const size_t label=0);
   
-  
+  /**
+   function that evaluates the matrix of density-density interactions
+   */
+  matrix<double>interaction_matrix(const size_t label=0);
+
   
   /**
    function that evaluates the hybridization function (in case there is a bath)

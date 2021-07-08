@@ -18,6 +18,7 @@ Green_function(complex w, bool spin_down, int label = 0)
 cluster_averages(int label = 0)
 ground_state_solve(int label = 0)
 hopping_matrix(bool spin_down, int label = 0)
+interaction_matrix(int label = 0)
 hybridization_function(complex w, bool spin_down, int label = 0)
 mixing(int label = 0)
 model_size(string name)
@@ -43,6 +44,7 @@ static PyMethodDef methods[] = {
   { "cluster_averages", cluster_averages_python, METH_VARARGS, cluster_averages_help },
   { "ground_state_solve", ground_state_solve_python, METH_VARARGS, ground_state_solve_help},
   { "hopping_matrix", hopping_matrix_python, METH_VARARGS, hopping_matrix_help },
+  { "interaction_matrix", interaction_matrix_python, METH_VARARGS, interaction_matrix_help },
   { "hybridization", hybridization_python, METH_VARARGS, hybridization_help },
   { "hybridization_functionC", hybridization_functionC_python, METH_VARARGS, hybridization_functionC_help },
   { "matrix_elements", matrix_elements_python, METH_VARARGS, matrix_elements_help },
