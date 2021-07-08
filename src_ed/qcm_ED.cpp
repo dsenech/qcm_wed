@@ -220,9 +220,9 @@ namespace ED{
   {
     return model_instances.at(label)->hopping_matrix_full(spin_down);
   }
-  matrix<double> interaction_matrix(const size_t label)
+  vector<tuple<int,int,double>> interactions(const size_t label)
   {
-    return model_instances.at(label)->interaction_matrix();
+    return model_instances.at(label)->interactions();
   }
 
   

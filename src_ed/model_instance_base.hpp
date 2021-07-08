@@ -54,7 +54,7 @@ struct model_instance_base
   virtual matrix<Complex> Green_function_average(bool spin_down) = 0;
   virtual matrix<Complex> self_energy(const Complex &z, bool spin_down) = 0;
   virtual matrix<Complex> hopping_matrix(bool spin_down) = 0;
-  virtual matrix<double> interaction_matrix() = 0;
+  virtual vector<tuple<int,int,double>> interactions() = 0;
   virtual matrix<Complex> hopping_matrix_full(bool spin_down) = 0;
   virtual vector<Complex> susceptibility(shared_ptr<Hermitian_operator> h, const vector<Complex> &w) = 0;
   virtual matrix<Complex> hybridization_function(Complex w, bool spin_down) = 0;

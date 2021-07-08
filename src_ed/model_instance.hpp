@@ -62,7 +62,7 @@ struct model_instance : model_instance_base
   matrix<Complex>  self_energy(const Complex &z, bool spin_down = false);
   matrix<Complex>  hopping_matrix(bool spin_down = false);
   matrix<Complex>  hopping_matrix_full(bool spin_down = false);
-  matrix<double>   interaction_matrix();
+  vector<tuple<int,int,double>> interactions();
   matrix<Complex>  hybridization_function(Complex w, bool spin_down);
   vector<Complex>  susceptibility(shared_ptr<Hermitian_operator> h, const vector<Complex> &w);
   vector<pair<double,double>> susceptibility_poles(shared_ptr<Hermitian_operator> h);
@@ -1026,14 +1026,15 @@ matrix<Complex> model_instance<HilbertField>::hopping_matrix_full(bool spin_down
 
 
 template<typename HilbertField>
-matrix<double> model_instance<HilbertField>::interaction_matrix()
+vector<tuple<int,int,double>> model_instance<HilbertField>::interactions()
 {
-  matrix<double> V(2*the_model->n_sites);
+  vector<tuple<int,int,double>> V;
+  V.reserve(the_model->n_sites);
   for(auto& x : value){
     if(the_model->term.at(x.first)->is_interaction){
       auto elem = the_model->term.at(x.first)->matrix_elements();
       for(auto& y : elem){
-        V(y.r, y.c) += y.v.real()*x.second;
+        V.push_back(tuple<int,int,double>(y.r, y.c, y.v.real()*x.second));
       }
     }
   }

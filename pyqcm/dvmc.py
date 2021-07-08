@@ -4,7 +4,8 @@ import numpy as np
 def dvmc_solver():
     # printing the model data in a file
     np.savetxt('hopping.def', pyqcm.cluster_hopping_matrix(full=True), delimiter='\t', fmt='%1.6g', comments='')
-    np.savetxt('interaction.def', pyqcm.interaction_matrix(), delimiter='\t', fmt='%1.6g', comments='')
+    I = np.array(pyqcm.interactions())
+    np.savetxt('interaction.def', I, delimiter='\t', fmt='%1.6g', comments='')
 
     # calling the dvmc solver
     print('Here the DVMC solver is called...')

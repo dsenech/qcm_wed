@@ -166,7 +166,7 @@ namespace ED{
   /**
    function that evaluates the matrix of density-density interactions
    */
-  matrix<double>interaction_matrix(const size_t label=0);
+  vector<tuple<int,int,double>> interactions(const size_t label=0);
 
   
   /**

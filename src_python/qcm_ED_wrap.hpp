@@ -263,37 +263,36 @@ static PyObject* hopping_matrix_python(PyObject *self, PyObject *args)
   return out;
 }
 //==============================================================================
-const char* interaction_matrix_help =
+const char* interactions_help =
 R"(
 Computes the hopping matrix of the model
 arguments:
-1. True for the spin down sector (optional)
-2. label of model_instance (optional, default=0)
+1. label of model_instance (optional, default=0)
 returns:
-The hopping matrix
+The list of density-density interactions
 )";
 //------------------------------------------------------------------------------
-static PyObject* interaction_matrix_python(PyObject *self, PyObject *args)
+static PyObject* interactions_python(PyObject *self, PyObject *args)
 {
   int label=0;
   
   try{
     if(!PyArg_ParseTuple(args, "|i", &label))
-      qcm_ED_throw("failed to read parameters in call to interaction_matrix (python)");
+      qcm_ED_throw("failed to read parameters in call to interactions (python)");
   } catch(const string& s) {qcm_ED_catch(s);}
   
-  size_t d;
-  vector<double> g;
-  g = ED::interaction_matrix((size_t)label).v;
-  d = (size_t)sqrt(g.size());
-  
-  npy_intp dims[2];
-  dims[0] = dims[1] = d;
-  
-  PyObject *out = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
-  memcpy(PyArray_DATA((PyArrayObject*) out), g.data(), g.size()*sizeof(double));
-  PyArray_ENABLEFLAGS((PyArrayObject*) out, NPY_ARRAY_OWNDATA);
-  return out;
+  auto E = ED::interactions((size_t)label);  
+  PyObject *lst = PyList_New(E.size());
+  for(size_t i=0; i< E.size(); i++){
+    PyObject* elem = PyTuple_New(3);
+    PyTuple_SetItem(elem, 0, Py_BuildValue("i", get<0>(E[i])));
+    PyTuple_SetItem(elem, 1, Py_BuildValue("i", get<1>(E[i])));
+    PyTuple_SetItem(elem, 2, Py_BuildValue("d", get<2>(E[i])));
+    PyList_SET_ITEM(lst, i, elem);
+  }
+
+  return Py_BuildValue("O", lst);
+
 }
 //==============================================================================
 const char* hybridization_functionC_help =

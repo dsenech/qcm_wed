@@ -315,14 +315,14 @@ def cluster_hopping_matrix(clus=0, spin_down=False, label=0, full=0):
         return qcm.cluster_hopping_matrix(clus, spin_down, label)
 
 ################################################################################
-def interaction_matrix(clus=0):
+def interactions(clus=0):
     """
     returns the one-body matrix of cluster no i for instance 'label'
 
     :param cluster: label of the cluster (0 to the number of clusters - 1)
     :return: a real-valued matrix
     """
-    return qcm.interaction_matrix(clus)
+    return qcm.interactions(clus)
 
 
 ################################################################################
