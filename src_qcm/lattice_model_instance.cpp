@@ -146,8 +146,6 @@ void lattice_model_instance::build_H()
   
   // building the cluster one-body matrices
   build_cluster_H();
-  
-  gf_solved = true;
 }
 
 //==============================================================================
@@ -212,12 +210,12 @@ void lattice_model_instance::build_cluster_H()
  @param spin_down [in] true if we are asking for the spin down part (mixing = 4)
  @returns a complex-valued matrix containing the cluster Green function
  */
-matrix<complex<double>> lattice_model_instance::cluster_Green_function(size_t i, complex<double> w, bool spin_down)
+matrix<complex<double>> lattice_model_instance::cluster_Green_function(size_t i, complex<double> w, bool spin_down, bool blocks)
 {
   if(i >= model->clusters.size()) qcm_throw("cluster label out of range");
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
   int I = n_clus*label+model->clusters[i].ref;
-  matrix<Complex> g = ED::Green_function(w, spin_down, I);
+  matrix<Complex> g = ED::Green_function(w, spin_down, I, blocks);
   matrix<Complex> G;
   int mix = model->clusters[i].mixing;
   if(model->mixing == mix){
@@ -230,7 +228,7 @@ matrix<complex<double>> lattice_model_instance::cluster_Green_function(size_t i,
   }
   // combinaisons 0:1, 0:3, 0:5, 2:3
   else if((model->mixing&1) == 1 and (mix&1) == 0){
-    auto gm = ED::Green_function(-w, false, I);
+    auto gm = ED::Green_function(-w, false, I, blocks);
     G = upgrade_cluster_matrix_anomalous(model->mixing, mix, g, gm);
   }
   else{
@@ -250,7 +248,7 @@ matrix<complex<double>> lattice_model_instance::cluster_Green_function(size_t i,
 matrix<complex<double>> lattice_model_instance::cluster_self_energy(size_t i, complex<double> w, bool spin_down)
 {
   if(i >= model->clusters.size()) qcm_throw("cluster label out of range");
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
   int I = n_clus*label+model->clusters[i].ref;
   matrix<Complex> g = ED::self_energy(w, spin_down, I);
   int mix = model->clusters[i].mixing;
@@ -344,7 +342,7 @@ matrix<complex<double>> lattice_model_instance::cluster_hopping_matrix(size_t i,
  */
 void lattice_model_instance::cluster_self_energy(Green_function& G)
 {
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
 	G.sigma.block.assign(n_clus, matrix<Complex>());
   for(size_t i = 0; i<n_clus; i++){
     auto S =  cluster_self_energy(i, G.w, G.spin_down);
@@ -364,7 +362,7 @@ void lattice_model_instance::cluster_self_energy(Green_function& G)
  */
 Green_function lattice_model_instance::cluster_Green_function(Complex w, bool sig, bool spin_down)
 {
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
 	Green_function G;
 	G.w = w;
 	G.spin_down = spin_down;
@@ -401,7 +399,7 @@ Green_function lattice_model_instance::cluster_Green_function(Complex w, bool si
 double lattice_model_instance::Potthoff_functional()
 {
   if(SEF_solved) return omega;
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
 	
 	double omega_clus=0.0;
 	for(size_t i=0; i<n_clus; i++){

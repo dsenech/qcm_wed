@@ -191,9 +191,9 @@ namespace ED{
   
   
   
-  matrix<complex<double>> Green_function(const Complex &z, bool spin_down, const size_t label)
+  matrix<complex<double>> Green_function(const Complex &z, bool spin_down, const size_t label, bool blocks)
   {
-    return model_instances.at(label)->Green_function(z, spin_down);
+    return model_instances.at(label)->Green_function(z, spin_down, blocks);
   }
 
   
@@ -258,7 +258,7 @@ namespace ED{
 
     if(!M.is_correlated) qcm_throw("The Potthoff functional cannot be computed in the noninteracting case!");
 
-    if(!M.gf_solved) M.Green_function_solve();
+    M.Green_function_solve();
     return M.SEF_bath + M.E0;
   }
   

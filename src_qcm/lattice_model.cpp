@@ -247,9 +247,9 @@ void lattice_model::add_anomalous_elements(vector<lattice_matrix_element>& E, in
 /**
  consolidates some model data after reading the operators
  */
-void lattice_model::close_model()
+void lattice_model::close_model(bool force)
 {
-  if(is_closed) return;
+  if(is_closed and !force) return;
   is_closed = true;
 
   // adjusting the norms of all operators defined so that they are mulitplied by 1/L

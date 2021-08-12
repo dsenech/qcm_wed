@@ -26,6 +26,7 @@ destruction_operator<double>::destruction_operator(shared_ptr<ED_mixed_basis> _B
     }
   }
   consolidate();
+  
 }
 
 
@@ -44,13 +45,21 @@ destruction_operator<Complex>::destruction_operator(shared_ptr<ED_mixed_basis> _
   for(uint32_t I=0; I<B->dim; ++I){
     auto R = group->Representative(B->bin(I), B->sec.irrep); // just to get 'length'
     for(int site=0; site < group->n_sites; ++site){
-      if(group->S(orb.label,site) == Complex(0.0)) continue;
+      // if(group->S(orb.label,site) == Complex(0.0)) continue;
       auto P = Destroy(site + orb.spin*n, I, *B, *T);
       if(!get<3>(P)) continue;
       get<1>(P) = get<1>(P)%(2*group->g);
-      Complex X = group->phaseC[get<1>(P)] * group->S(orb.label,site) * sqrt((1.0*R.length)/get<2>(P));
+      Complex X = group->phaseC[get<1>(P)] * conjugate(group->S(orb.label,site)) * sqrt((1.0*R.length)/get<2>(P)); // CHANGE 
+      // Complex X = group->phaseC[get<1>(P)] * group->S(orb.label,site) * sqrt((1.0*R.length)/get<2>(P));
       insert(X, get<0>(P), I);
     }
   }
   consolidate();
+
+  // if (console::level > 6){
+  //   matrix<Complex> C(r, c);
+  //   dense_form(C, 1.0);
+  //   cout << C << endl;
+  //   cout << "from basis B \n" << *_B << "\nto basis T:\n" << *_T << endl;
+  // }
 }

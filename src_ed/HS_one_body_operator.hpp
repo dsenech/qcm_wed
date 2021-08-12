@@ -29,7 +29,7 @@ struct HS_one_body_operator : HS_nondiagonal_operator<HS_field>
           size_t J = this->B->index(Rp.b); // finds the index of the 'out' state
           if(J==this->B->dim) continue; // not a valid state in this representation
           X = group->phaseX<HS_field>(Rp.phase) * fold_type<HS_field, op_field>(x.v) * (pauli_phase * sqrt((1.0*R.length)/Rp.length));
-          this->insert(I,J,X); // inserts in the sparse matrix
+          this->insert(J,I,X); // inserts in the sparse matrix CHANGED I <--> J  on 2021-08-12
                               // no need to add the Hermitean conjugate here, this is done in t
         }
         else if(ss.b&binary_state::mask(x.r,n)) this->insert(I, I, real(x.v)); // diagonal case

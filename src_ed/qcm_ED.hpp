@@ -32,7 +32,7 @@ namespace ED{
    gen : array of the generators of the symmetry group of the system
    bath_irrep : if true, the labels in 'gen', for the bath section, are irrep labels for each bath instead of permutations of bath labels
    */
-  void new_model(const string &name, const size_t n_sites, const size_t n_bath, const vector<vector<int>> &gen, bool bath_irrep=false);
+  void new_model(const string &name, const size_t n_sites, const size_t n_bath, const vector<vector<int>> &gen, bool bath_irrep);
   
   
   
@@ -78,19 +78,19 @@ namespace ED{
   sec : The sectors of Hilbert space to build the Hamiltonian(s) upon (in string format).
   label : label of the instance (globally, not only for the model in question)
    */
-  void new_model_instance(const string &model_name, map<string, double> &param, const string &sec, size_t label=0);
+  void new_model_instance(const string &model_name, map<string, double> &param, const string &sec, size_t label);
   
   
   /**
    function that returns the mixing state of the instance
    0: normal, 1: anomalous, 2: spin-flip, 3:anomalous and spin-flip, 4: up and down spin separate
    */
-  int mixing(size_t label=0);
+  int mixing(size_t label);
   
   /**
    function that returns 1 if the Hilbert space is complex, 0 if it is real
    */
-  bool complex_HS(size_t label=0);
+  bool complex_HS(size_t label);
   
   
   
@@ -100,7 +100,7 @@ namespace ED{
    label : label of the model instance to solve
    output : ground state energy and a string representing the sector information
    */
-  pair<double, string> ground_state_solve(size_t label=0);
+  pair<double, string> ground_state_solve(size_t label);
   
   
   
@@ -109,7 +109,7 @@ namespace ED{
    label : label of the model instance
    output : array of string/double pairs : name and ground state average of the operators of the model
    */
-  vector<tuple<string,double,double>> cluster_averages(size_t label=0);
+  vector<tuple<string,double,double>> cluster_averages(size_t label);
   
   
   
@@ -118,7 +118,7 @@ namespace ED{
    function that solves for the re-usable representation of the one-body Green function.
    label : label of the model instance to solve (in case there are many)
    */
-  void Green_function_solve(size_t label=0);
+  void Green_function_solve(size_t label);
   
   
   
@@ -127,10 +127,12 @@ namespace ED{
    z : complex frequency
    spin_down : true if we want the spin-down sector (if the mixing=4)
    label : label of the model instance (in case there are many)
+   blocks : true if we want the Green function in the original symmetry basis
    output : the Green function matrix
    */
-  matrix<complex<double>> Green_function(const complex<double> &z, bool spin_down = false, const size_t label=0);
-  
+  // matrix<complex<double>> Green_function(const complex<double> &z, bool spin_down = false, const size_t label, bool blocks = false);
+   matrix<complex<double>> Green_function(const complex<double> &z, bool spin_down, const size_t label, bool blocks);
+ 
   
   /**
    function that evaluates the one-body Green function integrated around the negative real axis
@@ -138,8 +140,8 @@ namespace ED{
    label : label of the model instance (in case there are many)
    output : the integrated Green function matrix
    */
-  matrix<complex<double>> Green_function_average(bool spin_down = false, const size_t label=0);
-  
+  matrix<complex<double>> Green_function_average(bool spin_down, const size_t label);
+
   
   
   
@@ -150,7 +152,7 @@ namespace ED{
    label : label of the model instance (in case there are many)
    output : the self-energy matrix
    */
-  matrix<complex<double>> self_energy(const complex<double> &z, bool spin_down = false, const size_t label=0);
+  matrix<complex<double>> self_energy(const complex<double> &z, bool spin_down, const size_t label);
 
   
   
@@ -160,13 +162,13 @@ namespace ED{
    label : label of the model instance (in case there are many)
    output : the hopping matrix
    */
-  matrix<complex<double>> hopping_matrix(bool spin_down = false, const size_t label=0);
-  matrix<complex<double>> hopping_matrix_full(bool spin_down = false, const size_t label=0);
+  matrix<complex<double>> hopping_matrix(bool spin_down, const size_t label);
+  matrix<complex<double>> hopping_matrix_full(bool spin_down, const size_t label);
   
   /**
    function that evaluates the matrix of density-density interactions
    */
-  vector<tuple<int,int,double>> interactions(const size_t label=0);
+  vector<tuple<int,int,double>> interactions(const size_t label);
 
   
   /**
@@ -176,8 +178,8 @@ namespace ED{
    label : label of the model instance (in case there are many)
    output : the hybridization function matrix
    */
-  matrix<complex<double>> hybridization_function(const complex<double> w, bool spin_down = false, const size_t label=0);
-  
+  matrix<complex<double>> hybridization_function(const complex<double> w, bool spin_down, const size_t label);
+
   
   
   
@@ -188,7 +190,7 @@ namespace ED{
    label : label of the model instance (in case there are many)
    output : the corresponding values of the dynamic susceptibility
    */
-  vector<complex<double>> susceptibility(const string &op, const vector<complex<double>> &w, const size_t label=0);
+  vector<complex<double>> susceptibility(const string &op, const vector<complex<double>> &w, const size_t label);
   
   
   
@@ -199,7 +201,7 @@ namespace ED{
    label : label of the model instance (in case there are many)
    output : array of pole/residue pairs
    */
-  vector<pair<double,double>> susceptibility_poles(const string &op, const size_t label=0);
+  vector<pair<double,double>> susceptibility_poles(const string &op, const size_t label);
   
   
   
@@ -208,7 +210,7 @@ namespace ED{
    function that evaluates the contribution of the cluster ground states and bath to the Potthoff functional
    label : label of the model instance (in case there are many)
    */
-  double Potthoff_functional(const size_t label=0);
+  double Potthoff_functional(const size_t label);
   
   
   
@@ -219,7 +221,7 @@ namespace ED{
    label : label of the model instance (in case there are many)
    output : a size_t
    */
-  size_t Green_function_dimension(size_t label=0);
+  size_t Green_function_dimension(size_t label);
   
   
   
@@ -238,7 +240,7 @@ namespace ED{
    computes the asymptotic values of the trace of the self-energy (taking into account Nambu signs)
    label : label of the model instance (in case there are many)
    */
-  double tr_sigma_inf(const size_t label=0);
+  double tr_sigma_inf(const size_t label);
   
   
   /**
@@ -246,7 +248,7 @@ namespace ED{
    fout : output stream
    label : label of the model instance (in case there are many)
    */
-  void write_instance(ostream& fout, int label=0);
+  void write_instance(ostream& fout, int label);
     
 
   /**
@@ -254,7 +256,7 @@ namespace ED{
    fin : input stream
    label : label of the model instance (in case there are many)
    */
-  void read_instance(istream& fin, int label=0);
+  void read_instance(istream& fin, int label);
 
   
   
@@ -282,7 +284,7 @@ namespace ED{
    spin_down : true if we want the spin-down sector (if the mixing=4)
    label : label of the model instance (in case there are many)
    */
-  pair<vector<double>, vector<complex<double>>> qmatrix(bool spin_down=false, const size_t label=0);
+  pair<vector<double>, vector<complex<double>>> qmatrix(bool spin_down, const size_t label);
 
 
   /**
@@ -290,7 +292,7 @@ namespace ED{
    spin_down : true if we want the spin-down sector (if the mixing=4)
    label : label of the model instance (in case there are many)
    */
-  pair<vector<double>, vector<complex<double>>> hybridization(bool spin_down=false, const size_t label=0);
+  pair<vector<double>, vector<complex<double>>> hybridization(bool spin_down, const size_t label);
 
 
   void w_integral(function<void (Complex w, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy);

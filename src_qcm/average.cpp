@@ -15,7 +15,7 @@ double tr_sigma_inf(0.0);
 vector<pair<string,double>> lattice_model_instance::averages(bool print)
 {
   if(average_solved) return ave;
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
   double accur_OP = global_double("accur_OP");
   bool periodized_averages = global_bool("periodized_averages");
 
@@ -189,7 +189,7 @@ void lattice_model_instance::average_integrand_per(Complex w, vector3D<double> &
 vector<double> lattice_model_instance::dos(const complex<double> w)
 {
   double accur_OP = global_double("accur_OP");
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
 
   size_t D_dim = model->n_band;
   size_t d = D_dim;
@@ -243,17 +243,9 @@ double lattice_model_instance::spectral_average(const string& name, const comple
   
   lattice_operator op = *model->term.at(name);
   
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
   
   Green_function G = cluster_Green_function(w, false, false);
-  // G.w = w;
-  // G.spin_down = false;
-  // G.G.block.assign(n_clus, matrix<Complex>());
-  // for(size_t i = 0; i<n_clus; i++){
-  //   G.G.block[i] = matrix<Complex>(model->GF_dims[i], ED::Green_function(w, false, n_clus*label+model->clusters[i].ref));
-  // }
-  // G.G.set_size();
-
 
   auto F = [this, op, G] (vector3D<double> &k, const int *nv, double *I) mutable {
     for(size_t i = 0 ; i<*nv; i++) I[i] = 0.0;
@@ -275,7 +267,7 @@ double lattice_model_instance::spectral_average(const string& name, const comple
     G_down.spin_down = true;
     G_down.G.block.assign(n_clus, matrix<Complex>());
     for(size_t i = 0; i<n_clus; i++){
-      G_down.G.block[i] = matrix<Complex>(model->GF_dims[i], ED::Green_function(w, true, n_clus*label+model->clusters[i].ref));
+      G_down.G.block[i] = matrix<Complex>(model->GF_dims[i], ED::Green_function(w, true, n_clus*label+model->clusters[i].ref, false));
     }
     G_down.G.set_size();
     
@@ -412,7 +404,7 @@ vector<double> lattice_model_instance::momentum_profile_per(const lattice_operat
 double lattice_model_instance::potential_energy()
 {
   double accur_OP = global_double("accur_OP");
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
  
   console::message(3, "computing the potential energy");
   // computing the infinite frequency limit

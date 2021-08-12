@@ -34,8 +34,8 @@ struct HS_anomalous_operator : HS_nondiagonal_operator<HS_field>
         size_t J = this->B->index(Rp.b); // finds the index of the 'out' state
         if(J==this->B->dim) continue; // not a valid state in this representation
         X = 2.0 * group->phaseX<HS_field>(Rp.phase) * fold_type<HS_field, op_field>(x.v) * (pauli_phase * sqrt((1.0*R.length)/Rp.length));; // 2.0 because of the transpose of the antisymmetric delta
-        this->insert(I,J,X);
-        this->insert(J,I,conjugate(X)); // hermitian conjugate
+        this->insert(J,I,X);
+        this->insert(I,J,conjugate(X)); // hermitian conjugate
       }
     }
     this->sort_elements(); // sorting the elements for faster application/translation into CSR matrix

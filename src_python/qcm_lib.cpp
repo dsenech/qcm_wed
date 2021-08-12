@@ -48,6 +48,7 @@ static PyMethodDef methods[] = {
   { "write_instance", write_instance_python, METH_VARARGS, write_instance_help },
 //-------------------- QMC --------------------------------------------------------------
   { "add_cluster", add_cluster_python, METH_VARARGS, add_cluster_help },
+  { "switch_cluster_model", switch_cluster_model_python, METH_VARARGS, switch_cluster_model_help },
   { "anomalous_operator", (PyCFunction)anomalous_operator_python, METH_VARARGS | METH_KEYWORDS, anomalous_operator_help },
   { "averages", averages_python, METH_VARARGS, averages_help },
   { "band_Green_function", band_Green_function_python, METH_VARARGS, band_Green_function_help },

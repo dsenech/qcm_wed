@@ -284,7 +284,10 @@ void symmetry_group::build()
       if(abs(sin(phase)) > 1e-12) complex_irrep[i] = true;
     }
   }
-  
+
+  // if(console::level>5) cout << "phases in the character table:\n" << phi << endl;
+
+
   //..............................................................................
   // Constructing the transformation matrix for symmetric orbitals
   
@@ -315,6 +318,7 @@ void symmetry_group::build()
     site_irrep_dim[irrep] = n_sym_orb_in_irrep;
     if(irrep>0) site_irrep_dim_cumul[irrep] = site_irrep_dim_cumul[irrep-1] + n_sym_orb_in_irrep;
   }
+  if(console::level>5) cout << "symmetric orbitals:\n" << S << endl;
   
   if(n_sym_orb != n_sites){
     qcm_ED_throw("Problem with construction of symmetric orbitals: "
@@ -334,6 +338,7 @@ void symmetry_group::build()
       tensor(r1,r2) = index(r1,r2); // group or representation product
     }
   }
+  if(console::level>5) cout << "Symmetry tensor products:\n" << tensor << endl;
   //..............................................................................
   // identifying the conjugate irreps
   
@@ -351,6 +356,7 @@ void symmetry_group::build()
       }
     }
   }
+  if(console::level>5) cout << "Symmetry conjugate representations:\n" << conjugate << endl;
 
   //..............................................................................
   // precomputing the phases

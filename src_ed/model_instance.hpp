@@ -57,7 +57,7 @@ struct model_instance : model_instance_base
   pair<double, double> cluster_averages(shared_ptr<Hermitian_operator> h);
   void Green_function_solve();
   pair<double, string> one_body_solve();
-  matrix<Complex>  Green_function(const Complex &z, bool spin_down = false);
+  matrix<Complex>  Green_function(const Complex &z, bool spin_down = false, bool blocks = false);
   matrix<Complex>  Green_function_average(bool spin_down);
   matrix<Complex>  self_energy(const Complex &z, bool spin_down = false);
   matrix<Complex>  hopping_matrix(bool spin_down = false);
@@ -409,10 +409,10 @@ void model_instance<HilbertField>::Green_function_solve()
  Evaluates the Green function matrix g (column-order format) at complex frequency z
  */
 template<typename HilbertField>
-matrix<complex<double>> model_instance<HilbertField>::Green_function(const Complex &z, bool spin_down)
+matrix<complex<double>> model_instance<HilbertField>::Green_function(const Complex &z, bool spin_down, bool blocks)
 {
   if(spin_down and !(mixing&HS_mixing::up_down)) qcm_ED_throw("spin_down=True impossible with Hilbert space mixing "+to_string(mixing));
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
 
   block_matrix<Complex> gf_block_matrix(the_model->group->site_irrep_dim*n_mixed);
   if(spin_down and mixing&HS_mixing::up_down){
@@ -438,6 +438,9 @@ matrix<complex<double>> model_instance<HilbertField>::Green_function(const Compl
     }
     if(the_model->n_bath) G.v -= H;
     G.inverse();
+  }
+  else if(blocks){
+    G = gf_block_matrix.build_matrix();
   }
   else{
     the_model->group->to_site_basis(gf_block_matrix, G, n_mixed);
@@ -511,6 +514,9 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
   Q_matrix_set<HilbertField> Qm(the_model->group, mixing);
   Q_matrix_set<HilbertField> Qp(the_model->group, mixing);
 
+   console::message(3, "\ncomputing Q-matrix for state of energy "+to_string(Omega.energy)+" in sector "+Omega.sec.name());
+   if(spin_down) console::message(3, "spin down part");
+ 
   // building the Q matrices
   int ns = 2*sym_orb.size();
   #pragma omp parallel for
@@ -540,7 +546,7 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     Qtmp.e -= Omega.energy; // adjust the eigenvalues by adding/subtracting the GS energy
     if(pm == -1){
       Qtmp.e *= -1.0;
-      Qtmp.v.cconjugate();
+      // Qtmp.v.cconjugate(); // CHANGE
     }
     Qtmp.streamline();
     if(pm==-1) 
@@ -558,6 +564,61 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     Q->q[r].check_norm(global_double("accur_Q_matrix"));
     Q->q[r].v.v *= sqrt(Omega.weight);
   }
+  if(console::level>5) cout << "Q-matrix:\n" << *Q << endl; // TEMPO
+
+//??????????????????????????????????????????????????????????????????????????????????????
+// CHECKING ANTICOMMUTATION RELATIONS TO CHECK THE VALIDITY OF THE DESTRUCTION OPERATORS
+  // for(int r=0; r<sym_orb.size(); r++){
+  //   int spin = (spin_down)? 1:sym_orb[r][0].spin;
+  //   sector target_sec = the_model->group->shift_sector(Omega.sec, 1, spin, r);
+  //   vector<vector<HilbertField>> phi(sym_orb[r].size());
+  //   vector<state<HilbertField>> phi2(sym_orb[r].size()); // TEMPO
+  //   int dim_target;
+  //   for(size_t i=0; i< sym_orb[r].size(); i++){
+  //     vector<HilbertField> Om2(Omega.psi.size());
+  //     symmetric_orbital sorb = sym_orb[r][i];
+  //     if(spin_down) sorb.spin =1;
+  //     the_model->create_or_destroy(1, sorb, Omega, phi[i], HilbertField(1.0));
+  //     dim_target = phi[i].size();
+  //     phi2[i] = state<HilbertField>(target_sec, phi[i].size()); phi2[i].psi = phi[i]; // TEMPO
+  //     the_model->create_or_destroy(-1, sorb, phi2[i], Om2, HilbertField(1.0));// TEMPO
+  //     sector target_sec2 = the_model->group->shift_sector(Omega.sec, -1, spin, r);
+  //     to_zero(phi[i]);
+  //     the_model->create_or_destroy(-1, sorb, Omega, phi[i], HilbertField(1.0));// TEMPO
+  //     phi2[i] = state<HilbertField>(target_sec2, phi[i].size()); phi2[i].psi = phi[i]; // TEMPO
+  //     the_model->create_or_destroy(1, sorb, phi2[i], Om2, HilbertField(1.0));// TEMPO
+  //     cout << "check : " << Om2 * Omega.psi << endl;
+  //   }
+
+
+  //   // destruction_identifier D(Omega.sec, sym_orb[r][0]);
+  //   // matrix<Complex> C1(the_model->destruction_complex.at(D)->r, the_model->destruction_complex.at(D)->c);
+  //   // the_model->destruction_complex.at(D)->dense_form(C1, 1.0);
+  //   // matrix<Complex> C1d(C1);
+  //   // C1d.hermitian_conjugate();
+
+  //   // sector target_sec2 = the_model->group->shift_sector(Omega.sec,-1, spin, r);
+  //   // D = destruction_identifier(target_sec2, sym_orb[r][0]);
+  //   // matrix<Complex> C2(the_model->destruction_complex.at(D)->r, the_model->destruction_complex.at(D)->c);
+  //   // the_model->destruction_complex.at(D)->dense_form(C2, 1.0);
+  //   // matrix<Complex> C2d(C2);
+  //   // C2d.hermitian_conjugate();
+
+
+  //   // matrix<Complex> anticom1(C1.r);
+  //   // matrix<Complex> anticom2(C2.c);
+
+  //   // anticom1.product(C1,C1d);
+  //   // anticom2.product(C2d,C2);
+  //   // anticom1.v += anticom2.v;
+  //   // cout << "anticommutator:\n" << anticom1 << endl;
+
+  // }
+  
+
+
+//??????????????????????????????????????????????????????????????????????????????????????
+
 }
 
 
@@ -899,7 +960,7 @@ string model_instance<HilbertField>::GS_string() const
 template<typename HilbertField>
 void model_instance<HilbertField>::write(ostream& fout)
 {
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
   
   // writing the info line
   // fout << "cluster: " << the_model->name << '\n';
@@ -958,7 +1019,7 @@ template<typename HilbertField>
 pair<vector<double>, vector<complex<double>>> model_instance<HilbertField>::qmatrix(bool spin_down)
 {
   if(GF_solver != GF_format_BL) qcm_ED_throw("Green function format is not Lehmann! Cannot output the Q matrix.");
-  if(!gf_solved) Green_function_solve();
+  Green_function_solve();
   if(states.size() > 1)  qcm_ED_throw("The ground state is not a pure state! Cannot output the Q matrix.");
   shared_ptr<Green_function_set> gf;
   if(spin_down) gf = (*states.begin())->gf_down;

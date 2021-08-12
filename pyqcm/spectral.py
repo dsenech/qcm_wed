@@ -43,19 +43,19 @@ def __frequency_array(wmax=6.0, eta=0.05):
 
 
 ################################################################################
-def __kgrid(ax, nk, quadrant=False, k_perp=0.0, plane='xy'):
+def __kgrid(ax, nk, quadrant=False, k_perp=0.0, plane='xy', size=1.0):
 
     if quadrant:
-        orig = np.array([0.0, 0.0, 0.0])
-        k = pyqcm.wavevector_grid(nk, orig, 1.0, k_perp, plane)
+        orig = np.array([0.5*(1-size), 0.5*(1-size), 0.0])
+        k = pyqcm.wavevector_grid(nk, orig, size, k_perp, plane)
         ax.set_xticks((0, 0.5, 1))
         ax.set_yticks((0, 0.5, 1))
         ax.set_xticklabels(('$0$', '$\pi/2$', '$\pi$'))
         ax.set_yticklabels(('$0$', '$\pi/2$', '$\pi$'))
         x = np.linspace(0, 1, nk)
     else:
-        orig = np.array([-1.0, -1.0, 0.0])
-        k = pyqcm.wavevector_grid(nk, orig, 2.0, k_perp, plane)
+        orig = np.array([-size, -size, 0])
+        k = pyqcm.wavevector_grid(nk, orig, size*2, k_perp, plane)
         ax.set_xticks((-1, 0, 1))
         ax.set_yticks((-1, 0, 1))
         ax.set_xticklabels(('$-\pi$', '$0$', '$\pi$'))
@@ -227,7 +227,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
 
 
 ################################################################################
-def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, self=False, spin_down=False, file=None, plt_ax=None, **kwargs):
+def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, self=False, spin_down=False, blocks=False, file=None, plt_ax=None, **kwargs):
     """Plots the spectral function of the cluster in the site basis
     
     :param float  wmax: the frequency range is from -wmax to wmax
@@ -238,6 +238,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     :param boolean full: if True, plots off diagonal components as well
     :param boolean self: if True, plots the self-energy instead of the spectral function
     :param boolean spin_down: if True, plots the spin down part, if different
+    :param boolean blocks: if True, gives the GF in the symmetry basis (block diagonal)
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
     :param kwargs: keyword arguments passed to the matplotlib 'plot' function
@@ -270,7 +271,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
         if self:
             g = pyqcm.cluster_self_energy(clus, w[i], spin_down, label)
         else:
-            g = pyqcm.cluster_Green_function(clus, w[i], spin_down, label)
+            g = pyqcm.cluster_Green_function(clus, w[i], spin_down, label, blocks)
         if full:
             l = 0
             for j in range(d):
@@ -461,7 +462,7 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
 
 
 ################################################################################
-def mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='GF', k_perp = 0, freq = 0.0, max=None, plane = 'xy', band_basis=False, file=None, plt_ax=None, **kwargs):
+def mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='GF', k_perp = 0, freq = 0.0, max=None, plane = 'xy', size=1.0, band_basis=False, file=None, plt_ax=None, **kwargs):
     """Plots the spectral weight at zero frequency in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
@@ -474,6 +475,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='GF', k_perp = 
     :param float freq: frequency at which the spectral function is computed (0 by default)
     :param float max: maximum value of the plotting range (if None, maximum of the data)
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
+    :param float size: size of the plot, in multiple of the default (2 pi on the side)
     :param band_basis: uses the band basis instead of the orbital basis (for multiband models)
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
@@ -490,7 +492,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='GF', k_perp = 
         ax = plt_ax
     ax.set_aspect(1)
 
-    k, x = __kgrid(ax, nk, quadrant=quadrant, k_perp=k_perp, plane=plane)
+    k, x = __kgrid(ax, nk, quadrant=quadrant, k_perp=k_perp, plane=plane, size=size)
 
     # reserves space for the spectral function
     A = np.zeros(nk * nk)

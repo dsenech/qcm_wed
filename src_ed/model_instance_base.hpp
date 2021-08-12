@@ -50,7 +50,7 @@ struct model_instance_base
   virtual pair<double, double> cluster_averages(shared_ptr<Hermitian_operator> h) = 0;
   virtual void Green_function_solve() = 0;
   virtual pair<double, string> one_body_solve() = 0;
-  virtual matrix<Complex> Green_function(const Complex &z, bool spin_down) = 0;
+  virtual matrix<Complex> Green_function(const Complex &z, bool spin_down, bool blocks) = 0;
   virtual matrix<Complex> Green_function_average(bool spin_down) = 0;
   virtual matrix<Complex> self_energy(const Complex &z, bool spin_down) = 0;
   virtual matrix<Complex> hopping_matrix(bool spin_down) = 0;

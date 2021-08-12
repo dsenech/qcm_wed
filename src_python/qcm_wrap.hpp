@@ -61,6 +61,28 @@ static PyObject* add_cluster_python(PyObject *self, PyObject *args)
 }
 
 //==============================================================================
+const char* switch_cluster_model_help =
+R"{(
+Adds a cluster to the repeated unit
+arguments:
+1. name of new cluster model (string)
+returns: None
+){";
+//------------------------------------------------------------------------------
+static PyObject* switch_cluster_model_python(PyObject *self, PyObject *args)
+{
+  char* s1 = nullptr;
+  
+  try{
+    if(!PyArg_ParseTuple(args, "s", &s1))
+      qcm_throw("failed to read parameters in call to lattice_model (python)");
+  
+    QCM::switch_cluster_model(string(s1));
+  } catch(const string& s) {qcm_catch(s);}
+  return Py_BuildValue("");
+}
+
+//==============================================================================
 const char* averages_help =
 R"{(
 returns the average values of all operators in a model instance.
@@ -195,17 +217,18 @@ static PyObject* cluster_Green_function_python(PyObject *self, PyObject *args)
   int label=0;
   int clus;
   int spin_down=0;
+  int blocks=0;
   complex<double> z;
   
   try{
-    if(!PyArg_ParseTuple(args, "iD|ii", &clus, &z, &spin_down, &label))
+    if(!PyArg_ParseTuple(args, "iD|iii", &clus, &z, &spin_down, &label, &blocks))
       qcm_throw("failed to read parameters in call to cluster_Green_function (python)");
   } catch(const string& s) {qcm_catch(s);}
   
   size_t d;
   matrix<complex<double>> g;
   try{
-    g = QCM::cluster_Green_function((size_t)clus, z, (bool)spin_down, label);
+    g = QCM::cluster_Green_function((size_t)clus, z, (bool)spin_down, label, blocks);
     d = qcm_model->GF_dims[clus];
   } catch(const string& s) {qcm_catch(s);}
   
@@ -364,7 +387,7 @@ static PyObject*  CDMFT_host_python(PyObject *self, PyObject *args)
       qcm_throw("failed to read parameters in call to CPT_Green_function (python)");
     vector<double> _freqs = doubles_from_Py(freqs);
     vector<double> _weights = doubles_from_Py(weights);
-    QCM::CDMFT_host(_freqs, _weights);
+    QCM::CDMFT_host(_freqs, _weights, 0);
   }catch(const string& s) {qcm_catch(s);}
   return Py_BuildValue("");
 }
@@ -391,7 +414,7 @@ static PyObject*  CDMFT_distance_python(PyObject *self, PyObject *args)
     if(!PyArg_ParseTuple(args, "O|i", &val, &label))
       qcm_throw("failed to read parameters in call to CPT_Green_function (python)");
     vector<double> _val = doubles_from_Py(val);;
-    d = QCM::CDMFT_distance(_val);
+    d = QCM::CDMFT_distance(_val, 0);
   }catch(const string& s) {qcm_catch(s);}
   return Py_BuildValue("d", d);
 }

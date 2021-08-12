@@ -13,11 +13,13 @@ solver = 'ED'
 # EXCEPTIONS
 
 class OutOfBoundsError(Exception):
+    def __init__(self, variable, iteration):
+        self.variable = variable
+        self.iteration = iteration
     pass
 class TooManyIterationsError(Exception):
-    pass
-
-class VarParamMismatchError(Exception):
+    def __init__(self, max_iteration):
+        self.max_iteration = max_iteration
     pass
 
 class MissingArgError(ValueError):
@@ -27,6 +29,8 @@ class MinimizationError(Exception):
     pass
 
 class ParseError(Exception):
+    def __init__(self, mess):
+        self.message = mess
     pass
 
 class WrongArgumentError(ValueError):
@@ -252,18 +256,19 @@ def averages(label=0, print_to_file=True):
     return qcm.averages(label, print_to_file)
 
 ################################################################################
-def cluster_Green_function(cluster, z, spin_down=False, label=0):
+def cluster_Green_function(cluster, z, spin_down=False, label=0, blocks=False):
     """Computes the cluster Green function
 
     :param int cluster: label of the cluster (0 to the number of clusters-1)
     :param complex z: frequency
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 	4)
     :param int label:  label of the model instance (default 0)
+    :param boolean blocks: true if we want the GF in block diagonal form (symmetry sectors)
     :return: a complex-valued matrix
 
     """
 
-    return qcm.cluster_Green_function(cluster, z, spin_down, label)
+    return qcm.cluster_Green_function(cluster, z, spin_down, label, blocks)
 
 ################################################################################
 def cluster_Green_function_average(cluster=0, spin_down=False):
@@ -918,6 +923,15 @@ def spectral_average(name, z, label=0):
 
     """
     return qcm.spectral_average(name, z, label)
+
+################################################################################
+def switch_cluster_model(name):
+    """
+    switches cluster model to 'name'. Hack used in DCA.
+
+    """
+    return qcm.switch_cluster_model(name)
+
 
 ################################################################################
 def variational_parameters():

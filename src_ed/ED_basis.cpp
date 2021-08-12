@@ -65,7 +65,7 @@ tuple<uint32_t, int, int, bool>  Destroy(const int a, const uint32_t label, cons
 	auto X = Bx.group->Representative(ss.b^mask, By.sec.irrep);
 	if(X.length==0) return T;
 	uint32_t labelp = By.index(X.b);
-	if(labelp == By.dim) return T; // replace by exception raise
+	if(labelp == By.dim) {qcm_throw("labelp = By.dim!"); return T;} // replace by exception raise
 	if(bitcount64(ss.b & (mask-1)) & 1) X.phase += Bx.group->g;
 	get<3>(T) = true;
 	get<0>(T) = labelp;

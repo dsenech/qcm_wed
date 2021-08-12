@@ -17,6 +17,7 @@
 #include "lattice_model_instance.hpp"
 #include "parser.hpp"
 #include "qcm_ED.hpp"
+#include "model.hpp"
 #include "parameter_set.hpp"
 #include "console.hpp"
 
@@ -28,6 +29,7 @@ shared_ptr<parameter_set> param_set = nullptr; // pointer to the unique paramete
 map<int, unique_ptr<lattice_model_instance>> lattice_model_instances; // list of instances
 vector<string> target_sectors; // target GS sectors of the different clusters
 
+extern map<string, shared_ptr<model>> models;
 
 //==============================================================================
 namespace QCM{
@@ -127,10 +129,10 @@ namespace QCM{
    returns the cluster Green function for cluster # i at frequency w
    * @param spin_down true if the spin-down sector is covered
    */
-  matrix<complex<double>> cluster_Green_function(size_t i, complex<double> w, bool spin_down, int label)
+  matrix<complex<double>> cluster_Green_function(size_t i, complex<double> w, bool spin_down, int label, bool blocks)
   {
     // if(lattice_model_instances.find(label) == lattice_model_instances.end()) qcm_throw("The instance # "+to_string(label)+" does not exist.");
-    return lattice_model_instances.at(label)->cluster_Green_function(i, w, spin_down);
+    return lattice_model_instances.at(label)->cluster_Green_function(i, w, spin_down, blocks);
   }
   
   
@@ -610,6 +612,18 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
     qcm_model->clusters.push_back({tmp.first, qcm_model->sites.size(), name, cpos, ref-1});
   }
   
+  /**
+   * replace the cluster model with another one with the same number of sites (for DCA)
+   * @param name name of the new cluster model
+   */
+  void switch_cluster_model(const string &name)
+  {
+    if(models.find(name)==models.end())
+      qcm_throw("cluster model "+name+" does not exist!");
+    qcm_model->clusters[0].name = name;
+    if (!models[name]->is_closed) qcm_model->close_model(true);
+  }
+
   
   /**
    * defines a new lattice model

@@ -388,6 +388,7 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
     auto B = basis.at(x.sec);
     sector target_sec = group->shift_sector(x.sec, pm, a.spin, a.irrep);
     auto T = basis.at(target_sec);
+    if(T->dim == 0) return false; // CHANGE
     if(y.size() != T->dim) y.resize(T->dim);
 
     if(pm==1){ // creation

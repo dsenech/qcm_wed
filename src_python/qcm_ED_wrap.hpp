@@ -6,7 +6,6 @@
 
 #include <Python.h>
 #include "arrayobject.h"
-// #include "ndarrayobject.h"
 #include "float.h"
 #include "console.hpp"
 #include "model_instance.hpp"
@@ -141,17 +140,18 @@ static PyObject* Green_function_python(PyObject *self, PyObject *args)
 {
   int label=0;
   int spin_down=0;
+  int blocks=0;
   complex<double> z;
   
   try{
-    if(!PyArg_ParseTuple(args, "D|ii", &z, &spin_down, &label))
+    if(!PyArg_ParseTuple(args, "D|iii", &z, &spin_down, &label, &blocks))
       qcm_ED_throw("failed to read parameters in call to Green_function (python)");
   } catch(const string& s) {qcm_ED_catch(s);}
   
   vector<complex<double>> g;
   size_t d;
   try{
-    g = ED::Green_function(z, (bool)spin_down, (size_t)label).v;
+    g = ED::Green_function(z, (bool)spin_down, (size_t)label, (bool)blocks).v;
     d = ED::Green_function_dimension((size_t)label);
   } catch(const string& s) {qcm_ED_catch(s);}
   
@@ -864,16 +864,17 @@ returns a tuple:
 static PyObject* qmatrix_python(PyObject *self, PyObject *args)
 {
   int label=0;
+  int spin_down=0;
   
   try{
-    if(!PyArg_ParseTuple(args, "|i",&label))
+    if(!PyArg_ParseTuple(args, "|ii",&spin_down,&label))
       qcm_ED_throw("failed to read parameters in call to qmatrix (python)");
   } catch(const string& s) {qcm_ED_catch(s);}
   
   npy_intp dims[2];
   PyObject *out1, *out2;
   try{
-    auto Q = ED::qmatrix(label);
+    auto Q = ED::qmatrix(spin_down, label);
     dims[0] = Q.first.size();
     out1 = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
     memcpy(PyArray_DATA((PyArrayObject*) out1), Q.first.data(), Q.first.size()*sizeof(double));
@@ -899,16 +900,17 @@ returns a tuple:
 static PyObject* hybridization_python(PyObject *self, PyObject *args)
 {
   int label=0;
-  
+  int spin_down=0;
+
   try{
-    if(!PyArg_ParseTuple(args, "|i",&label))
+    if(!PyArg_ParseTuple(args, "|ii",&spin_down,&label))
       qcm_ED_throw("failed to read parameters in call to hybridization (python)");
   } catch(const string& s) {qcm_ED_catch(s);}
   
   npy_intp dims[2];
   PyObject *out1, *out2;
   try{
-    auto Q = ED::hybridization(label);
+    auto Q = ED::hybridization(spin_down,label);
     dims[0] = Q.first.size();
     out1 = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
     memcpy(PyArray_DATA((PyArrayObject*) out1), Q.first.data(), Q.first.size()*sizeof(double));
