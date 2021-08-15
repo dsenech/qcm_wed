@@ -32,7 +32,7 @@ template<>
 void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
 {
   auto& sym_orb = the_model->sym_orb[mixing];
-  auto cf = make_shared<continued_fraction_set>(Omega.sec, the_model->group, mixing);
+  auto cf = make_shared<continued_fraction_set>(Omega.sec, the_model->group, mixing, false);
   if(spin_down) Omega.gf_down = cf;
   else Omega.gf = cf;
   
@@ -81,7 +81,7 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
           
           // tridiagonalisation and calculation of the projection
           pair<vector<double>, vector<double>> V = LanczosGreen(H, psi);
-          continued_fraction cont_fraction(V.first, V.second, Omega.energy,norm*Omega.weight,pm==1);
+          continued_fraction cont_fraction(V.first, V.second, Omega.energy, norm*Omega.weight, pm==1);
           if(pm == 1){
             cf->e[r](o1,o2) = cont_fraction;
             if(console::level>5){
@@ -112,9 +112,10 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
 template<>
 void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
 {
+  qcm_throw("the use of continued fractions with complex-values Hamiltonian is not yet ready");
   auto& sym_orb = the_model->sym_orb[mixing];
 
-  auto cf = make_shared<continued_fraction_set>(Omega.sec, the_model->group, mixing);
+  auto cf = make_shared<continued_fraction_set>(Omega.sec, the_model->group, mixing, true);
   if(spin_down) Omega.gf_down = cf;
   else Omega.gf = cf;
   
@@ -147,7 +148,7 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
         vector<Complex> psi(H.B->dim);
         double norm;
         
-        console::message(3,"element " + sorb[o1].str() +  ' ' + sorb[o2].str());
+        console::message(3,"\nelement " + sorb[o1].str() +  ' ' + sorb[o2].str());
         
         symmetric_orbital sorb1 = sym_orb[r][o1];
         symmetric_orbital sorb2 = sym_orb[r][o2];
@@ -158,7 +159,7 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
         }
         else if(o1 < o2){
           if(pm==1) the_model->create_or_destroy(pm, sorb2, Omega, psi, Complex(0.0,1.0));
-          else the_model->create_or_destroy(pm, sorb1, Omega, psi, Complex(0.0,-1.0));
+          else the_model->create_or_destroy(pm, sorb2, Omega, psi, Complex(0.0,-1.0));
         }
         
         // normalisation of |x> and storing its norm in "norm"
@@ -168,21 +169,21 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
           
           // tridiagonalisation and calculation of the projection
           pair<vector<double>, vector<double>> V = LanczosGreen(H, psi);
-          continued_fraction cont_fraction(V.first, V.second, Omega.energy,norm*Omega.weight,pm==1);
+          continued_fraction cont_fraction(V.first, V.second, Omega.energy, norm*Omega.weight, pm==1);
           if(pm == 1){
             cf->e[r](o1,o2) = cont_fraction;
             if(console::level>5){
               cout << "coefficients of the electron continued fraction:\n";
-              cout << "alpha's : " << V.first << endl;
-              cout << "betas's : " << V.second << endl;
+              cout << "alphas\tbetas\n";
+              cout << cont_fraction; 
             }
           }
           else{
             cf->h[r](o1,o2) = cont_fraction;
             if(console::level>5){
               cout << "coefficients of the hole continued fraction:\n";
-              cout << "alpha's : " << V.first << endl;
-              cout << "betas's : " << V.second << endl;
+              cout << "alphas\tbetas\n";
+              cout << cont_fraction; 
             }
           }
         }

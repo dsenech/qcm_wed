@@ -406,8 +406,8 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
           cout << "destruction operator [" << target_sec << ", " << a << "] not found!" << endl;
         }
         destruction_complex.at(D)->multiply_add_conjugate(x.psi,y,z);
+        // cout << "creation at " << a.label << '\n' << x.psi << '\n' << y << "\n\n"; // tempo
       }
-      // cout << "creation at " << a.label << '\n' << x.psi << '\n' << y << "\n\n"; // tempo
     }
     else{ // destruction
       if(Hamiltonian_format == H_FORMAT::H_format_onthefly){
@@ -424,8 +424,8 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
           cout << "destruction operator [" << x.sec << ", " << a << "] not found!" << endl;
         }
         destruction_complex.at(D)->multiply_add(x.psi,y,z);
+        // cout << "destruction at " << a.label << '\n' << x.psi << '\n' << y << "\n\n"; // tempo
       }
-      // cout << "destruction at " << a.label << '\n' << x.psi << '\n' << y << "\n\n"; // tempo
     }
   }
   return true;

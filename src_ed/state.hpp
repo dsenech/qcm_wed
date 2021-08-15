@@ -48,10 +48,10 @@ struct state
     energy = from_string<double>(input[1]);
     weight = from_string<double>(input[2]);
     if(GF_solver == GF_format_BL) gf = shared_ptr<Q_matrix_set<HilbertField>>(new Q_matrix_set<HilbertField>(fin, group, mixing));
-    else gf = shared_ptr<continued_fraction_set>(new continued_fraction_set(fin, sec, group, mixing));
+    else gf = shared_ptr<continued_fraction_set>(new continued_fraction_set(fin, sec, group, mixing, typeid(HilbertField) == typeid(Complex)));
     if(mixing&HS_mixing::up_down){
       if(GF_solver == GF_format_BL) gf_down = shared_ptr<Q_matrix_set<HilbertField>>(new Q_matrix_set<HilbertField>(fin, group, mixing));
-      else gf_down = shared_ptr<continued_fraction_set>(new continued_fraction_set(fin, sec, group, mixing));
+      else gf_down = shared_ptr<continued_fraction_set>(new continued_fraction_set(fin, sec, group, mixing, typeid(HilbertField) == typeid(Complex)));
     }
   }
   
@@ -62,10 +62,10 @@ struct state
   state(shared_ptr<symmetry_group> group , int mixing, const double ener, const double _weight, const string& _sec, const vector<vector<double>> &a, const vector<vector<double>> &b)
   : energy(ener), weight(_weight), sec(sector(_sec))
   {
-    gf = shared_ptr<continued_fraction_set>(new continued_fraction_set(sec, group, mixing, a, b));
+    gf = shared_ptr<continued_fraction_set>(new continued_fraction_set(sec, group, mixing, a, b, typeid(HilbertField) == typeid(Complex)));
     if(mixing&HS_mixing::up_down){
       // TEMPO : completer pour down. Arguments supplementaires ou integres dans A et B ?
-      gf_down = shared_ptr<continued_fraction_set>(new continued_fraction_set(sec, group, mixing, a, b));
+      gf_down = shared_ptr<continued_fraction_set>(new continued_fraction_set(sec, group, mixing, a, b, typeid(HilbertField) == typeid(Complex)));
     }
   }
 

@@ -220,7 +220,7 @@ pair<vector<double>, vector<double>> LanczosGreen(T &H, vector<HilbertField> &ps
     check_signals();
 	if(a.size()) swap(q,psi,b.back()); // psi <-- q/beta   and   q <-- -beta*psi
 	H.mult_add(psi,q); //calculate q = q + H*psi
-	HilbertField z = psi*q;
+	HilbertField z = q*psi;
 	a.push_back(real(z));
 	mult_add(-a.back(),psi,q); // q -= a*psi
     double zz = norm(q);

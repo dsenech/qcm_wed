@@ -3,8 +3,8 @@
 /**
  Constructor
  */
-continued_fraction_set::continued_fraction_set(sector _sec, shared_ptr<symmetry_group> _group, int mixing) :
-Green_function_set(_group, mixing), sec(_sec)
+continued_fraction_set::continued_fraction_set(sector _sec, shared_ptr<symmetry_group> _group, int mixing, bool _is_complex) :
+Green_function_set(_group, mixing), sec(_sec), is_complex(_is_complex)
 {
   e.assign(group->site_irrep_dim.size(), matrix<continued_fraction>());
   h.assign(group->site_irrep_dim.size(), matrix<continued_fraction>());
@@ -20,8 +20,8 @@ Green_function_set(_group, mixing), sec(_sec)
 /**
  Constructor from arrays
  */
-continued_fraction_set::continued_fraction_set(sector _sec, shared_ptr<symmetry_group> _group, int mixing, const vector<vector<double>> &A, const vector<vector<double>> &B) :
-Green_function_set(_group, mixing), sec(_sec)
+continued_fraction_set::continued_fraction_set(sector _sec, shared_ptr<symmetry_group> _group, int mixing, const vector<vector<double>> &A, const vector<vector<double>> &B, bool _is_complex) :
+Green_function_set(_group, mixing), sec(_sec), is_complex(_is_complex)
 {
   assert(group->site_irrep_dim.size() == 2*A.size());
   assert(group->site_irrep_dim.size() == 2*B.size());
@@ -38,7 +38,8 @@ Green_function_set(_group, mixing), sec(_sec)
   for(size_t r=0; r<e.size(); ++r){
     size_t nr = e[r].r;
     for(size_t a=0; a<nr; ++a){
-      for(size_t b=0; b<=a; ++b){
+      int bmax = (is_complex)? nr : a+1;
+      for(size_t b=0; b<bmax; ++b){
         e[r](a, b) = continued_fraction(A[j], B[j]);
         j++;
         h[r](a, b) = continued_fraction(A[j], B[j]);
@@ -52,8 +53,8 @@ Green_function_set(_group, mixing), sec(_sec)
 /**
  Constructor from input stream (ASCII file)
  */
-continued_fraction_set::continued_fraction_set(istream &fin, sector _sec, shared_ptr<symmetry_group> _group, int mixing) :
-Green_function_set(_group, mixing), sec(_sec)
+continued_fraction_set::continued_fraction_set(istream &fin, sector _sec, shared_ptr<symmetry_group> _group, int mixing, bool _is_complex) :
+Green_function_set(_group, mixing), sec(_sec), is_complex(_is_complex)
 {
   e.assign(group->site_irrep_dim.size(), matrix<continued_fraction>());
   h.assign(group->site_irrep_dim.size(), matrix<continued_fraction>());
@@ -65,10 +66,12 @@ Green_function_set(_group, mixing), sec(_sec)
     h[r].set_size(n);
   }
   string tmp;
+  fin >> tmp;
   for(size_t r=0; r<e.size(); ++r){
     size_t nr = e[r].r;
     for(size_t a=0; a<nr; ++a){
-      for(size_t b=0; b<=a; ++b){
+      int bmax = (is_complex)? nr : a+1;
+      for(size_t b=0; b<bmax; ++b){
         size_t r2, a2, b2;
         fin >> tmp >> r2 >> tmp >> a2 >> tmp >> b2;
         if(r2 != r or a2 != a or b2 != b) qcm_ED_throw("error while reading continued fraction");
@@ -84,11 +87,11 @@ write in a ASCII file
  */
 void continued_fraction_set::write(ostream& flux)
 {
-  
   for(size_t r=0; r<e.size(); ++r){
     size_t nr = e[r].r;
     for(size_t a=0; a<nr; ++a){
-      for(size_t b=0; b<=a; ++b){
+      int bmax = (is_complex)? nr : a+1;
+      for(size_t b=0; b<bmax; ++b){
         flux << "irrep: " << r << "\ta: " << a << "\tb: " << b << "\n";
         flux << e[r](a,b) << h[r](a,b);
       }
@@ -119,11 +122,23 @@ void continued_fraction_set::Green_function(const Complex &z, block_matrix<Compl
     }
     
     // off diagonal terms
-    for(size_t o1 = 0; o1 < nr; o1++){
-      for(size_t o2 = 0; o2 <o1; o2++){
-        Complex tmp = 0.5*(e[r](o1,o2).evaluate(z) + h[r](o1,o2).evaluate(z) - Gtmp[o1] - Gtmp[o2]);
-        G.block[r](o1,o2) += tmp;
-        G.block[r](o2,o1) += tmp;
+    if(is_complex){
+      for(size_t o1 = 0; o1 < nr; o1++){
+        for(size_t o2 = 0; o2 <o1; o2++){
+          Complex tmp1 = e[r](o1,o2).evaluate(z) +  h[r](o1,o2).evaluate(z);
+          Complex tmp2 = Complex(0,1)*(e[r](o2,o1).evaluate(z) +  h[r](o2,o1).evaluate(z));
+          G.block[r](o2,o1) += 0.5*(tmp1 + tmp2 - Complex(1, 1)*(Gtmp[o1] + Gtmp[o2]));
+          G.block[r](o1,o2) += 0.5*(tmp1 - tmp2 - Complex(1,-1)*(Gtmp[o1] + Gtmp[o2]));
+        }
+      }
+    }
+    else{
+      for(size_t o1 = 0; o1 < nr; o1++){
+        for(size_t o2 = 0; o2 <o1; o2++){
+          Complex tmp = 0.5*(e[r](o1,o2).evaluate(z) + h[r](o1,o2).evaluate(z) - Gtmp[o1] - Gtmp[o2]);
+          G.block[r](o1,o2) += tmp;
+          G.block[r](o2,o1) += tmp;
+        }
       }
     }
   }

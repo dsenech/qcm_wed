@@ -519,7 +519,7 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
  
   // building the Q matrices
   int ns = 2*sym_orb.size();
-  #pragma omp parallel for
+  // #pragma omp parallel for
   for(int s=0; s< ns; s++){
     int r = s/2;
     int pm = 2*(s%2)-1;
@@ -546,13 +546,13 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     Qtmp.e -= Omega.energy; // adjust the eigenvalues by adding/subtracting the GS energy
     if(pm == -1){
       Qtmp.e *= -1.0;
-      // Qtmp.v.cconjugate(); // CHANGE
     }
-    Qtmp.streamline();
+    // Qtmp.streamline();
     if(pm==-1) 
       Qm.q[r] = Qtmp;
     else 
       Qp.q[r] = Qtmp;
+      Qp.q[r].v.cconjugate(); // IMPORTANT. Source of bug found 2021-08-14
   }
 
   auto Q = make_shared<Q_matrix_set<HilbertField>>(the_model->group, mixing);

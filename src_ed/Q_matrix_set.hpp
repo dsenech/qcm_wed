@@ -128,7 +128,7 @@ template<typename HilbertField>
 std::ostream& operator<<(std::ostream &flux, const Q_matrix_set<HilbertField> &Q)
 {
   
-  flux << "\nQMatrix:\n" << std::setprecision(LONG_DISPLAY);
+  flux << "\nQ-Matrix:\n" << std::setprecision(LONG_DISPLAY);
   for(size_t r=0; r<Q.q.size(); ++r){
     flux << "\nPart " << r+1 << '\n';
     flux << Q.q[r];
