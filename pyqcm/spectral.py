@@ -64,7 +64,7 @@ def __kgrid(ax, nk, quadrant=False, k_perp=0.0, plane='xy', size=1.0):
     return k, x
 
 ################################################################################
-def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=None, offset=2, opt='A', title=None, file=None, plt_ax=None, **kwargs):
+def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=None, offset=2, opt='A', inverse_path=False, title=None, file=None, plt_ax=None, **kwargs):
     """Plots the spectral function :math:`A(\mathbf{k},\omega)` along a wavevector path in the Brillouin zone.
     This version plots the spin-down part with the correct sign of the frequency in the Nambu formalism
 
@@ -76,6 +76,7 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
     :param int band: if not None, only plots the spectral function associated with this orbital number (starts at 1). If None, sums over all bands.
     :param float offset: vertical offset in the plot between the curves associated to successive wavevectors
     :param str opt: 'A' : spectral function, 'self' : self-energy, 'Sx' : spin (x component), 'Sy' : spin (y component)
+    :param boolean inverse_path: if True, inverts the path (k --> -k)
     :param str title: optional title for the plot. If None, a string with the model parameters will be used.
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
@@ -101,6 +102,11 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
     w = __frequency_array(wmax, eta)
 
     k, tick_pos, tick_str = pyqcm.wavevector_path(nk, path)  # defines the array of wavevectors
+    if inverse_path:
+        k *= -1
+        for i,s in enumerate(tick_str):
+            tick_str[i] = '-'+s
+
 
     A = np.zeros((len(w), len(k)))
     for i in range(len(w)):
@@ -696,7 +702,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
 
 
 ################################################################################
-def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, quadrant=False, k_perp=0.0, plane='xy', file=None, plt_ax=None, **kwargs):
+def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, im_part=False, quadrant=False, k_perp=0.0, plane='xy', file=None, plt_ax=None, **kwargs):
     """Plots the anomalous Green function or self-energy (2D)
 
     :param int nk: number of wavevectors on each side of the grid
@@ -704,6 +710,7 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, quadrant=Fal
     :param int label: label of the model instance 
     :param int bands: shows the weight for (b1,b2) (starts at 1), or numpy array of spin-Nambu projection
     :param boolean self: if True, plots the anomalous self-energy instead of the spectral function
+    :param boolean im_part: if True, plots the imaginary part instead of the real part
     :param boolean quadrant: if True, plots the first quadrant of a square Brillouin zone only
     :param float k_perp: for 3D models, value of the component of k perpendicular to the plane
     :param str plane: for 3D models, plane of the plot ('z'='xy', 'y'='xz', 'x='yz')
@@ -748,9 +755,15 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, quadrant=Fal
             return
         A = np.zeros(nk*nk)
         for i in range(nk*nk):
-            A[i] = (-g[i,0:d,d:2*d]*bands).sum().real
+            if im_part:
+                A[i] = (-g[i,0:d,d:2*d]*bands).sum().imag
+            else:
+                A[i] = (-g[i,0:d,d:2*d]*bands).sum().real
     else:    
-        A = -g[:, bands[0]-1, bands[1]+d-1].real
+        if im_part:
+            A = -g[:, bands[0]-1, bands[1]+d-1].imag
+        else:
+            A = -g[:, bands[0]-1, bands[1]+d-1].real
 
     A = np.reshape(A, (nk, nk))
     max = np.abs(A).max()
