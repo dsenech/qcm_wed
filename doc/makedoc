@@ -1,0 +1,7 @@
+#! /bin/bash
+python3 -c 'import qcm; print(qcm.print_options(2))'
+mv options.rst source/.
+make html
+#make latex
+#make latexpdf
+
