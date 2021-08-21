@@ -17,9 +17,9 @@
 #include "lattice_model_instance.hpp"
 #include "parser.hpp"
 #include "qcm_ED.hpp"
-#include "model.hpp"
 #include "parameter_set.hpp"
 #include "console.hpp"
+#include "model.hpp"
 
 //==============================================================================
 // global variables
@@ -538,7 +538,7 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
   double Berry_flux(vector<vector3D<double>>& k, int band, int label)
   {
     if(lattice_model_instances.find(label) == lattice_model_instances.end()) qcm_throw("The instance # "+to_string(label)+" does not exist.");
-    return lattice_model_instances.at(label)->Berry_flux(k, band);
+    return lattice_model_instances.at(label)->Berry_flux(k, band, false);
   }
 
 
@@ -612,18 +612,6 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
     qcm_model->clusters.push_back({tmp.first, qcm_model->sites.size(), name, cpos, ref-1});
   }
   
-  /**
-   * replace the cluster model with another one with the same number of sites (for DCA)
-   * @param name name of the new cluster model
-   */
-  void switch_cluster_model(const string &name)
-  {
-    if(models.find(name)==models.end())
-      qcm_throw("cluster model "+name+" does not exist!");
-    qcm_model->clusters[0].name = name;
-    if (!models[name]->is_closed) qcm_model->close_model(true);
-  }
-
   
   /**
    * defines a new lattice model
@@ -814,5 +802,16 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
     return lattice_model_instances.at(label)->monopole(k, a, nk, band, rec); 
   }
 
+  /**
+   * replace the cluster model with another one with the same number of sites (for DCA)
+   * @param name name of the new cluster model
+   */
+  void switch_cluster_model(const string &name)
+  {
+    if(models.find(name)==models.end())
+      qcm_throw("cluster model "+name+" does not exist!");
+    qcm_model->clusters[0].name = name;
+    if (!models[name]->is_closed) qcm_model->close_model(true);
+  }
 }
 

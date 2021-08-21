@@ -33,7 +33,7 @@ struct model
   vector<bool> in_bath; //! indicates whether an orbital (from 0 to 2*n_orb) is in bath or not
   vector<vector<vector<symmetric_orbital>>> sym_orb;
 
-  model(const string &_name, const size_t _n_orb, const size_t _n_bath, const vector<vector<int>> &gen, bool bath_irrep=false);
+  model(const string &_name, const size_t _n_orb, const size_t _n_bath, const vector<vector<int>> &gen, bool bath_irrep);
   void add_chemical_potential();
   bool create_or_destroy(int pm, const symmetric_orbital &a, state<double> &x, vector<double> &y, double z);
   bool create_or_destroy(int pm, const symmetric_orbital &a, state<Complex> &x, vector<Complex> &y, Complex z);

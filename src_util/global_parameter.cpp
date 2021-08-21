@@ -77,7 +77,8 @@ namespace QCM {
     new_global_double(1.0e-5,"accur_Q_matrix","tolerance in the normalization of the Q matrix");
     new_global_double(1e-5,"band_lanczos_minimum_gap","gap between the lowest two states in BL below which the method fails");
     new_global_double(0.01,"minimum_weight","minimum weight in the density matrix");
-    new_global_double(1.0e-4, "Qmatrix_tolerance", "minimum value of a Qmatrix coefficient");
+    new_global_double(1.0e-5, "Qmatrix_wtol", "maximum difference in frequencies in Q-matrix");
+    new_global_double(1.0e-10, "Qmatrix_vtol", "minimum value of a Qmatrix contribution");
     new_global_double(0.0,"temperature", "Temperature of the system.");
 
     new_global_int(1,"Davidson_states","Number of states requested in the Davidson-Liu algorithm");

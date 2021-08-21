@@ -61,22 +61,21 @@ namespace QCM{
   vector<matrix<complex<double>>> self_energy(const complex<double> w, const vector<vector3D<double>> &k, bool spin_down, int label);
   vector<matrix<complex<double>>> tk(const vector<vector3D<double>> &k, bool spin_down, int label);
   vector<pair<double,string>> ground_state(int label);
-  vector<pair<string,double>> averages(int label, bool print);
+  vector<pair<string,double>> averages(int label=0, bool print=true);
   vector<pair<vector<double>, vector<double>>> Lehmann_Green_function(vector<vector3D<double>> &k, int band, bool spin_down, int label);
   vector<tuple<string, int, int>> cluster_info();
   vector<vector<double>> dispersion(const vector<vector3D<double>> &k, bool spin_down, int label);
-  void add_cluster(const string &name, const vector3D<int64_t> &cpos, const vector<vector3D<int64_t>> &pos, int ref);
-  void switch_cluster_model(const string &name);
+  void add_cluster(const string &name, const vector3D<int64_t> &cpos, const vector<vector3D<int64_t>> &pos, int ref=0);
   void anomalous_operator(const string &name, vector3D<int64_t> &link, complex<double> amplitude, int band1, int band2, const string& type);
   void density_wave(const string &name, vector3D<int64_t> &link, complex<double> amplitude, int band, vector3D<double> Q, double phase, const string& type);
-  void explicit_operator(const string &name, const string &type, const vector<tuple<vector3D<int64_t>, vector3D<int64_t>, complex<double>>> &elem, int tau, int sigma);
+  void explicit_operator(const string &name, const string &type, const vector<tuple<vector3D<int64_t>, vector3D<int64_t>, complex<double>>> &elem, int tau=1, int sigma=0);
   void global_parameter_init();
   void hopping_operator(const string &name, vector3D<int64_t> &link, double amplitude, int band1, int band2, int tau, int sigma);
   void interaction_operator(const string &name, vector3D<int64_t> &link, double amplitude, int band1, int band2, const string &type);
   void k_integral(int dim, function<void (vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy);
   void new_lattice_model(const string &name, vector<int64_t> &superlattice, vector<int64_t> &lattice);
   void new_model_instance(int label);
-  void print_model(const string& filename, bool asy_operators, bool asy_labels, bool asy_band, bool asy_neighbors, bool asy_working_basis);
+  void print_model(const string& filename, bool asy_operators=false, bool asy_labels=false, bool asy_band=false, bool asy_neighbors=false, bool asy_working_basis=false);
   void qcm_init();
   void set_basis(vector<double> &basis);
   void set_parameter(const string& name, double value);
@@ -86,6 +85,8 @@ namespace QCM{
   void CDMFT_variational_set(vector<string>& varia);
   void CDMFT_host(const vector<double>& freqs, const vector<double>& weights, int label);
   double CDMFT_distance(const vector<double>& p, int label);
+  void switch_cluster_model(const string &name);
+
 };
 
 #endif /* QCM_hpp */

@@ -137,7 +137,6 @@ namespace ED{
     }
     // decides whether the sector set requires a complex Hilbert space
     if(mod.group->has_complex_irrep) need_complex = true;
-    // if(need_complex) console::message(2, "Need for a complex Hilbert space");
     
     if(model_instances.find(label) != model_instances.end()) model_instances[label].reset();
     if(need_complex) model_instances[label] = make_shared<model_instance<Complex>>(label, models.at(model_name), param, sec);
@@ -258,7 +257,7 @@ namespace ED{
 
     if(!M.is_correlated) qcm_throw("The Potthoff functional cannot be computed in the noninteracting case!");
 
-    M.Green_function_solve();
+    if(!M.gf_solved) M.Green_function_solve();
     return M.SEF_bath + M.E0;
   }
   

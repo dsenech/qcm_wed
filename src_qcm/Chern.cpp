@@ -145,7 +145,7 @@ double lattice_model_instance::Berry_flux(const vector<vector3D<double>> &k, int
   double flux = -arg(z)/(2*M_PI);
 
   if(model->mixing == HS_mixing::normal) flux *= 2.0;
-  if(model->mixing == HS_mixing::up_down and spin_down == false) flux += Berry_flux(k, true);
+  if(model->mixing == HS_mixing::up_down and spin_down == false) flux += Berry_flux(k, true, 0);
   return flux;
 }
 

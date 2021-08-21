@@ -34,36 +34,36 @@ struct lattice_model_instance{
 	vector<double> CDMFT_freqs; //!< CDMFT frequency grid
 	vector<double> CDMFT_weights; //!< weights of the different frequencies in CDMFT
 
-	complex<double> TrSigmaG(Complex w, vector3D<double> &k, bool spin_down = false);
-	double Berry_flux(const vector<vector3D<double>> &k, int band, bool spin_down=false);
-	double Berry_plaquette(Green_function &G, const vector3D<double> &k1, const double deltax, const double deltay, const int opt, int dir, int band=0);
+	complex<double> TrSigmaG(Complex w, vector3D<double> &k, bool spin_down);
+	double Berry_flux(const vector<vector3D<double>> &k, int band, bool spin_down);
+	double Berry_plaquette(Green_function &G, const vector3D<double> &k1, const double deltax, const double deltay, const int opt, int dir, int band);
 	double CDMFT_distance(const vector<double>& p);
 	double monopole_part(vector3D<double>& k, double a, int nk, int band, bool rec, int dir, bool spin_down);
 	double monopole(vector3D<double>& k, double a, int nk, int band, bool rec);
 	double potential_energy();
 	double Potthoff_functional();
 	double spectral_average(const string& name, const complex<double> w);
-	Green_function cluster_Green_function(Complex w, bool sig, bool spin_down = false);
-	lattice_model_instance(shared_ptr<lattice_model> _model, const map<string, double>& _params, const vector<string>& _sectors, int label=0);
-	matrix<complex<double>> cluster_Green_function(size_t i, complex<double> w, bool spin_down = false, bool blocks = false);
-	matrix<complex<double>> cluster_hopping_matrix(size_t i, bool spin_down = false);
+	Green_function cluster_Green_function(Complex w, bool sig, bool spin_down);
+	lattice_model_instance(shared_ptr<lattice_model> _model, const map<string, double>& _params, const vector<string>& _sectors, int label);
+	matrix<complex<double>> cluster_Green_function(size_t i, complex<double> w, bool spin_down, bool blocks);
+	matrix<complex<double>> cluster_hopping_matrix(size_t i, bool spin_down);
 	matrix<complex<double>> cluster_self_energy(size_t i, complex<double> w, bool spin_down);
 	matrix<complex<double>> hybridization_function(size_t i, complex<double> w, bool spin_down);
 	matrix<Complex> epsilon(Green_function_k &M);
-	matrix<Complex> projected_Green_function(Complex w, bool spin_down = false);
+	matrix<Complex> projected_Green_function(Complex w, bool spin_down);
 	matrix<Complex> band_Green_function(Green_function_k &M);
 	matrix<Complex> upgrade_cluster_matrix_anomalous(int latt_mix, int clus_mix, matrix<Complex> &g, matrix<Complex> &gm);
 	matrix<Complex> upgrade_cluster_matrix(int latt_mix, int clus_mix, matrix<Complex> &g);
 	pair<vector<array<double,9>>, vector<array<complex<double>, 11>>> site_and_bond_profile();
-	vector<complex<double>> Green_function_average(int clus, bool spin_down = false);
-	vector<double> Berry_curvature(vector3D<double>& k1, vector3D<double>& k2, int nk, int band=0, bool recursive=false, int dir=3);
+	vector<complex<double>> Green_function_average(int clus, bool spin_down);
+	vector<double> Berry_curvature(vector3D<double>& k1, vector3D<double>& k2, int nk, int band, bool recursive=false, int dir=3);
 	vector<double> dispersion(Green_function_k &M);
 	vector<double> dos(const complex<double> w);
 	vector<double> momentum_profile_per(const lattice_operator& op, const vector<vector3D<double>> &k);
 	vector<double> momentum_profile(const lattice_operator& op, const vector<vector3D<double>> &k);
 	vector<pair<double,string>> ground_state();
 	vector<pair<string,double>> averages(bool print=true);
-	vector<pair<vector<double>, vector<double>>> Lehmann_Green_function(vector<vector3D<double>> &k, int band=0, bool spin_down=false);
+	vector<pair<vector<double>, vector<double>>> Lehmann_Green_function(vector<vector3D<double>> &k, int band, bool spin_down);
 	void average_integrand_per(Complex w, vector3D<double> &k, const int *nv, double *I);
 	void average_integrand(Complex w, vector3D<double> &k, const int *nv, double *I);
 	void build_cluster_H();

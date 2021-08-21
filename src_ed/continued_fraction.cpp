@@ -31,10 +31,10 @@ continued_fraction::continued_fraction(const vector<double>& _a, const vector<do
  */
 continued_fraction::continued_fraction(vector<double>& _a, vector<double>& _b, double e0, double norm, bool create) : a(_a), b(_b)
 {
-  for(size_t i=1; i< b.size(); ++i) b[i] *= b[i];
+  for(size_t i=0; i< b.size(); ++i) b[i] *= b[i];
   b[0] = norm;
   if(create) for(size_t i=0; i< a.size(); ++i) a[i] -= e0;
-  else for(size_t i=0; i< a.size(); ++i) a[i] = -a[i] + e0;
+  else for(size_t i=0; i< a.size(); ++i) a[i]  = -a[i] + e0;
 }
 
 

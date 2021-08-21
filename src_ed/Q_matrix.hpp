@@ -181,16 +181,18 @@ template<typename HilbertField>
 void Q_matrix<HilbertField>::streamline()
 {
   vector<int> f(M);
-  double Qmatrix_tolerance = global_double("Qmatrix_tolerance");
-  
+  double Qmatrix_wtol = global_double("Qmatrix_wtol");
+  double Qmatrix_vtol = global_double("Qmatrix_vtol");
+  if(Qmatrix_vtol < 1e-12) return;
+
   matrix<HilbertField> v2(L,M);
   vector<double> e2(M);
-  int ii=0;
+  int i2=0;
 
   for(int i=0; i<M; i++){
     int j;
     for(j=i+1; j<M; j++){
-      if(fabs(e[j]-e[i]) > Qmatrix_tolerance) break;
+      if(fabs(e[j]-e[i]) > Qmatrix_wtol) break;
     }
     int n = j-i;
     matrix<HilbertField> Q(L, n);
@@ -199,21 +201,21 @@ void Q_matrix<HilbertField>::streamline()
       Us.r=L;
       Us.c=1;
       Us.v = v.extract_column(i);
-      if(norm(Us.v) < 1e-4) Us.c=0;
+      if(norm2(Us.v) < Qmatrix_vtol) Us.c=0;
     }
     else{
       v.move_sub_matrix(L, n, 0, i, 0, 0, Q);
-      Us = streamlineQ(Q, 1e-8);
+      Us = streamlineQ(Q, Qmatrix_vtol);
     }
     if(Us.c > 0){
-      memcpy(&e2[ii], &e[i], Us.c*sizeof(double));
-      memcpy(&v2.v[L*ii], &Us.v[0], Us.c*L*sizeof(HilbertField));
-      ii += Us.c;
+      for(int k=0; k<Us.c; k++) e2[i2+k] = e[i];
+      memcpy(&v2.v[L*i2], &Us.v[0], Us.c*L*sizeof(HilbertField));
+      i2 += Us.c;
     }
     i += n-1;
   }
-  if(console::level>5) cout << "streamlining Q-matrix from " << M << " to " << ii << " rows" << endl;
-  M = ii;
+  if(console::level>5) cout << "streamlining Q-matrix from " << M << " to " << i2 << " rows" << endl;
+  M = i2;
   e = e2;
   e.resize(M);
   v.v = v2.v;
@@ -303,14 +305,15 @@ matrix<HilbertField> Q_matrix<HilbertField>::streamlineQ(const matrix<HilbertFie
   matrix<HilbertField> U(L);
   QQ.eigensystem(d, U);
   // cout << "streamlining eigenvalues from " << Q.c << " terms : " << d << endl;
-  vector<bool> I(0);
+  vector<int> I(0);
   I.reserve(L);
-  for(int i=0; i<L; i++) if(fabs(d[i]) > threshold) I.push_back(i);
+  for(int i=0; i<L; i++) if(d[i] > threshold) I.push_back(i);
   matrix<HilbertField> Us(L,I.size());
   for(int i=0; i<I.size(); i++){
     //! extracts a rectangular submatrix of size (R,C), starting at (i,j) of this, and copies it to position (I, J) of A
       U.move_sub_matrix(L, 1, 0, I[i], 0, i, Us, sqrt(d[I[i]]));
   }
+  // cout << "\nUs  = \n" << Us << endl;
   return Us;
 }
 

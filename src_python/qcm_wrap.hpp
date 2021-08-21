@@ -61,28 +61,6 @@ static PyObject* add_cluster_python(PyObject *self, PyObject *args)
 }
 
 //==============================================================================
-const char* switch_cluster_model_help =
-R"{(
-Adds a cluster to the repeated unit
-arguments:
-1. name of new cluster model (string)
-returns: None
-){";
-//------------------------------------------------------------------------------
-static PyObject* switch_cluster_model_python(PyObject *self, PyObject *args)
-{
-  char* s1 = nullptr;
-  
-  try{
-    if(!PyArg_ParseTuple(args, "s", &s1))
-      qcm_throw("failed to read parameters in call to lattice_model (python)");
-  
-    QCM::switch_cluster_model(string(s1));
-  } catch(const string& s) {qcm_catch(s);}
-  return Py_BuildValue("");
-}
-
-//==============================================================================
 const char* averages_help =
 R"{(
 returns the average values of all operators in a model instance.
@@ -2004,5 +1982,30 @@ static PyObject* monopole_python(PyObject *self, PyObject *args)
   } catch(const string& s) {qcm_catch(s);}
   return Py_BuildValue("d", QCM::monopole(k, a, nk, band, rec, label));
 }
+
+
+
+//==============================================================================
+const char* switch_cluster_model_help =
+R"{(
+switches the cluster model
+arguments:
+1. name of new cluster model (string)
+returns: None
+){";
+//------------------------------------------------------------------------------
+static PyObject* switch_cluster_model_python(PyObject *self, PyObject *args)
+{
+  char* s1 = nullptr;
+  
+  try{
+    if(!PyArg_ParseTuple(args, "s", &s1))
+      qcm_throw("failed to read parameters in call to lattice_model (python)");
+  
+    QCM::switch_cluster_model(string(s1));
+  } catch(const string& s) {qcm_catch(s);}
+  return Py_BuildValue("");
+}
+
 
 #endif

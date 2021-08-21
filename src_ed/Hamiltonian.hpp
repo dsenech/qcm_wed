@@ -338,13 +338,11 @@ Q_matrix<HilbertField> Hamiltonian<HilbertField>::build_Q_matrix(vector<vector<H
     vector<HilbertField> y(dim);
     matrix<HilbertField> U(H_dense);
     H_dense.eigensystem(Q.e, U);
-    if(console::level > 6) cout << "H_dense eigensystem\nenergies : " << Q.e << " \nU:\n" << U << endl;
     assert(U.is_unitary(1e-6));
     for(size_t i=0; i<phi.size(); ++i){
       to_zero(y);
       U.left_apply_add(phi[i],y); // does y = phi[i] . U
       Q.v.insert_row(i,y); // inserts y as the ith row of Q
-      if(console::level > 6) cout << "vector phi: " << phi[i] << "\t Q row: " << y << endl; 
     }
     return Q;
   }
@@ -364,7 +362,8 @@ Q_matrix<HilbertField> Hamiltonian<HilbertField>::build_Q_matrix(vector<vector<H
     Q_matrix<HilbertField> Q(phi.size(),M);
     if(Q.M > 0){
       Q.e = eval; 
-      Q.v.product(P,U,phi.size());
+      Q.v.product(P,U,phi.size()); //  tempo
+      // Q.v.product(P,U; 
     }
     return Q;
   }

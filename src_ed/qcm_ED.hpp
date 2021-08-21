@@ -127,12 +127,11 @@ namespace ED{
    z : complex frequency
    spin_down : true if we want the spin-down sector (if the mixing=4)
    label : label of the model instance (in case there are many)
-   blocks : true if we want the Green function in the original symmetry basis
+   blocks : true if in irreducible representations basis
    output : the Green function matrix
    */
-  // matrix<complex<double>> Green_function(const complex<double> &z, bool spin_down = false, const size_t label, bool blocks = false);
-   matrix<complex<double>> Green_function(const complex<double> &z, bool spin_down, const size_t label, bool blocks);
- 
+  matrix<complex<double>> Green_function(const complex<double> &z, bool spin_down, const size_t label, bool blocks);
+  
   
   /**
    function that evaluates the one-body Green function integrated around the negative real axis
@@ -141,7 +140,7 @@ namespace ED{
    output : the integrated Green function matrix
    */
   matrix<complex<double>> Green_function_average(bool spin_down, const size_t label);
-
+  
   
   
   
@@ -179,7 +178,7 @@ namespace ED{
    output : the hybridization function matrix
    */
   matrix<complex<double>> hybridization_function(const complex<double> w, bool spin_down, const size_t label);
-
+  
   
   
   

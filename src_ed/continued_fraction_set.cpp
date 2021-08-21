@@ -66,7 +66,6 @@ Green_function_set(_group, mixing), sec(_sec), is_complex(_is_complex)
     h[r].set_size(n);
   }
   string tmp;
-  fin >> tmp;
   for(size_t r=0; r<e.size(); ++r){
     size_t nr = e[r].r;
     for(size_t a=0; a<nr; ++a){
@@ -87,6 +86,7 @@ write in a ASCII file
  */
 void continued_fraction_set::write(ostream& flux)
 {
+  
   for(size_t r=0; r<e.size(); ++r){
     size_t nr = e[r].r;
     for(size_t a=0; a<nr; ++a){

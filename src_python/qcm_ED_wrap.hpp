@@ -6,6 +6,7 @@
 
 #include <Python.h>
 #include "arrayobject.h"
+// #include "ndarrayobject.h"
 #include "float.h"
 #include "console.hpp"
 #include "model_instance.hpp"
@@ -864,17 +865,16 @@ returns a tuple:
 static PyObject* qmatrix_python(PyObject *self, PyObject *args)
 {
   int label=0;
-  int spin_down=0;
   
   try{
-    if(!PyArg_ParseTuple(args, "|ii",&spin_down,&label))
+    if(!PyArg_ParseTuple(args, "|i",&label))
       qcm_ED_throw("failed to read parameters in call to qmatrix (python)");
   } catch(const string& s) {qcm_ED_catch(s);}
   
   npy_intp dims[2];
   PyObject *out1, *out2;
   try{
-    auto Q = ED::qmatrix(spin_down, label);
+    auto Q = ED::qmatrix(false, label);
     dims[0] = Q.first.size();
     out1 = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
     memcpy(PyArray_DATA((PyArrayObject*) out1), Q.first.data(), Q.first.size()*sizeof(double));
@@ -900,17 +900,16 @@ returns a tuple:
 static PyObject* hybridization_python(PyObject *self, PyObject *args)
 {
   int label=0;
-  int spin_down=0;
-
+  
   try{
-    if(!PyArg_ParseTuple(args, "|ii",&spin_down,&label))
+    if(!PyArg_ParseTuple(args, "|i",&label))
       qcm_ED_throw("failed to read parameters in call to hybridization (python)");
   } catch(const string& s) {qcm_ED_catch(s);}
   
   npy_intp dims[2];
   PyObject *out1, *out2;
   try{
-    auto Q = ED::hybridization(spin_down,label);
+    auto Q = ED::hybridization(false, label);
     dims[0] = Q.first.size();
     out1 = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
     memcpy(PyArray_DATA((PyArrayObject*) out1), Q.first.data(), Q.first.size()*sizeof(double));

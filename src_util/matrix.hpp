@@ -157,6 +157,11 @@ template <typename T> struct matrix {
 
 
 
+  //! extracts a row into a vector
+  void extract_row(size_t i, vector<T> &A) {
+    for (size_t j = 0; j < c; j++) A[j] = v[i + r * j];
+  }
+
   //! extracts a row
   vector<T> extract_row(size_t i) {
     vector<T> A(c);
@@ -164,18 +169,6 @@ template <typename T> struct matrix {
     return A;
   }
 
-  //! deletes a row
-  vector<T> delete_row(size_t ii) {
-    vector<T> vv(v.size());
-    int rr = r-1;
-    for(int j=0; j<c; j++){
-      for(int i = 0; i<ii; i++) vv[i+j*rr] = v[i+j*r];
-      for(int i = ii; i<rr; i++) vv[i+j*rr] = v[i+1+j*r];
-    }
-    r = rr;
-    erase(v);
-    v = vv;
-  }
 
   //! extracts a column into a vector
   void extract_column(size_t i, vector<T> &A) { copy(&v[i * r], &v[i * r] + r, &A[0]); }
@@ -184,13 +177,6 @@ template <typename T> struct matrix {
     vector<T> A(r);
     copy(&v[i * r], &v[i * r] + r, &A[0]);
     return A;
-  }
-
-  //! deletes a column
-  vector<T> delete_column(size_t j) {
-    memmove(&v[r*j], &v[r*(j+1), (c-j-1)*r]);
-    c--;
-    v.resize(r*c);
   }
 
 

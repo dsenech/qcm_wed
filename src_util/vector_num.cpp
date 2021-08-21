@@ -110,6 +110,24 @@ bool random(vector<Complex> &x, std::normal_distribution<double> &ran) {
 
 
 /**
+ changes the components of x so as to make the first non-negligible component real and positive
+ */
+void fix_phase(vector<Complex> &x) {
+  Complex fac(1.0);
+  for (size_t i = 0; i < x.size(); i++) {
+    if (abs(x[i]) > 1e-10) {
+      fac = x[i];
+      break;
+    }
+  }
+  fac = abs(fac) / fac;
+  x *= fac;
+  for (size_t i = 0; i < x.size(); i++) x[i] = chop(x[i]);
+}
+
+
+
+/**
  Finds the largest component in absolute value
  */
 double max_abs(vector<double> &x) {

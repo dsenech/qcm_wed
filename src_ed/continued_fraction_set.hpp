@@ -5,9 +5,9 @@
 #include "continued_fraction.hpp"
 
 //! set of Jacobi continued fraction for the whole Green function
-// template<typename HilbertField>
 struct continued_fraction_set : Green_function_set
 {
+  
   vector<matrix<continued_fraction>> e; 	//!< electron fractions
   vector<matrix<continued_fraction>> h; 	//!< hole fractions
   sector sec; //!< sector

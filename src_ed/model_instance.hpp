@@ -48,7 +48,7 @@ struct model_instance : model_instance_base
   void clear_states();
   void compute_weights();
   void insert_state(shared_ptr<state<HilbertField>> S);
-  void set_hopping_matrix(bool spin_down = false);
+  void set_hopping_matrix(bool spin_down);
   string GS_string() const;
   void build_bases_and_HS_operators(const sector& GS_sector, bool spin_down);
   
@@ -57,11 +57,11 @@ struct model_instance : model_instance_base
   pair<double, double> cluster_averages(shared_ptr<Hermitian_operator> h);
   void Green_function_solve();
   pair<double, string> one_body_solve();
-  matrix<Complex>  Green_function(const Complex &z, bool spin_down = false, bool blocks = false);
+  matrix<Complex>  Green_function(const Complex &z, bool spin_down, bool blocks);
   matrix<Complex>  Green_function_average(bool spin_down);
-  matrix<Complex>  self_energy(const Complex &z, bool spin_down = false);
-  matrix<Complex>  hopping_matrix(bool spin_down = false);
-  matrix<Complex>  hopping_matrix_full(bool spin_down = false);
+  matrix<Complex>  self_energy(const Complex &z, bool spin_down);
+  matrix<Complex>  hopping_matrix(bool spin_down);
+  matrix<Complex>  hopping_matrix_full(bool spin_down);
   vector<tuple<int,int,double>> interactions();
   matrix<Complex>  hybridization_function(Complex w, bool spin_down);
   vector<Complex>  susceptibility(shared_ptr<Hermitian_operator> h, const vector<Complex> &w);
@@ -71,8 +71,8 @@ struct model_instance : model_instance_base
   void write(ostream& fout);
   void read(istream& fin);
   double tr_sigma_inf();
-  pair<vector<double>, vector<complex<double>>> qmatrix(bool spin_down=false);
-  pair<vector<double>, vector<complex<double>>> hybridization(bool spin_down=false);
+  pair<vector<double>, vector<complex<double>>> qmatrix(bool spin_down);
+  pair<vector<double>, vector<complex<double>>> hybridization(bool spin_down);
   void print_wavefunction(ostream& fout);
 };
 
@@ -104,7 +104,7 @@ model_instance<HilbertField>::model_instance(size_t _label, shared_ptr<model> _t
     tcb_down.set_size(n_mixed*the_model->n_sites,n_mixed*the_model->n_bath);
   }
   try{
-    set_hopping_matrix();
+    set_hopping_matrix(false);
   } catch(const string& s) {qcm_ED_catch(s);}
 }
 
@@ -412,7 +412,7 @@ template<typename HilbertField>
 matrix<complex<double>> model_instance<HilbertField>::Green_function(const Complex &z, bool spin_down, bool blocks)
 {
   if(spin_down and !(mixing&HS_mixing::up_down)) qcm_ED_throw("spin_down=True impossible with Hilbert space mixing "+to_string(mixing));
-  Green_function_solve();
+  if(!gf_solved) Green_function_solve();
 
   block_matrix<Complex> gf_block_matrix(the_model->group->site_irrep_dim*n_mixed);
   if(spin_down and mixing&HS_mixing::up_down){
@@ -547,7 +547,7 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     if(pm == -1){
       Qtmp.e *= -1.0;
     }
-    // Qtmp.streamline();
+    Qtmp.streamline();
     if(pm==-1) 
       Qm.q[r] = Qtmp;
     else 
@@ -634,7 +634,7 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
  */
 template<typename HilbertField>
 matrix<Complex> model_instance<HilbertField>::hybridization_function(Complex w, bool spin_down){
-  set_hopping_matrix();
+  set_hopping_matrix(false);
   size_t n_bathg = tb.r;
   matrix<HilbertField>& my_tb = (spin_down and mixing&HS_mixing::up_down)? tb_down : tb;
   matrix<HilbertField>& my_tcb = (spin_down and mixing&HS_mixing::up_down)? tcb_down : tcb;
@@ -754,7 +754,7 @@ void model_instance<HilbertField>::print(ostream& fout)
   fout << endl;
   for(auto& x: value) fout << x.first << " :\t" << x.second << endl;
 
-  set_hopping_matrix();
+  set_hopping_matrix(false);
   fout << "\nhopping matrix:\n" << tc << endl;
   if(the_model->n_bath){
     fout << "\nbath hopping matrix:\n" << tb << endl;
@@ -786,7 +786,7 @@ pair<double, string> model_instance<HilbertField>::one_body_solve()
   if(the_model->group->g != 1) qcm_ED_throw("The symmetry group must be trivial when using 'one_body_solve()'");
 
   GS_energy = 0.0;
-  set_hopping_matrix();
+  set_hopping_matrix(false);
   GF_solver = GF_format_BL;
   auto S = make_shared<state<HilbertField>>();
   auto Qset = make_shared<Q_matrix_set<HilbertField>>(the_model->group, mixing);
@@ -909,7 +909,7 @@ double model_instance<HilbertField>::tr_sigma_inf()
   for(int i=0; i<iw.size(); i++) iw[i] = (i+1)*1.0e-5;
   for(int i=0; i<iw.size(); i++){
     complex<double> z(0.0);
-    auto sigma = self_energy(complex<double>(0.0, 1.0/iw[i]));
+    auto sigma = self_energy(complex<double>(0.0, 1.0/iw[i]), false);
     for(int j=0; j<d2; j++) z += sigma(j,j);
     if(mixing&1) for(int j=d2; j<d1; j++) z -= sigma(j,j);
     S[i] = real<double>(z);
@@ -960,7 +960,7 @@ string model_instance<HilbertField>::GS_string() const
 template<typename HilbertField>
 void model_instance<HilbertField>::write(ostream& fout)
 {
-  Green_function_solve();
+  if(!gf_solved) Green_function_solve();
   
   // writing the info line
   // fout << "cluster: " << the_model->name << '\n';
@@ -1019,7 +1019,7 @@ template<typename HilbertField>
 pair<vector<double>, vector<complex<double>>> model_instance<HilbertField>::qmatrix(bool spin_down)
 {
   if(GF_solver != GF_format_BL) qcm_ED_throw("Green function format is not Lehmann! Cannot output the Q matrix.");
-  Green_function_solve();
+  if(!gf_solved) Green_function_solve();
   if(states.size() > 1)  qcm_ED_throw("The ground state is not a pure state! Cannot output the Q matrix.");
   shared_ptr<Green_function_set> gf;
   if(spin_down) gf = (*states.begin())->gf_down;

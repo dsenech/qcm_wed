@@ -33,6 +33,7 @@ double sum_negative(vector<double>&x);
 double max_abs(vector<double>&x);
 double min_abs(vector<double>&x);
 double sum(vector<double>&x);
+void fix_phase(vector<Complex> &x);
 void mult_add(Complex a, const vector<Complex> &x, vector<Complex> &y);
 void mult_add(double a, const vector<double > &x, vector<double > &y);
 void operator*=(vector<Complex> &x, const Complex &c);
@@ -163,8 +164,10 @@ void erase(vector<T> &x){
 template <typename T>
 ostream& operator << (ostream& flux, const vector<T>& x){
   if(x.size() > (size_t)global_int("dim_max_print")) return flux;
+	// flux << "(" << chop(x[0], console::precision);
 	flux << "(" << x[0];
 	for(size_t i=1; i<x.size(); ++i){
+		// flux << ", " << chop(x[i], console::precision);
 		flux << ", " <<x[i];
 	}
 	flux << ")";

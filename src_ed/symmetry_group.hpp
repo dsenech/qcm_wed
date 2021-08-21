@@ -60,7 +60,7 @@ struct symmetry_group
   vector<Complex> phaseC;
 
 
-  symmetry_group(int _N, int _n_sites, const vector<vector<int>> &gen, bool bath_irrep=false);
+  symmetry_group(int _N, int _n_sites, const vector<vector<int>> &gen, bool bath_irrep);
   bool is_valid_element(const vector<int>& v, bool full=false);
   bool is_identity(const vector<int>& v, bool full=false);
   vector<int> product(const vector<int>& x, const vector<int>& y);

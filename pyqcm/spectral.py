@@ -481,8 +481,8 @@ def mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='GF', k_perp = 
     :param float freq: frequency at which the spectral function is computed (0 by default)
     :param float max: maximum value of the plotting range (if None, maximum of the data)
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
-    :param float size: size of the plot, in multiple of the default (2 pi on the side)
     :param band_basis: uses the band basis instead of the orbital basis (for multiband models)
+    :param float size: size of the plot, in multiple of the default (2 pi on the side)
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
     :param kwargs: keyword arguments passed to the matplotlib 'plot' function

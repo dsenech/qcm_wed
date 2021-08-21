@@ -15,7 +15,7 @@ double tr_sigma_inf(0.0);
 vector<pair<string,double>> lattice_model_instance::averages(bool print)
 {
   if(average_solved) return ave;
-  Green_function_solve();
+  if(!gf_solved) Green_function_solve();
   double accur_OP = global_double("accur_OP");
   bool periodized_averages = global_bool("periodized_averages");
 
@@ -94,7 +94,7 @@ void lattice_model_instance::average_integrand(Complex w, vector3D<double> &k, c
   const double w_offset = 2.0;
   Complex G_pole = 1.0/(w - w_offset);
 
-  Green_function G = cluster_Green_function(w,false);
+  Green_function G = cluster_Green_function(w, false, false);
 	Green_function_k K(G,k);
 	set_Gcpt(K);
 	K.Gcpt.add(-G_pole); // regulates the Green function at high frequency (subtracts G_pole times the identity matrix)
@@ -109,7 +109,7 @@ void lattice_model_instance::average_integrand(Complex w, vector3D<double> &k, c
 	}
 	i = 0;
 	if(model->mixing == HS_mixing::up_down){
-    Green_function G = cluster_Green_function(w,false,true);
+    Green_function G = cluster_Green_function(w, false, true);
     Green_function_k K(G,k);
     set_Gcpt(K);
     K.Gcpt.add(-G_pole); // regulates the Green function at high frequency (subtracts G_pole times the identity matrix)
@@ -139,7 +139,7 @@ void lattice_model_instance::average_integrand_per(Complex w, vector3D<double> &
   const double w_offset = 2.0;
   Complex G_pole = 1.0/(w - w_offset);
   
-  Green_function G = cluster_Green_function(w,false);
+  Green_function G = cluster_Green_function(w, false, false);
   vector3D<double> k_red = model->superdual.to(model->physdual.from(k));
 
   Green_function_k K(G,k_red);
@@ -189,7 +189,7 @@ void lattice_model_instance::average_integrand_per(Complex w, vector3D<double> &
 vector<double> lattice_model_instance::dos(const complex<double> w)
 {
   double accur_OP = global_double("accur_OP");
-  Green_function_solve();
+  if(!gf_solved) Green_function_solve();
 
   size_t D_dim = model->n_band;
   size_t d = D_dim;
@@ -243,9 +243,10 @@ double lattice_model_instance::spectral_average(const string& name, const comple
   
   lattice_operator op = *model->term.at(name);
   
-  Green_function_solve();
+  if(!gf_solved) Green_function_solve();
   
   Green_function G = cluster_Green_function(w, false, false);
+
 
   auto F = [this, op, G] (vector3D<double> &k, const int *nv, double *I) mutable {
     for(size_t i = 0 ; i<*nv; i++) I[i] = 0.0;
@@ -305,7 +306,7 @@ vector<double> lattice_model_instance::momentum_profile(const lattice_operator& 
     const double w_offset = 2.0;
     Complex G_pole = 1.0/(w - w_offset);
     
-    Green_function G = cluster_Green_function(w,false);
+    Green_function G = cluster_Green_function(w, false, false);
     size_t i = 0;
     for(auto& k : k_set){
       Green_function_k K(G,k);
@@ -352,7 +353,7 @@ vector<double> lattice_model_instance::momentum_profile_per(const lattice_operat
     const double w_offset = 2.0;
     Complex G_pole = 1.0/(w - w_offset);
     
-    Green_function G = cluster_Green_function(w,false);
+    Green_function G = cluster_Green_function(w, false, false);
     size_t i = 0;
     for(auto& k : k_set){
       vector3D<double> k_red = model->superdual.to(model->physdual.from(k));
@@ -404,7 +405,7 @@ vector<double> lattice_model_instance::momentum_profile_per(const lattice_operat
 double lattice_model_instance::potential_energy()
 {
   double accur_OP = global_double("accur_OP");
-  Green_function_solve();
+  if(!gf_solved) Green_function_solve();
  
   console::message(3, "computing the potential energy");
   // computing the infinite frequency limit
@@ -441,7 +442,7 @@ double lattice_model_instance::potential_energy()
 complex<double> lattice_model_instance::TrSigmaG(Complex w, vector3D<double> &k, bool spin_down)
 {
   complex<double> z(0.0);
-  Green_function G = cluster_Green_function(w, spin_down);
+  Green_function G = cluster_Green_function(w, false, spin_down);
   Green_function_k K(G,k);
   set_Gcpt(K);
   cluster_self_energy(G);
@@ -462,7 +463,7 @@ void lattice_model_instance::potential_energy_integrand(Complex w, vector3D<doub
   
   const double w_offset = 2.0;
   
-  Complex e = TrSigmaG(w, k);
+  Complex e = TrSigmaG(w, k, false);
   if(model->mixing == HS_mixing::up_down) e += TrSigmaG(w, k, true);
   else if(model->mixing == HS_mixing::normal) e *= 2;
   
