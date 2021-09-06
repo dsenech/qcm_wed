@@ -10,7 +10,6 @@
 
 #include "matrix.hpp"
 
-#define ITERMAX 400			// maximum number of iterations
 #define FACTOR 4
 #define TINY 1e-14
 // #define DEBUGD // uncomment this line for debugging the method
@@ -83,8 +82,10 @@ void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector
 	vector<double> residuals;
 	residuals.resize(K);
 	
+	size_t max_iter_lanczos = global_int("max_iter_lanczos");
+
 	size_t iter;
-	for(iter=0; iter<ITERMAX; iter++){
+	for(iter=0; iter<max_iter_lanczos; iter++){
 		
 		//--------------------------------------------------------------------------
 		// STEP B
@@ -221,7 +222,7 @@ void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector
 		
 		
 	}
-	if(iter == ITERMAX) qcm_ED_throw("Davidson method failed to converge!");
+	if(iter == max_iter_lanczos) qcm_ED_throw("Davidson method failed to converge!");
 	else console::message(3, to_string(ncall) + " calls to H and " + to_string(iter) + " iterations");
 }
 

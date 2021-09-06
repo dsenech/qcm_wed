@@ -280,11 +280,11 @@ def fixed_density_loop(
 				var2[v] = np.empty(max_trials)
 
 		mu_converged = False
-		for j in range(max_trials):
+		for j in range(max_trials+1):
 			#+++ CALLING THE FUNCTION +++
 			pyqcm.set_parameter('mu', mu)
 			pyqcm.banner('mu = {:1.4f}'.format(mu), '+')
-			func(mu)
+			func()
 			dens = pyqcm.averages()['mu']
 			n[j] = target_n-dens
 			print('density = ', dens, '\t delta n = ', n[j])
