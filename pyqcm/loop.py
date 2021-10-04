@@ -382,12 +382,13 @@ def fade(F, p1, p2, n):
 
 
 ################################################################################
-def Hartree(F, couplings, maxiter=10):
+def Hartree(F, couplings, maxiter=10, eps_algo=0):
 	"""Performs the Hartree approximation
 
 	:param F: task to perform wihtin the loop
 	:param [class hartree] couplings: list of Hartree couplings (or single coupling)
 	:param int maxiter: maximum number of Hartree iterations
+	:param int eps_algo: number of elements in the epsilon algorithm convergence accelerator = 2*eps_algo + 1 (0 = no acceleration)
 
 	"""
 
@@ -396,6 +397,12 @@ def Hartree(F, couplings, maxiter=10):
 	pyqcm.banner('Hartree procedure', c='*', skip=1)
 	hartree_converged = False
 	diff_tot = 1e6
+	var_data = np.empty((len(couplings), maxiter+2))
+
+	if eps_algo:
+		for C in couplings:
+			C.init_epsilon(maxiter, eps_algo)
+
 	iter = 0
 	while True:
 		F()
@@ -403,11 +410,13 @@ def Hartree(F, couplings, maxiter=10):
 		pyqcm.banner('Hartree iteration {:d}'.format(iter), '-')
 		diff_tot = 0
 		hartree_converged = True
-		for C in couplings:
+		for i,C in enumerate(couplings):
 			C.update()
 			C.print()
 			diff_tot += np.abs(C.diff)
 			hartree_converged = hartree_converged and C.converged()
+			var_data[i, iter] = C.vm
+
 
 		print('total difference = {:g}'.format(diff_tot))
 

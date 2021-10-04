@@ -9,9 +9,6 @@ import time
 import qcm
 import timeit
 
-
-
-
 #-------------------------------------------------------------------------------
 # global variables
 
@@ -265,6 +262,11 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         pyqcm.banner('CDMFT procedure', '*', skip=1)
     else:
         pyqcm.banner('CDMFT procedure (combined with Hartree procedure)', '*', skip=1)
+        if eps_algo:
+            for C in hartree:
+                C.init_epsilon(maxiter, eps_algo)
+
+
 
     # identifying the variational parameters
     nvar = len(var)
@@ -356,16 +358,24 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         for i in range(nvar):
             pyqcm.set_parameter(var[i], sol.x[i])
 
+        diff_param = np.linalg.norm(params_array - sol.x)/np.sqrt(nvar)
+        initial_step = diff_param
+        if superiter > 0:
+            diffH = __diff_hybrid(Hyb, Hyb0)
+            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}, diff hybrid = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, diffH, iter_done, time_MIN/time_ED))
+        else:
+            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, iter_done, time_MIN/time_ED))
+
         #--------------------------------- Hartree step ---------------------------------
         if hartree != None:
             hartree_converged = True
             hartree_ave = np.zeros(nclus)
             diff_hartree = 0
+            diff_hartree_rel = 0
             for C in hartree:
-                C.update()
+                C.update(pr=True)
                 diff_hartree += np.abs(C.diff)
                 hartree_converged = hartree_converged and C.converged()
-            print('Hartree mean-field difference : {: #.2e}'.format(diff_hartree))
         #--------------------------------------------------------------------------------
 
         #--------------------------------- counterterms ---------------------------------
@@ -376,13 +386,6 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
                 CT_converged = CT_converged and C.converged()
         #--------------------------------------------------------------------------------
 
-        diff_param = np.linalg.norm(params_array - sol.x)/np.sqrt(nvar)
-        initial_step = diff_param
-        if superiter > 0:
-            diffH = __diff_hybrid(Hyb, Hyb0)
-            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}, diff hybrid = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter, dist_value, diff_param, diffH, iter_done, time_MIN/time_ED))
-        else:
-            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter, dist_value, diff_param, iter_done, time_MIN/time_ED))
 
         # writing the parameters in a progress file
         des = 'distance\tdiff_param\tdiff_hybrid\t'
@@ -413,15 +416,17 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         if superiter > maxiter:
             raise pyqcm.TooManyIterationsError(maxiter)
 
+        #--------------------------- convergence acceleration ---------------------------
         eps_length = 2*eps_algo + 1
         if eps_algo and superiter>=2*eps_length and superiter%(2*eps_length) == 0:
             pyqcm.banner('applying the epsilon algorithm')
             for i in range(nvar):
-                z = epsilon(var_data[i,superiter-eps_length:superiter])
+                z = pyqcm.epsilon(var_data[i,superiter-eps_length:superiter])
                 var_data[i,superiter] = z
                 pyqcm.set_parameter(var[i], z)
             var_val = pyqcm.__varia_table(var,var_data[:,superiter])
             print(var_val)
+        #-------------------------------------------------------------------------------
 
 
     # here we have converged
@@ -454,30 +459,6 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         pyqcm.banner('Failure of the CDMFT algorithm', '*')
 
 
-
-
-######################################################################
-def epsilon(y, pr=False):
-    """Performs the epsilon algorithm for accelerated convergence
-
-    :param [float] y: sequence to be extrapolated
-    :param boolean pr: if True, prints the resulting extrapolation
-    :return [float]: the extrapolated values
-
-    """
-    
-    if len(y)%2 ==0 :
-        print("the epsilon algorithm requires an odd-length sequence")
-        return 0
-    M = np.zeros((len(y),len(y)+1))
-    M[:,1] = y
-    for i in range(len(y)-2, -1, -1):
-        for k in range(2,len(y)-i+1):
-            M[i,k] = M[i+1,k-2] + 1.0/(M[i+1,k-1]-M[i,k-1])
-    np.set_printoptions(linewidth=1000)
-    if pr == True :
-        print(M)
-    return M[0,-1]
 
 
 ######################################################################

@@ -23,13 +23,14 @@ class hartree:
 
     size0 = 0
 
-    def __init__(self, Vm, V, eig, accur=1e-4, lattice=False):
+    def __init__(self, Vm, V, eig, accur=1e-4, accur_rel=1e-3, lattice=False):
         """
 
         :param str Vm: name of the mean-field operator
         :param str V: name of the interaction operator
         :param float eig: eigenvalue
         :param float accur: required accuracy of the self-consistent procedure
+        :param float accur_rel: required relative accuracy of the self-consistent procedure
         :param boolean lattice: if True, the lattice average is used, otherwise the cluster average
 
         """
@@ -38,8 +39,12 @@ class hartree:
         self.eig = eig
         self.lattice = lattice
         self.diff = 1e6
+        self.diff_rel = 1e6
         self.ave = 0
         self.accur = accur
+        self.accur_rel = accur_rel
+        self.epsilon = False
+        self.iter = 0
 
         par = pyqcm.parameters()
         assert V in par, 'Hartree : '+V+' is not a parameter in the model!'
@@ -68,8 +73,17 @@ class hartree:
         self.vm = self.eig*v*self.ave
         pyqcm.set_parameter(self.Vm, self.vm)
         self.diff = self.vm-vm0
+        self.diff_rel = np.abs(self.diff)/(np.abs(self.vm)+1e-6)
+        meta_pr = ''
+        if self.epsilon:
+            eps_length = 2*self.epsilon + 1
+            self.data[self.iter] = self.vm
+            if self.iter >= 2*eps_length and self.iter%(2*eps_length) == 0:
+                self.vm = pyqcm.epsilon(self.data[self.iter-eps_length:self.iter])
+                meta_pr = ' (epsilon algo)'
+        self.iter += 1
         if pr:
-            print('delta '+self.Vm+' = ', self.diff)
+            print('delta {:s} = {:1.3g} ( {:1.3g}%)'.format(self.Vm, self.diff, 100*self.diff_rel), meta_pr)
 
     def omega(self):
         """returns the constant contribution, added to the Potthoff functional
@@ -85,6 +99,16 @@ class hartree:
             self.ave = pyqcm.averages()[self.Vm]
         return -0.5*self.eig*v*self.ave*self.ave
 
+    def omega_var(self):
+        """returns the constant contribution, added to the Potthoff functional
+        
+        """
+
+        par = pyqcm.parameters()
+        v = par[self.V]
+        vm0 = par[self.Vm]
+        return -0.5*vm0*vm0/(self.eig*v)
+
     def converged(self):
         """Tests whether the mean-field procedure has converged
 
@@ -92,7 +116,7 @@ class hartree:
         
         """
 
-        if np.abs(self.diff) < self.accur :
+        if np.abs(self.diff) < self.accur and self.diff_rel < self.accur_rel:
             return True
         else:
             return False
@@ -103,7 +127,12 @@ class hartree:
 
 
     def print(self):
-        print('<{:s}> = {:g}\t{:s} = {:g} (diff = {:g})'.format(self.Vm, self.ave, self.Vm, self.vm, self.diff))
+        print('<{:s}> = {:g}\t{:s} = {:g} (diff = {:g}, {:g}%)'.format(self.Vm, self.ave, self.Vm, self.vm, self.diff, 100*self.diff_rel))
+
+    def init_epsilon(self, n, eps_length):
+        self.data = np.empty(n+1)
+        self.epsilon = eps_length
+        self.iter = 0
 
 
 

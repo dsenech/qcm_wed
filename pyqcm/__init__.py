@@ -1787,3 +1787,26 @@ def switch_cluster_model(name):
     return qcm.switch_cluster_model(name)
 
 
+######################################################################
+def epsilon(y, pr=False):
+    """Performs the epsilon algorithm for accelerated convergence
+
+    :param [float] y: sequence to be extrapolated
+    :param boolean pr: if True, prints the resulting extrapolation
+    :return [float]: the extrapolated values
+
+    """
+    
+    if len(y)%2 ==0 :
+        print("the epsilon algorithm requires an odd-length sequence")
+        return 0
+    M = np.zeros((len(y),len(y)+1))
+    M[:,1] = y
+    for i in range(len(y)-2, -1, -1):
+        for k in range(2,len(y)-i+1):
+            M[i,k] = M[i+1,k-2] + 1.0/(M[i+1,k-1]-M[i,k-1])
+    np.set_printoptions(linewidth=1000)
+    if pr == True :
+        print(M)
+    return M[0,-1]
+

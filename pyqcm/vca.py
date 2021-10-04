@@ -83,7 +83,7 @@ def __QN_values(func, x, step):
 ################################################################################
 # quasi-Newton method
 
-def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, bfgs=False, max_iteration=30, max_iter_diff=None, hartree=None):
+def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, bfgs=False, max_iteration=30, max_iter_diff=None):
     """Performs the quasi_newton procedure
     
     :param func: a function of N variables
@@ -95,7 +95,6 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
     :param boolean bfgs: True if the BFGS method is used, otherwise the symmetric rank-1 formula is used (default)
     :param int max_iterations: maximum number of iterations, beyond which an exception is raised
     :param float max_iter_diff: maximum step to make
-    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :return (float, [float], [[float]]): tuple of x (the solution), gradient (array, the value of the gradient), hessian (matrix, the Hessian matrix)
 
     """
@@ -107,21 +106,14 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
     ihessian = np.eye(n)  # inverse Hessian matrix
     iteration = 0
     x = start
-    hartree_converged = True
 
     while iteration < max_iteration:
         x0 = x
         x, dx, gradient, ihessian = __quasi_newton_step(iteration, func, x0, step, gradient, dx, bfgs)
         iteration += 1
 
-        if hartree != None:
-            hartree_converged = True
-            for C in hartree:
-                C.update()
-                C.print()
-                hartree_converged = hartree_converged and C.converged()
 
-        if (np.linalg.norm(gradient) < gtol) and hartree_converged :
+        if (np.linalg.norm(gradient) < gtol) :
             if root:
                 print('convergence on gradient after ', iteration, ' iterations')
             break
@@ -135,7 +127,7 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
             if np.abs(dx[i]) > accur[i]:
                 converged = False
                 break
-        if converged and hartree_converged:
+        if converged:
             if root:
                 print('convergence on position after ', iteration, ' iterations')
             break
@@ -288,7 +280,7 @@ def __NR_Hessian(func, x, step):
 ################################################################################
 # Newton-Raphson method
 
-def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max_iteration=30, max_iter_diff=None, hartree=None):
+def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max_iteration=30, max_iter_diff=None):
     """Performs the Newton-Raphson procedure
     
     :param func: a function of N variables
@@ -299,7 +291,6 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
     :param float gtol: the gradient tolerance (gradient must be smaller than gtol for convergence)
     :param int max_iterations:  maximum number of iterations, beyond which an exception is raised
     :param float max_iter_diff: optional maximum value of the maximum step
-    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :returns (float, [float], [[float]]): the value of the function, the gradient, and the Hessian
 
     """
@@ -310,7 +301,6 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
     iteration = 0
     x = start
     step0 = step
-    hartree_converged = True
 
     while iteration < max_iteration:
         iteration += 1
@@ -318,13 +308,8 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
         gradient0 = np.copy(gradient)
         dx, F, gradient, hessian = __newton_raphson_step(func, x, step)
 
-        if hartree != None:
-            hartree_converged = True
-            for C in hartree:
-                C.update(pr=True)
-                hartree_converged  = hartree_converged and C.converged()
 
-        if np.linalg.norm(gradient) < gtol and hartree_converged:
+        if np.linalg.norm(gradient) < gtol:
             if root:
                 print('convergence on gradient after ', iteration, ' iterations')
             break
@@ -364,7 +349,7 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
             if np.abs(dx[i]) > accur[i]:
                 converged = False
                 break
-        if converged and hartree_converged:
+        if converged:
             if root:
                 print('convergence on position after ', iteration, ' iterations')
             break
@@ -418,6 +403,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     """
     global first_time
     pyqcm.new_model_instance()
+    L = pyqcm.model_size()[0]
 
     if names is None:
         print('missing argument names : variational parameters must be specified')
@@ -462,7 +448,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         OM = pyqcm.Potthoff_functional()
         if hartree != None:
             for C in hartree:
-                OM += C.omega()
+                OM += C.omega_var()/L
         return OM
         
     if hartree == None:
@@ -475,9 +461,9 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
 
     try:
         if NR :
-            sol, grad, iH = __newton_raphson(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree)  # Newton-Raphson process
+            sol, grad, iH = __newton_raphson(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff)  # Newton-Raphson process
         else:
-            sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, False, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree)  # quasi-Newton process
+            sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, False, max_iteration=max_iter, max_iter_diff=max_iter_diff)  # quasi-Newton process
     except pyqcm.OutOfBoundsError as E:
         print('variable ', E.variable + 1, ' is out of bounds: abs(', names[E.variable], ') > ', max[E.variable])
         raise pyqcm.OutOfBoundsError(variable=E.variable, iteration=E.iteration)
@@ -485,11 +471,6 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     except pyqcm.TooManyIterationsError as E:
         print('quasi-Newton method failed to converge after ', E.max_iteration, ' iterations')
         raise pyqcm.TooManyIterationsError(E.max_iteration)
-
-    if hartree != None:
-        print('Mean field values:')
-        for C in hartree:
-            C.print()
 
     omega = var2x(sol)  # final, converged value
     if root:
@@ -519,16 +500,18 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     return sol, 1.0/np.diag(iH)
 
 ################################################################################
-def plot_sef(param, prm, accur_SEF=1e-4, show=True):
+def plot_sef(param, prm, accur_SEF=1e-4, hartree=None, show=True):
     """Draws a plot of the Potthoff functional as a function of a parameter param taken from the list prm. The results are going to be appended to 'sef.tsv'
     
     :param str param: name of the parameter (independent variable)
     :param [float] prm: list of values of the parameter
     :param float accur_SEF: precision of the computation of the self-energy functional
+    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :param boolean show: if True, the plot is shown on the screen.
     :returns: None
 
     """
+    L = pyqcm.model_size()[0]
 
     pyqcm.set_global_parameter('accur_SEF', accur_SEF)
     omega = np.empty(len(prm))
@@ -538,6 +521,10 @@ def plot_sef(param, prm, accur_SEF=1e-4, show=True):
         # print(pyqcm.parameter_set(opt='report'))
         # print('.'*80, '\n', pyqcm.cluster_parameters())
         omega[i] = pyqcm.Potthoff_functional()
+        if hartree != None:
+            for C in hartree:
+                omega[i] += C.omega_var()/L
+
         print("omega(", prm[i], ") = ", omega[i])
     
     if show:
@@ -609,7 +596,7 @@ def plot_GS_energy(param, prm, clus=0, file=None, plt_ax=None, **kwargs):
 ################################################################################
 # performs the VCA
 
-def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='Nelder-Mead'):
+def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='Nelder-Mead', hartree=None):
     """Performs the VCA assuming that the solution is a minimum of the Potthoff functional
     Uses minimization routines from scipy.optimize.
     
@@ -619,6 +606,7 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
     :param float accur: accuracy of parameters
     :param float ftol: convergence criterion for the value of the SEF
     :param str method: minimization method used in scipy.optimize.minimize()
+    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :return: None
 
     """
@@ -629,6 +617,7 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
         raise pyqcm.MissingArgError('names')
 
     nvar = len(names)  # number of variational parameters
+    L = pyqcm.model_size()[0]
 
     if start is None:
         print('missing argument start')
@@ -651,7 +640,11 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
             pyqcm.set_parameter(names[i], x[i])
             print('x = ', x) # new
         pyqcm.new_model_instance()
-        return pyqcm.Potthoff_functional()
+        OM = pyqcm.Potthoff_functional()
+        if hartree != None:
+            for C in hartree:
+                OM += C.omega_var()/L
+        return OM
 
     from scipy.optimize import minimize
     ftol = 1e-4
