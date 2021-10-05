@@ -448,14 +448,14 @@ double lattice_model_instance::Potthoff_functional()
   SEF_solved = true;
 
   // writing to file
-  static bool first_print = true;
-  ofstream fout("sef.tsv",ios::app);
-  print_info();
-  if(first_print){
-    fout << line_info_names << endl;
-    first_print = false;
-  }
-  fout << line_info_values << endl;
+  // static bool first_print = true;
+  // ofstream fout("sef.tsv",ios::app);
+  // print_info();
+  // if(first_print){
+  //   fout << line_info_names << endl;
+  //   first_print = false;
+  // }
+  // fout << line_info_values << endl;
   
 	return(omega);
 }

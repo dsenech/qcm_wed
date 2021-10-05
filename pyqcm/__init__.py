@@ -8,7 +8,7 @@ parameter_set_str = ''
 ################################################################################
 # GLOBAL MODULE VARIABLES
 solver = 'ED'
-
+first_SEF = True
 ################################################################################
 # EXCEPTIONS
 
@@ -761,20 +761,27 @@ def periodized_Green_function_element(r, c, z, k, spin_down=False, label=0):
 
 
 ################################################################################
-def Potthoff_functional(hartree=None, label=0):
+def Potthoff_functional(hartree=None, file='sef.tsv', label=0):
     """
     computes the Potthoff functional for a given instance
 
     :param int label: label of the model instance
+    :param str file: name of the file to append with the result
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :return: the value of the self-energy functional
 
     """
+    global first_SEF
+
     OM = qcm.Potthoff_functional(label)
     if hartree != None:
         L = model_size()[0]
         for C in hartree:
             OM += C.omega_var()/L
+
+    write_summary(file, first=first_SEF, suppl_descr='omegaH\t', suppl_values='{:.8g}\t'.format(OM))
+    first_SEF = False
+
     return OM
 
 

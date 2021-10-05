@@ -404,6 +404,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     global first_time
     pyqcm.new_model_instance()
     L = pyqcm.model_size()[0]
+    pyqcm.first_SEF = True
 
     if names is None:
         print('missing argument names : variational parameters must be specified')
@@ -508,6 +509,7 @@ def plot_sef(param, prm, accur_SEF=1e-4, hartree=None, show=True):
 
     """
     L = pyqcm.model_size()[0]
+    pyqcm.first_SEF = True
 
     pyqcm.set_global_parameter('accur_SEF', accur_SEF)
     omega = np.empty(len(prm))
