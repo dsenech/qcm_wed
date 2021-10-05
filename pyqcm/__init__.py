@@ -788,7 +788,7 @@ def properties(label=0):
 
     """
     des, data = qcm.properties(label)
-    des += 'githash_pyqcm\t'
+    des += 'githash\t'
     data += git_hash + '\t'
     return des, data
 

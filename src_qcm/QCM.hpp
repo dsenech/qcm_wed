@@ -49,7 +49,6 @@ namespace QCM{
   pair<vector<array<double,9>>, vector<array<complex<double>, 11>>> site_and_bond_profile(int label);
   size_t Green_function_dimension();
   size_t reduced_Green_function_dimension();
-  string git_hash();
   vector<double> Berry_curvature(vector3D<double>& k1, vector3D<double>& k2, int nk, int band, bool rec, int dir, int label);
   vector<double> dos(const complex<double> w, int label);
   vector<double> momentum_profile(const string& op, const vector<vector3D<double>> &k_set, int label);

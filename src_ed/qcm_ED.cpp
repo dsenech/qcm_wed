@@ -347,14 +347,6 @@ namespace ED{
     auto& M = model_instances.at(label);
     M->read(fin);
   }
-
-  string git_hash()
-  {
-#ifdef GITHASH
-    return string(GITHASH);
-#endif
-    return "";
-  }
   
   
   pair<vector<double>, vector<complex<double>>> qmatrix(bool spin_down, const size_t label)

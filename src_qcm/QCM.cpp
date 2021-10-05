@@ -561,17 +561,6 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
   }
   
   
-  /**
-   * returns a string containint the mercurial version of the program
-   */
-  string git_hash()
-  {
-    #ifdef GITHASH
-    return string(GITHASH);
-    #endif
-    return "";
-  }
-
   
   /**
    * returns a pair of strings list some properties of the model

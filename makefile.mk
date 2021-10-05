@@ -1,5 +1,5 @@
-GITHASH = $(shell git rev-parse --short HEAD)
-OPTIONS += -DGITHASH="\"${GITHASH}\""
+#GITHASH = $(shell git rev-parse --short HEAD)
+#OPTIONS += -DGITHASH="\"${GITHASH}\""
 INCLUDE += $(LOCAL_INCLUDE)
 
 #this file define the var INCLUDE

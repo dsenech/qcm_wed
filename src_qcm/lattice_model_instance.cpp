@@ -630,10 +630,6 @@ void lattice_model_instance::print_info()
     ostr1 << "E0_" << i+1 << "\tsector_"  << i+1 << '\t';
     ostr2 << setprecision(print_precision) << gs[i].first << '\t' << gs[i].second << '\t';
   }
-  ostr1 << "githash\t";
-  ostr2 << QCM::git_hash() << '\t';
-  ostr1 << "githash_ED\t";
-  ostr2 << ED::git_hash() << '\t';
   line_info_names = ostr1.str();
   line_info_values = ostr2.str();
 }

@@ -260,13 +260,6 @@ namespace ED{
   
   
   /**
-   prints the git hash (the short version) of the program, to keep track of versions in output
-   output : a string, the short git hash
-   */
-  string git_hash();
-  
-
-  /**
    prints the global model on a file
    */
   void print_models(ostream& fout);
