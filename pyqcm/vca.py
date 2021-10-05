@@ -445,11 +445,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         else:
             var2sef(x)    
         pyqcm.new_model_instance()
-        OM = pyqcm.Potthoff_functional()
-        if hartree != None:
-            for C in hartree:
-                OM += C.omega_var()/L
-        return OM
+        return pyqcm.Potthoff_functional(hartree)
         
     if hartree == None:
         pyqcm.banner('VCA procedure', '*')
@@ -520,10 +516,7 @@ def plot_sef(param, prm, accur_SEF=1e-4, hartree=None, show=True):
         pyqcm.new_model_instance()
         # print(pyqcm.parameter_set(opt='report'))
         # print('.'*80, '\n', pyqcm.cluster_parameters())
-        omega[i] = pyqcm.Potthoff_functional()
-        if hartree != None:
-            for C in hartree:
-                omega[i] += C.omega_var()/L
+        omega[i] = pyqcm.Potthoff_functional(hartree)
 
         print("omega(", prm[i], ") = ", omega[i])
     
@@ -640,11 +633,7 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
             pyqcm.set_parameter(names[i], x[i])
             print('x = ', x) # new
         pyqcm.new_model_instance()
-        OM = pyqcm.Potthoff_functional()
-        if hartree != None:
-            for C in hartree:
-                OM += C.omega_var()/L
-        return OM
+        return pyqcm.Potthoff_functional(hartree)
 
     from scipy.optimize import minimize
     ftol = 1e-4

@@ -761,15 +761,22 @@ def periodized_Green_function_element(r, c, z, k, spin_down=False, label=0):
 
 
 ################################################################################
-def Potthoff_functional(label=0):
+def Potthoff_functional(hartree=None, label=0):
     """
     computes the Potthoff functional for a given instance
 
     :param int label: label of the model instance
+    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :return: the value of the self-energy functional
 
     """
-    return qcm.Potthoff_functional(label)
+    OM = qcm.Potthoff_functional(label)
+    if hartree != None:
+        L = model_size()[0]
+        for C in hartree:
+            OM += C.omega_var()/L
+    return OM
+
 
 ################################################################################
 def properties(label=0):
