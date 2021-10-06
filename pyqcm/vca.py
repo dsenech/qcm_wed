@@ -106,6 +106,7 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
     ihessian = np.eye(n)  # inverse Hessian matrix
     iteration = 0
     x = start
+    step0 = step
 
     while iteration < max_iteration:
         x0 = x
@@ -131,6 +132,15 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
             if root:
                 print('convergence on position after ', iteration, ' iterations')
             break
+
+        #redefining the steps
+        step_multiplier = 2.0
+        for i in range(n):
+            step[i] = np.abs(dx[i])
+            if step[i] > step0[i]:
+                step[i] = 2.0*step0[i]
+            if step[i] < step_multiplier*accur[i]:
+                step[i] = step_multiplier*accur[i]
 
     if iteration == max_iteration:
         raise pyqcm.TooManyIterationsError(max_iteration)
