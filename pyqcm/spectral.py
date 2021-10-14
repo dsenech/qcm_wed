@@ -468,13 +468,14 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
 
 
 ################################################################################
-def mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='GF', k_perp = 0, freq = 0.0, max=None, plane = 'xy', size=1.0, band_basis=False, file=None, plt_ax=None, **kwargs):
+def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, opt='GF', k_perp = 0, freq = 0.0, max=None, plane = 'xy', size=1.0, band_basis=False, file=None, plt_ax=None, **kwargs):
     """Plots the spectral weight at zero frequency in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
     :param float eta: Lorentzian broadening
     :param int label: label of the model instance 
     :param int band: if None, sums all the bands. Otherwise just shows the weight for that band (starts at 1)
+    :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param boolean quadrant: if True, plots the first quadrant of a square Brillouin zone only
     :param str opt: The quantity to plot. 'GF' = Green function, 'self' = self-energy, 'Z' = quasi-particle weigt
     :param float k_perp: momentum component in the third direction (in multiple of pi)
@@ -519,11 +520,11 @@ def mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='GF', k_perp = 
     else:
         if band is None:
             for l in range(d): 
-                A += -pyqcm.periodized_Green_function_element(l, l, freq + eta * 1j, k, label=label).imag
+                A += -pyqcm.periodized_Green_function_element(l, l, freq + eta * 1j, k, spin_down=spin_down, label=label).imag
         elif band_basis == False:
-            A = -pyqcm.periodized_Green_function_element(band-1, band-1, freq + eta * 1j, k, label=label).imag
+            A = -pyqcm.periodized_Green_function_element(band-1, band-1, freq + eta * 1j, k, spin_down=spin_down, label=label).imag
         else:
-            A = -pyqcm.band_Green_function(freq + eta * 1j, k, label=label)[:, band-1, band-1].imag
+            A = -pyqcm.band_Green_function(freq + eta * 1j, k, spin_down=spin_down, label=label)[:, band-1, band-1].imag
 
     A = np.reshape(A, (nk, nk))
     axis = ''
@@ -780,11 +781,12 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, im_part=Fals
         plt.show()
 
 ################################################################################
-def dispersion(nk=64, label=0, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, **kwargs):
+def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, **kwargs):
     """Plots the dispersion relation in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
     :param int label: label of the model instance 
+    :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int band: if None, sums all the bands. Otherwise just shows the weight for that band (starts at 1)
     :param boolean contour: True if a contour plot is produced instead of a 3D plot.
     :param str datafile: if given, name of the data file (no extension please) in which the data is printed, for plotting with an external program. Does not plot. Will produce one file per band, with the .tsv extension.
@@ -812,7 +814,7 @@ def dispersion(nk=64, label=0, band=None, contour=False, datafile=None, quadrant
     k, x = __kgrid(ax, nk, quadrant=quadrant, k_perp=k_perp, plane=plane)
 
     d, nbands = pyqcm.reduced_Green_function_dimension()
-    e = pyqcm.dispersion(k, label=label)
+    e = pyqcm.dispersion(k, label=label, spin_down=spin_down)
     k.shape = (nk, nk, 3)
     e.shape = (nk, nk, d)
 

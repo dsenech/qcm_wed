@@ -198,6 +198,7 @@ def fixed_density_loop(
 	dens_tol=0.001,
 	dir='',
 	measure=None,
+	cluster_density=False
 ):
 	"""Performs a loop while trying to keep a fixed density
 
@@ -212,6 +213,7 @@ def fixed_density_loop(
 	:param dens_tol: tolerance on the value of the density
 	:param dir: directory of calling script
 	:param measure: name of function to be called when the desired density is reached
+	:param cluster_density: if True, uses the cluster density instead of the lattice density
 
 	"""
 	first_time = True
@@ -285,7 +287,10 @@ def fixed_density_loop(
 			pyqcm.set_parameter('mu', mu)
 			pyqcm.banner('mu = {:1.4f}'.format(mu), '+')
 			func()
-			dens = pyqcm.averages()['mu']
+			if cluster_density:
+				dens = pyqcm.cluster_averages()['mu'][0]
+			else:
+				dens = pyqcm.averages()['mu']
 			n[j] = target_n-dens
 			print('density = ', dens, '\t delta n = ', n[j])
 			#++++++++++++++++++++++++++++
