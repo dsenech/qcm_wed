@@ -29,9 +29,43 @@ mixing = 0
 clusters = None
 maxfev = 500000
 
+
 ################################################################################
 # PRIVATE FUNCTIONS
 ################################################################################
+
+def moving_std(x):
+    n = len(x)
+    std = np.empty(n-1)
+    for i in range(1,n):
+        std[i-1] = np.std(x[n-i-1:n])/np.sqrt(i)
+    I = np.argmin(std)
+    return std[I], x[n-I-1]
+
+################################################################################
+# CLASSES
+######################################################################
+class observable:
+    def __init__(self, name, tol):
+        self.name = name
+        self.tol = tol
+        self.val = np.zeros(32)
+        self.ave = 999
+
+    def __repr__(self):
+        return self.name + '(tol = {:.2g})'.format(self.tol)
+
+    def test_convergence(self, iter, x):
+        if iter > len(self.val):
+            self.val.resize(len(self.val) + 32)
+        self.val[iter] = x
+        std, self.ave = moving_std(self.val[0:iter+1])
+        if std < self.tol:
+            return True
+        else:
+            return False
+        
+
 
 ######################################################################
 class solution:    
@@ -222,7 +256,7 @@ def __optimize(F, x, method='Nelder-Mead', initial_step=0.1, accur = 1e-4, accur
 ######################################################################
 # main CDMFT function
 
-def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4, accur_dist=1e-10, displaymin=False, method='CG', file='cdmft.tsv', skip_averages=False, eps_algo=0, initial_step = 0.1, hartree=None, check_sectors=None, grid_type = 'sharp', counterterms=None, SEF=False):
+def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4, accur_dist=1e-10, displaymin=False, method='CG', file='cdmft.tsv', skip_averages=False, eps_algo=0, initial_step = 0.1, hartree=None, check_sectors=None, grid_type = 'sharp', counterterms=None, SEF=False, observables=None):
     """Performs the CDMFT procedure
 
     :param [str] varia: list of variational parameters 
@@ -245,6 +279,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
     :param str grid_type: type of frequency grid along the imaginary axis : 'sharp', 'ifreq', 'self'
     :param [str] counterterms: list of counterterms names (cluster operators that should strive to have zero average)
     :param boolean SEF: if True, computes the Potthoff functional at the end
+    :param [class observable]: list of observables used to assess convergence
     :returns: None
 
     """
@@ -265,8 +300,6 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         if eps_algo:
             for C in hartree:
                 C.init_epsilon(maxiter, eps_algo)
-
-
 
     # identifying the variational parameters
     nvar = len(var)
@@ -294,6 +327,13 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
     superiter = 0
     diff_hartree = 0.0
     hartree_converged = True
+
+    # checks on the observables
+    if observables != None:
+        for x in observables:
+            if x.name[-2:] != '_1':
+                print('observables must be cluster operators associated with cluster 1 only')
+                exit()
 
     # first define the frequency grid for the distance function
     print('frequency grid type = ', grid_type)
@@ -410,6 +450,21 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
                 converged = True
                 break
 
+        # checking convergence on the observables
+        # for the moment, this works only for observables belonging to the first cluster
+        obs_converged = True
+        if observables != None and superiter > 0:
+            ave = pyqcm.cluster_averages()
+            for x in observables:
+                val = ave[x.name[0:-2]][0]
+                Conv = x.test_convergence(superiter, val)
+                obs_converged = obs_converged and Conv
+                print('observable <{:s}> = {:.6g}'.format(x.name, x.ave))
+            if obs_converged:
+                converged = True
+                pyqcm.banner('CDMFT converged on the observables', '=')
+                break
+
         superiter += 1
         var_val = pyqcm.__varia_table(var,sol.x)
         print(var_val)
@@ -450,6 +505,10 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         if file != None:
             des = 'iterations\tdist_function\tdistance\tdiff_hybrid\t'
             val = '{:d}\t{:s}\t{: #.2e}\t{: #.2e}\t'.format(superiter, dist_function, dist_value, diffH)
+            if observables != None:
+                for x in observables:
+                    des += 'ave_'+x.name+'_obs\t'
+                    val += '{: #.6e}\t'.format(x.ave)
             pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
             first_time = False
             first_time2 = True

@@ -468,9 +468,9 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
   /**
    computes the lattice averages
    */
-  vector<pair<string,double>> averages(int label, bool print)
+  vector<pair<string,double>> averages(int label)
   {
-    return lattice_model_instances.at(label)->averages(print);
+    return lattice_model_instances.at(label)->averages();
   }
   
   

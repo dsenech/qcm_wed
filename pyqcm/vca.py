@@ -83,7 +83,7 @@ def __QN_values(func, x, step):
 ################################################################################
 # quasi-Newton method
 
-def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, bfgs=False, max_iteration=30, max_iter_diff=None):
+def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, bfgs=False, max_iteration=30, max_iter_diff=None, hartree=None):
     """Performs the quasi_newton procedure
     
     :param func: a function of N variables
@@ -95,6 +95,7 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
     :param boolean bfgs: True if the BFGS method is used, otherwise the symmetric rank-1 formula is used (default)
     :param int max_iterations: maximum number of iterations, beyond which an exception is raised
     :param float max_iter_diff: maximum step to make
+    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :return (float, [float], [[float]]): tuple of x (the solution), gradient (array, the value of the gradient), hessian (matrix, the Hessian matrix)
 
     """
@@ -106,15 +107,21 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
     ihessian = np.eye(n)  # inverse Hessian matrix
     iteration = 0
     x = start
-    step0 = step
+    hartree_converged = True
 
     while iteration < max_iteration:
         x0 = x
         x, dx, gradient, ihessian = __quasi_newton_step(iteration, func, x0, step, gradient, dx, bfgs)
         iteration += 1
 
+        if hartree != None:
+            hartree_converged = True
+            for C in hartree:
+                C.update()
+                C.print()
+                hartree_converged = hartree_converged and C.converged()
 
-        if (np.linalg.norm(gradient) < gtol) :
+        if (np.linalg.norm(gradient) < gtol) and hartree_converged :
             if root:
                 print('convergence on gradient after ', iteration, ' iterations')
             break
@@ -128,7 +135,7 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
             if np.abs(dx[i]) > accur[i]:
                 converged = False
                 break
-        if converged:
+        if converged and hartree_converged:
             if root:
                 print('convergence on position after ', iteration, ' iterations')
             break
@@ -290,7 +297,7 @@ def __NR_Hessian(func, x, step):
 ################################################################################
 # Newton-Raphson method
 
-def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max_iteration=30, max_iter_diff=None):
+def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max_iteration=30, max_iter_diff=None, hartree=None):
     """Performs the Newton-Raphson procedure
     
     :param func: a function of N variables
@@ -301,6 +308,7 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
     :param float gtol: the gradient tolerance (gradient must be smaller than gtol for convergence)
     :param int max_iterations:  maximum number of iterations, beyond which an exception is raised
     :param float max_iter_diff: optional maximum value of the maximum step
+    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :returns (float, [float], [[float]]): the value of the function, the gradient, and the Hessian
 
     """
@@ -311,20 +319,26 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
     iteration = 0
     x = start
     step0 = step
+    hartree_converged = True
 
     while iteration < max_iteration:
         iteration += 1
 
         gradient0 = np.copy(gradient)
         dx, F, gradient, hessian = __newton_raphson_step(func, x, step)
+        ihessian = np.linalg.inv(hessian)
 
+        if hartree != None:
+            hartree_converged = True
+            for C in hartree:
+                C.update(pr=True)
+                hartree_converged  = hartree_converged and C.converged()
 
-        if np.linalg.norm(gradient) < gtol:
+        if np.linalg.norm(gradient) < gtol and hartree_converged:
             if root:
                 print('convergence on gradient after ', iteration, ' iterations')
             break
 
-        ihessian = np.linalg.inv(hessian)
 
         if max_iter_diff is not None:
             norm_dx = np.linalg.norm(dx)
@@ -359,7 +373,7 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
             if np.abs(dx[i]) > accur[i]:
                 converged = False
                 break
-        if converged:
+        if converged and hartree_converged:
             if root:
                 print('convergence on position after ', iteration, ' iterations')
             break
@@ -394,7 +408,7 @@ def __newton_raphson_step(func=None, x=None, step=None):
 ################################################################################
 # performs the VCA
 
-def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, accur_grad=1e-6, max_iter=30, max_iter_diff=None, NR=False, hartree=None):
+def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, accur_grad=1e-6, max_iter=30, max_iter_diff=None, NR=False, hartree=None, hartree_self_consistent=False):
     """Performs a VCA with the QN or NR method
     
     :param var2sef: function that converts variational parameters to model parameters
@@ -408,6 +422,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     :param float max_iter_diff: optional maximum value of the maximum step in the quasi-Newton method
     :param boolean NR: True if the Newton-Raphson method is used, False if the quasi-Newton method is used
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
+    :param boolean hartree_self_consistent: True if the Hartree approximation is treated in the self-consistent, rather than variational, way.
     :return: None
     
     """
@@ -415,6 +430,11 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     pyqcm.new_model_instance()
     L = pyqcm.model_size()[0]
     pyqcm.first_SEF = True
+
+    hartree_self = None
+    if hartree_self_consistent:
+        hartree_self = hartree
+
 
     if names is None:
         print('missing argument names : variational parameters must be specified')
@@ -468,9 +488,9 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
 
     try:
         if NR :
-            sol, grad, iH = __newton_raphson(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff)  # Newton-Raphson process
+            sol, grad, iH = __newton_raphson(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # Newton-Raphson process
         else:
-            sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, False, max_iteration=max_iter, max_iter_diff=max_iter_diff)  # quasi-Newton process
+            sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, False, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # quasi-Newton process
     except pyqcm.OutOfBoundsError as E:
         print('variable ', E.variable + 1, ' is out of bounds: abs(', names[E.variable], ') > ', max[E.variable])
         raise pyqcm.OutOfBoundsError(variable=E.variable, iteration=E.iteration)
@@ -494,10 +514,13 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         H = np.linalg.inv(iH)  # Hessian at the solution (inverse of iH)
         val = ''
         for i in range(nvar):
-            val += str(H[i, i]) + '\t'
+            val += '{:.4g}\t'.format(H[i, i])
         des = ''
         for i in range(nvar):
             des += '2der_' + names[i] + '\t'
+        if hartree != None:
+            val += '{:.8g}\t'.format(omega)
+            des += 'omegaH\t'
         pyqcm.write_summary('vca.tsv', first = first_time, suppl_descr = des, suppl_values = val)
         first_time = False
 

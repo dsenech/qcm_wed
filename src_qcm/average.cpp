@@ -12,7 +12,7 @@ double tr_sigma_inf(0.0);
  Calculates the lattice expectation value of all operators in the model
  @returns an array of (string, double) giving the average for each lattice operator
  */
-vector<pair<string,double>> lattice_model_instance::averages(bool print)
+vector<pair<string,double>> lattice_model_instance::averages()
 {
   if(average_solved) return ave;
   if(!gf_solved) Green_function_solve();
@@ -57,20 +57,6 @@ vector<pair<string,double>> lattice_model_instance::averages(bool print)
     i++;
   }
   E_kin /= model->Lc;
-
-  // printing to file
-  if(print){
-    static bool first_print = true;
-    ofstream fout("averages.tsv",ios::app);
-    print_info();
-    if(first_print){
-      fout << line_info_names << endl;
-      first_print = false;
-    }
-    fout << line_info_values << endl;
-    fout.close();
-  }
-
   
 	return ave;
 }

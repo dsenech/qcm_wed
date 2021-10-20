@@ -46,9 +46,9 @@ class hartree:
         self.epsilon = False
         self.iter = 0
 
-        par = pyqcm.parameters()
-        assert V in par, 'Hartree : '+V+' is not a parameter in the model!'
-        assert Vm in par, 'Hartree : '+Vm+' is not a parameter in the model!'
+        # par = pyqcm.parameters()
+        # assert V in par, 'Hartree : '+V+' is not a parameter in the model!'
+        # assert Vm in par, 'Hartree : '+Vm+' is not a parameter in the model!'
 
         if lattice:
             self.size0 = pyqcm.cluster_info()[0][1]

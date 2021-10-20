@@ -162,9 +162,17 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
 {
   bool is_complex = (typeid(HilbertField) == typeid(Complex));
 
+  if(!is_correlated or gf_read){
+    averages.reserve(value.size());
+    for(auto& x : value){
+      auto X = cluster_averages(the_model->term.at(x.first));
+      averages.push_back(tuple<string,double,double>(x.first, X.first, X.second));
+    }
+  }
+  
   if(gs_solved or gf_read) return {GS_energy, GS_string()};
   if(!is_correlated) return one_body_solve();
-  
+
   // building a set of trial sectors according to the target sector;
   
   console::message(3, "computing low-energy state for cluster instance "+full_name());

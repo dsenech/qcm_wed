@@ -4,6 +4,7 @@ import re
 import time
 
 parameter_set_str = ''
+first_time = True
 
 ################################################################################
 # GLOBAL MODULE VARIABLES
@@ -240,16 +241,23 @@ def print_graph(name, sites):
     qcm.print_graph(name, sites)
 
 ################################################################################
-def averages(label=0, print_to_file=True):
+def averages(label=0, file='averages.tsv'):
     """
     Computes the lattice averages of the operators present in the model
 
     :param int label:  label of the model instance
-    :param boolean print_to_file: if True, appends a line in the file 'averages.tsv'
+    :param str file: name of the file in which the information is appended
     :return {str,float}: a dict giving the values of the averages for each parameter
 
     """
-    return qcm.averages(label, print_to_file)
+    global first_time
+
+    ave = qcm.averages(label)
+    write_summary(file, first = first_time)
+    first_time = False
+
+    return ave
+
 
 ################################################################################
 def cluster_Green_function(cluster, z, spin_down=False, label=0, blocks=False):
