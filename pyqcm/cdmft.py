@@ -34,23 +34,37 @@ maxfev = 500000
 # PRIVATE FUNCTIONS
 ################################################################################
 
-def moving_std(x):
+def moving_std(x, min):
+    """
+    finds the subsequence with the smallest standard deviation, with minimum size min
+    :param x: sequence 
+    :param int min: minimum length of subsequence
+    """
     n = len(x)
-    std = np.empty(n-1)
-    for i in range(1,n):
-        std[i-1] = np.std(x[n-i-1:n])/np.sqrt(i)
-    I = np.argmin(std)
-    return std[I], x[n-I-1]
+    if n<min :
+        print('the sequence given to moving_std is too short (should be >= {:d}'.format(min))
+        exit()
+    if min<2 :
+        print('the minimum value of argument "min" in moving_std() is 2')
+        exit()
+
+    std = np.empty(n-1) # stores the standard deviations of the subsequences
+    for i in range(n-1):
+        std[i] = np.std(x[n-i-2:n])/np.sqrt(i+2) # the length of the subsequence is i+2
+    I = np.argmin(std[min-2:]) + min - 2
+    return std[I], np.mean(x[n-I-2:n]), I+2
 
 ################################################################################
 # CLASSES
 ######################################################################
 class observable:
-    def __init__(self, name, tol):
+    def __init__(self, name, tol, min_length=2):
         self.name = name
         self.tol = tol
         self.val = np.zeros(32)
         self.ave = 999
+        self.length = 0
+        self.min_length = min_length
 
     def __repr__(self):
         return self.name + '(tol = {:.2g})'.format(self.tol)
@@ -59,7 +73,9 @@ class observable:
         if iter > len(self.val):
             self.val.resize(len(self.val) + 32)
         self.val[iter] = x
-        std, self.ave = moving_std(self.val[0:iter+1])
+        if iter+1 < self.min_length:
+            return False
+        std, self.ave, self.length = moving_std(self.val[0:iter+1], self.min_length)
         if std < self.tol:
             return True
         else:
@@ -319,6 +335,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
     bath_size = np.array(bath_size)
     nclus = len(clusters)
     nmixed = Gdim//nsites
+    observable_series_length = 0
 
     # counterterms
     CT_converged = True
@@ -453,16 +470,19 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         # checking convergence on the observables
         # for the moment, this works only for observables belonging to the first cluster
         obs_converged = True
-        if observables != None and superiter > 0:
+        if observables != None:
             ave = pyqcm.cluster_averages()
+            observable_series_length = 0
             for x in observables:
                 val = ave[x.name[0:-2]][0]
                 Conv = x.test_convergence(superiter, val)
+                if x.length > observable_series_length:
+                    observable_series_length = x.length
                 obs_converged = obs_converged and Conv
                 print('observable <{:s}> = {:.6g}'.format(x.name, x.ave))
             if obs_converged:
                 converged = True
-                pyqcm.banner('CDMFT converged on the observables', '=')
+                pyqcm.banner('CDMFT converged on the observables (length of series : {:d})'.format(observable_series_length), '=')
                 break
 
         superiter += 1
@@ -509,6 +529,8 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
                 for x in observables:
                     des += 'ave_'+x.name+'_obs\t'
                     val += '{: #.6e}\t'.format(x.ave)
+                des += 'series_length\t'
+                val += '{:d}\t'.format(observable_series_length)
             pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
             first_time = False
             first_time2 = True
@@ -516,6 +538,8 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         pyqcm.banner('CDMFT completed successfully', '*')
     else:
         pyqcm.banner('Failure of the CDMFT algorithm', '*')
+    
+    return superiter, observable_series_length
 
 
 
