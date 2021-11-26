@@ -162,7 +162,8 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
 {
   bool is_complex = (typeid(HilbertField) == typeid(Complex));
 
-  if(!is_correlated or gf_read){
+  // if(!is_correlated or gf_read){ // doing this causes a bug if U=0, in move_submatrix...
+  if(gf_read){
     averages.reserve(value.size());
     for(auto& x : value){
       auto X = cluster_averages(the_model->term.at(x.first));

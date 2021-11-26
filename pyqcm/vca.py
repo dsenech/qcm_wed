@@ -108,6 +108,7 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
     iteration = 0
     x = start
     hartree_converged = True
+    step0 = step
 
     while iteration < max_iteration:
         x0 = x
