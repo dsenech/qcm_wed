@@ -202,22 +202,25 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
     eta = 0.05j
     info = pyqcm.cluster_info()
     d = info[clus][2]
+    d = pyqcm.Green_function_dimension()
     print(info)
     nclus = len(info)
     print('number of clusters = ', nclus)
     print('dimension of Green function matrix = ', d)
-    A = np.zeros((len(w), d))
+    A = np.zeros((len(w), d*d))
     for i in range(len(w)):
         g = pyqcm.hybridization_function(clus, w[i], False, label)
-        for l in range(d):
-            if realpart:
-                A[i, l] += g[l, l].real
-            else:
-                A[i, l] += -g[l, l].imag
+        for l1 in range(d):
+            for l2 in range(d):
+                l = l1 + d*l2
+                if realpart:
+                    A[i, l] += g[l1, l2].real
+                else:
+                    A[i, l] += -g[l1, l2].imag
 
     offset = 2
     ax.set_xlim(np.real(w[0]), np.real(w[-1]))
-    for j in range(d):
+    for j in range(d*d):
         ax.plot(np.real(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
     ax.axvline(0, c='r', ls='solid', lw=0.5)
     if plt_ax == None:

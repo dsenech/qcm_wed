@@ -1108,5 +1108,65 @@ class general_bath:
         return S
 
 
+######################################################################
+# DEBUG HELPER
 
+def cdmft_distance_debug(varia=None, vset=None, beta=50, wc=2.0, grid_type = 'sharp', counterterms=None):
+    """Debugs the CDMFT distance function
 
+    :param [str] varia: list of variational parameters 
+    :param [[float]] vset: sets of bath parameters
+    :param float beta: inverse fictitious temperature (for the frequency grid)
+    :param float wc: cutoff frequency (for the frequency grid)
+    :param str grid_type: type of frequency grid along the imaginary axis : 'sharp', 'ifreq', 'self'
+    :param [str] counterterms: list of counterterms names (cluster operators that should strive to have zero average)
+    :param boolean SEF: if True, computes the Potthoff functional at the end
+    :param [class observable]: list of observables used to assess convergence
+    :returns: None
+
+    """
+    global w, wr, weight, var, mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
+
+    # identifying the variational parameters
+    var = varia
+    nvar = len(var)
+    qcm.CDMFT_variational_set(var)
+    if nvar == 0:
+        print('CDMFT requires variational parameters...Aborting.')
+        exit()
+
+    pyqcm.new_model_instance()
+    mixing = pyqcm.mixing()
+    print('mixing state = ', mixing)
+    Gdim = pyqcm.Green_function_dimension()
+    nsites, nbands, clusters, bath_size, ref = pyqcm.model_size()
+    clusters = np.array(clusters)
+    bath_size = np.array(bath_size)
+    nclus = len(clusters)
+    nmixed = Gdim//nsites
+        
+    pyqcm.new_model_instance()
+    dist_function = __frequency_grid(grid_type, beta, wc)
+    qcm.CDMFT_host(wr, weight)
+
+    # puts the values only of the parameters into array params_array
+    x = np.zeros(nvar)
+    first = True
+    for s in vset:
+        assert len(s) == nvar
+        x = np.array(s)
+        d = qcm.CDMFT_distance(x, 0)
+        if first:
+            S = 'dist\t'
+            for i in range(nvar):
+                S += var[i] + '\t'
+            fout = open('cdmft_distance.tsv', 'a')
+            fout.write(S+'\n')
+            fout.close()
+            first = False
+        S = '{:g}\t'.format(d)
+        for i in range(nvar):
+            S += '{:g}\t'.format(x[i])
+        fout = open('cdmft_distance.tsv', 'a')
+        fout.write(S+'\n')
+        fout.close()

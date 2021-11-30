@@ -265,7 +265,7 @@ void anomalous_operator<op_field>::set_hopping_matrix_templ(double value, matrix
       }
       else{
         e.move_sub_matrix(nR, nC, nR, 0, nR, 0, E, 2.0);
-        e.move_sub_matrix(nR, nC, 0, nC, 0, nC, E, -2.0);
+        e.move_sub_matrix_conjugate(nR, nC, 0, nC, 0, nC, E, -2.0); // BUG FIX 2021-11-29 
       }
       break;
       

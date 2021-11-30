@@ -47,6 +47,20 @@ new_cluster_operator('L2_4b', 'sb2', 'anomalous', [
     (6, 2+no, 1.0)
 ])
 
+new_cluster_operator_complex('L2_4b', 'sbi1', 'anomalous', [
+    (1, 3+no, -1.0j),
+    (2, 4+no, -1.0j),
+    (3, 1+no, 1.0j),
+    (4, 2+no, 1.0j)
+])
+
+new_cluster_operator_complex('L2_4b', 'sbi2', 'anomalous', [
+    (1, 5+no, -1.0j),
+    (2, 6+no, -1.0j),
+    (5, 1+no, 1.0j),
+    (6, 2+no, 1.0j)
+])
+
 new_cluster_operator('L2_4b', 'pb1', 'anomalous', [
     (3, 4+no, 1.0),
     (4, 3+no, -1.0),
