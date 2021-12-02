@@ -31,31 +31,10 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
   bool superlattice_draw = true;
   
   if(superlattice.D == 1 and superlattice.e[0].x == 0 and superlattice.e[0].y == 0) superlattice_draw = false;
-  if(superlattice.D == 0) superlattice_draw = false;
-  
-  // finding out whether the plot should be 2D or 3D
-  bool draw_threeD = false;
-  for(int i=0; i<sites.size(); i++){
-    if(sites[i].position.z) {draw_threeD=true; break;}
-  }
-  if(superlattice.D == 3) draw_threeD = true;
-  
-  if(!draw_threeD) vector3D<double>::dimension=2;
+  if(superlattice.D == 0) superlattice_draw = false;  
+  vector3D<double>::dimension=2;
   
   string header;
-  if(draw_threeD){
-    header = R"(
-    import three;
-    triple viewer= (5,1,1);
-    currentprojection = orthographic(viewer, center=true);
-    material surfpen; // diffusepen,ambientpen,emissivepen,specularpen
-    surfpen.p = new pen[]{gray(0.2),gray(0.9),gray(0.5), gray(0.1)};
-    surfpen.shininess = 0.02;
-    )";
-    
-    fout << header;
-  }
-  
   header = R"(
   unitsize(1.5cm);
   dotfactor=10;
@@ -67,7 +46,7 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
   pen neg_pen=red;
   pen pos_pen=blue;
   pen sc_pen=orange + linewidth(0.5);
-  pen site_pen=black;
+  pen site_pen=black+linewidth(1);
   pen site2_pen=heavygreen;
   pen spin_pen_clus = heavygreen+linewidth(0.7);
   pen spin_pen=heavyred+linewidth(1);
@@ -78,20 +57,7 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
 
   fout << header;
 
-  if(draw_threeD){
-    header = R"(
-    void circledlabel(string s, triple r){
-      filldraw(shift(project(r))*scale(0.2)*unitcircle,white,pos_pen);
-      label(s,r);
-    }
-    void framedlabel(string s, triple r){
-      filldraw(shift(project(r)-(0.1,0.1))*scale(0.2)*unitsquare,neg_pen,neg_pen);
-      label(s,project(r),fontsize(9));
-    }
-    )";
-  }
-  else{
-    header = R"(
+  header = R"(
     void circledlabel(string s, pair r){
       filldraw(shift(r)*scale(0.2)*unitcircle,white,pos_pen);
       label(s,r);
@@ -101,37 +67,10 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
       label(s,r,fontsize(9));
     }
     )";
-  }
   fout << header;
   
   if (op.is_complex){
-    if(draw_threeD){
-      header = R"(
-      void circlevalue(pair z, triple r1, triple r2){
-        pen p = hsv(degrees(z)+hsvcorr, 0.5, 0.5);
-        material surfpen;
-        surfpen.p = new pen[]{p, p, p, gray(0.1)};
-        draw(shift(0.5*(r1+r2))*scale3(abs(z)*sc)*unitsphere, surfpen);
-      }
-      void drawtriplet(triple r1, triple r2, pair z){
-        draw(r1--r2,sc_pen,Arrow3(3, position=0.35));
-        circlevalue(z, r1, r2);
-      }
-      void drawsinglet(triple r1, triple r2, pair z){
-        draw(r1--r2,sc_pen);
-        circlevalue(z, r1, r2);
-      }
-      void drawonebody(triple r1, triple r2, pair z, bool v, int s){
-        pen p;
-        if(!v) p = hsv(degrees(z)+hsvcorr,1,1);
-        else p = hsv(degrees(z)+hsvcorr,0.5,0.5);
-        if(s==1) p += linetype("3 3");
-        draw(r1--r2, p, EndArrow3);
-      }
-      )";
-    }
-    else{
-      header = R"(
+    header = R"(
       void circlevalue(pair z, pair r){
         pair zs = sc*z;
         filldraw(shift(r)*scale(abs(zs))*unitcircle,white,value_pen);
@@ -152,51 +91,9 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
         circlevalue(z,0.5*(r1+r2));
       }
       )";
-    }
   }
   else{
-    if(draw_threeD){
-      header = R"(
-      void circlevalue(real z, triple r1, triple r2){
-        path3 C1 = circle(0.45*r1+0.55*r2, abs(z)*sc, r2-r1);
-        if(z > 0) draw(surface(C1), pos_pen, nolight);
-        else draw(surface(C1), neg_pen, nolight);
-      }
-      void circlevalue(pair z, triple r1, triple r2){
-        // path3 C1 = circle(0.45*r1+0.55*r2, abs(z)*sc, r2-r1);
-        // draw(surface(C1), hsv(degrees(z), 1.0, 1.0), nolight);
-        pen p = hsv(degrees(z), 0.5, 0.5);
-        surfpen.p = new pen[]{p, p, p, gray(0.1)};
-        draw(shift(0.5*(r1+r2))*scale3(abs(z)*sc)*unitsphere, surfpen);
-      }
-      void circlevalue(real z, triple r){
-        draw(shift(r)*scale3(z*sc)*unitsphere,gray(0.5),nolight);
-      }
-      void drawsinglet(triple r1, triple r2, pair z){
-        draw(r1--r2,sc_pen);
-        circlevalue(z, r1, r2);
-      }
-      void drawtriplet(triple r1, triple r2, pair z){
-        draw(r1--r2,sc_pen,Arrow3(3, position=0.35));
-        circlevalue(z, r1, r2);
-      }
-      void drawonebody(triple r1, triple r2, real z, bool v, int s){
-        pen p;
-        if(!v) p = hsv(degrees(z)+hsvcorr,1,1);
-        else p = hsv(degrees(z)+hsvcorr,0.5,0.5);
-        if(s==1) p += linetype("3 3");
-        draw(r1--r2, p, EndArrow3);
-      }
-      void drawinteraction(triple r1, triple r2, int s){
-        pen p;
-        p = value_pen + linewidth(1);
-        if(s==1) p += linetype("3 3");
-        draw(r1--r2, p);
-      }
-      )";
-    }
-    else{
-      header = R"(
+    header = R"(
       void circlevalue(real z, pair r){
         pair zs = sc*z;
         if(z > 0) filldraw(shift(r)*scale(abs(zs))*unitcircle,pos_pen,value_pen);
@@ -216,14 +113,13 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
         draw(r1--r2, p);
         circlevalue(z,0.5*(r1+r2));
       }
-      void drawinteraction(triple r1, triple r2, int s){
+      void drawinteraction(pair r1, pair r2, int s){
         pen p;
         p = value_pen + linewidth(1);
         if(s==1) p += linetype("3 3");
         draw(r1--r2, p);
       }
       )";
-    }
   }
 
   fout << header;
@@ -231,18 +127,15 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
   
   if(superlattice_draw and superlattice.D > 0){
     r = asy_working_basis ?  vector3D<double>(superlattice.e[0]) : phys.to(vector3D<double>(superlattice.e[0]));
-    if(draw_threeD) fout << "draw((0,0,0)--" << r << ", axes_pen, EndArrow3);\n";
-    else fout << "draw((0,0)--(" << r.x << "," << r.y << "), axes_pen, EndArrow);\n";
+    fout << "draw((0,0)--(" << r.x << "," << r.y << "), axes_pen, EndArrow);\n";
   }
   if(superlattice_draw and superlattice.D > 1){
     r = asy_working_basis ?  vector3D<double>(superlattice.e[1]) : phys.to(vector3D<double>(superlattice.e[1]));
-    if(draw_threeD) fout << "draw((0,0,0)--" << r << ", axes_pen, EndArrow3);\n";
-    else fout << "draw((0,0)--(" << r.x << "," << r.y << "), axes_pen, EndArrow);\n";
+    fout << "draw((0,0)--(" << r.x << "," << r.y << "), axes_pen, EndArrow);\n";
   }
   if(superlattice_draw and superlattice.D > 2){
     r = asy_working_basis ?  vector3D<double>(superlattice.e[2]) : phys.to(vector3D<double>(superlattice.e[2]));
-    if(draw_threeD) fout << "draw((0,0,0)--" << r << ", axes_pen, EndArrow3);\n";
-    else fout << "draw((0,0)--(" << r.x << "," << r.y << "), axes_pen, EndArrow);\n";
+    fout << "draw((0,0)--(" << r.x << "," << r.y << "), axes_pen, EndArrow);\n";
   }
   
   //-----------------------------------------------------------------------------------
@@ -306,8 +199,7 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
       vector3D<double> S(Sx[x.site1],Sz[x.site1],0.0);
       if(!S.is_null()){
         S *= asy_spin_scale;
-        if(draw_threeD) fout << "draw(" << r << "--"<< r+S << ",spin_pen,EndArrow3);\n";
-        else fout << "draw((" << r.x-S.x << ',' << r.y-S.y << ")--("<< r.x+S.x << ',' << r.y+S.y << "),spin_pen,EndArrow(4));\n";
+        fout << "draw((" << r.x-S.x << ',' << r.y-S.y << ")--("<< r.x+S.x << ',' << r.y+S.y << "),spin_pen,EndArrow(4));\n";
       }
       double d = charge[x.site1];
       if(abs(d) > 0.001){
@@ -380,10 +272,27 @@ void lattice_model::asy_print(const lattice_operator &op, bool asy_labels, bool 
 
   //..............................................................................
   // then, the sites only
-  
+  // draw dots or open circles for z > 0
+
+  // first find the range of z
+  int zmax = 0;
+  int zmin = 0;
+  for(int i=0; i<sites.size(); i++){
+    if(sites[i].position.z > zmax) zmax = sites[i].position.z;
+    if(sites[i].position.z < zmin) zmin = sites[i].position.z;
+  }
+  double zscale[zmax-zmin+1];
+  for(int i=0; i<zmax-zmin+1; i++) zscale[i] = (12.0 + 4*i)*5/(6*72);
+
   for(int i=0; i<sites.size(); i++){
     vector3D<double> r = asy_working_basis ?  vector3D<double>(sites[i].position) : phys.to(sites[i].position);
-    fout << "dot(" << r << ",site_pen); // site\n";
+    int z = sites[i].position.z;
+    if(z == zmin)
+      fout << "filldraw(shift" << r << "*scale(" << zscale[0] << ")*unitcircle,site_pen); // site\n";
+    else{
+      fout << "draw(shift" << r << "*scale(" << zscale[z-zmin] << ")*unitcircle,site_pen); // site\n";
+    }
+
     if(asy_band){
       if(n_band>1) fout << "label('" << sites[i].band+1 << "', " << r << ", NE, label_pen); // site\n";
     }
