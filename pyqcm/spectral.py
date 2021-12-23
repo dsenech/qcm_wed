@@ -64,7 +64,7 @@ def __kgrid(ax, nk, quadrant=False, k_perp=0.0, plane='xy', size=1.0):
     return k, x
 
 ################################################################################
-def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=None, offset=2, opt='A', inverse_path=False, title=None, file=None, plt_ax=None, **kwargs):
+def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=None, offset=2, opt='A', Nambu_redress=True, inverse_path=False, title=None, file=None, plt_ax=None, **kwargs):
     """Plots the spectral function :math:`A(\mathbf{k},\omega)` along a wavevector path in the Brillouin zone.
     This version plots the spin-down part with the correct sign of the frequency in the Nambu formalism
 
@@ -76,6 +76,7 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
     :param int band: if not None, only plots the spectral function associated with this orbital number (starts at 1). If None, sums over all bands.
     :param float offset: vertical offset in the plot between the curves associated to successive wavevectors
     :param str opt: 'A' : spectral function, 'self' : self-energy, 'Sx' : spin (x component), 'Sy' : spin (y component)
+    :param boolean Nambu_redress: if True, evaluates the Nambu component at the opposite frequency
     :param boolean inverse_path: if True, inverts the path (k --> -k)
     :param str title: optional title for the plot. If None, a string with the model parameters will be used.
     :param str file: if not None, saves the plot in a file with that name
@@ -126,11 +127,18 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
                 A[i, j] += -g[j, band, band].imag
 
     if mix == 1:
+        # add the contribution to the Nambu channel, but with opposite frequency
+        if Nambu_redress:
+            k *= -1
         for i in range(len(w)):
-            if opt=='self':
-                g = pyqcm.self_energy(-np.conj(w[i]), k, False, label)
+            if Nambu_redress:
+                W = -np.conj(w[i])
             else:
-                g = pyqcm.periodized_Green_function(-np.conj(w[i]), k, False, label)
+                W = w[i]
+            if opt=='self':
+                g = pyqcm.self_energy(W, k, False, label)
+            else:
+                g = pyqcm.periodized_Green_function(W, k, False, label)
             for j in range(len(k)):
                 if band is None:
                     for l in range(nbands): 
@@ -139,6 +147,7 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
                     A[i, j] += -g[j, nbands+band, nbands+band].imag
 
     if mix == 4:
+        # add the contribution to the spin-down channel in that case
         for i in range(len(w)):
             if opt=='self':
                 g = pyqcm.self_energy(w[i], k, True, label)

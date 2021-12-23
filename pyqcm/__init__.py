@@ -1338,7 +1338,7 @@ def print_cluster_averages(ave):
 
     """
     for x in ave:
-        print('   <{:s}> = {:f}'.format(x, ave[x][0]))
+        print('   <{:s}> = {:f}\tvar({:s}) = {:f}'.format(x, ave[x][0], x, ave[x][1]))
         
 
 def print_parameters(P):

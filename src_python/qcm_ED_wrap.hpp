@@ -879,8 +879,8 @@ static PyObject* qmatrix_python(PyObject *self, PyObject *args)
     out1 = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
     memcpy(PyArray_DATA((PyArrayObject*) out1), Q.first.data(), Q.first.size()*sizeof(double));
     PyArray_ENABLEFLAGS((PyArrayObject*) out1, NPY_ARRAY_OWNDATA);
-    dims[0] = Q.second.size()/Q.first.size();
-    dims[1] = Q.first.size();
+    dims[1] = Q.second.size()/Q.first.size();
+    dims[0] = Q.first.size();
     out2 = PyArray_SimpleNew(2, dims, NPY_COMPLEX128);
     memcpy(PyArray_DATA((PyArrayObject*) out2), Q.second.data(), Q.second.size()*sizeof(complex<double>));
     PyArray_ENABLEFLAGS((PyArrayObject*) out2, NPY_ARRAY_OWNDATA);
