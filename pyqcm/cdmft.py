@@ -94,7 +94,7 @@ class solution:
 
     def __str__(self):
         S = ''
-        if self.success == False:
+        if not self.success:
             S += 'optimization failure!\n'
         S += self.x.__str__()
         S += '\nf = {:f}\n'.format(self.fun)
@@ -260,7 +260,7 @@ def __optimize(F, x, method='Nelder-Mead', initial_step=0.1, accur = 1e-4, accur
         print('unknown method specified for minimization: ', method)
         exit()   
 
-    if sol.success == False:
+    if not sol.success:
         print(sol.message)
         raise pyqcm.MinimizationError()
     return sol, iter_done
@@ -309,7 +309,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
     else:
         var = varia
 
-    if hartree == None:
+    if hartree is None:
         pyqcm.banner('CDMFT procedure', '*', skip=1)
     else:
         pyqcm.banner('CDMFT procedure (combined with Hartree procedure)', '*', skip=1)
@@ -400,7 +400,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
         t3 = timeit.default_timer()
         time_MIN += t3 - t2
 
-        if method != 'ANNEAL' and sol.success == False:
+        if method != 'ANNEAL' and not sol.success:
             print(sol)
             raise pyqcm.MinimizationError()
 
@@ -670,7 +670,7 @@ def __dual_minimization(params_array, N, method, initial_step=1e-3, accur=1e-4, 
         except pyqcm.OutOfBoundsError(i):
             raise pyqcm.MinimizationError(i)
 
-        if sol.success == False:
+        if not sol.success:
             break
         x2 = sol.x
         nfev += sol.nfev
@@ -682,7 +682,7 @@ def __dual_minimization(params_array, N, method, initial_step=1e-3, accur=1e-4, 
         except pyqcm.OutOfBoundsError():
             raise pyqcm.MinimizationError()
 
-        if sol.success == False:
+        if not sol.success:
             break
         x1 = sol.x
         nfev += sol.nfev
@@ -916,7 +916,7 @@ class general_bath:
                 param_name = 'eb{:d}d_{:d}'.format(x, c)
                 D[param_name] = E[x-1+nb]
 
-        elif self.spin_flip and spin_down == False:
+        elif self.spin_flip and not spin_down:
             for x in range(1,nb+1):
                 param_name = 'eb{:d}u_{:d}'.format(x, c)
                 D[param_name] = E[x-1]
@@ -1052,7 +1052,7 @@ class general_bath:
         if self.nb%2:
             print('The number of bath orbitals must be even for starting_values_PH() to apply')
             exit()
-        if phi == None:
+        if phi is None:
             print('The PH phases of the sites must be specified')
             exit()
         NE = self.nb//2

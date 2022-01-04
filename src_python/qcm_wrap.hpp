@@ -1234,35 +1234,18 @@ R"{(
 Prints a description of the model into a file
 arguments:
 1. file : name of the file
-  keyword arguments:
-  2. asy_operators : true if asymptote files are produced for each operator
-  3. asy_labels : true if sites labels are indicated in the asymptote program
-  4. asy_band : true if band labels are indicated in the asymptote program
-  5. asy_neighbors : true if neighbors are drawn in the asymptote program
-  6. asy_working_basis : true if the working basis is used instead of the physical basis
 returns: void
 ){";
 //------------------------------------------------------------------------------
 static PyObject* print_model_python(PyObject *self, PyObject *args, PyObject *keywds)
 {
   char* s1 = nullptr;
-  int asy_operators = 0;
-  int asy_labels = 0;
-  int asy_band = 0;
-  int asy_neighbors = 0;
-  int asy_working_basis= 0;
   const char *kwlist[] = {"", "asy_operators", "asy_labels", "asy_band", "asy_neighbors", "asy_working_basis",  NULL};
 
   try{
-    if(!PyArg_ParseTupleAndKeywords(args, keywds, "s|iiiii", const_cast<char **>(kwlist),
-                                    &s1,
-                                    &asy_operators,
-                                    &asy_labels,
-                                    &asy_band,
-                                    &asy_neighbors,
-                                    &asy_working_basis))
+    if(!PyArg_ParseTuple(args, "s", &s1))
       qcm_throw("failed to read parameters in call to print_model (python)");
-    QCM::print_model(string(s1), asy_operators, asy_labels, asy_band, asy_neighbors, asy_working_basis);
+    QCM::print_model(string(s1));
   } catch(const string& s) {qcm_catch(s);}
   return Py_BuildValue("");
 }

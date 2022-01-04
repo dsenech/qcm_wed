@@ -86,7 +86,7 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
 
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -120,7 +120,7 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
         if opt=='Sy':
             assert mix&2, 'option Sy in spectral_function() only makes sense if spin-flip terms are present'
         for j in range(len(k)):
-            if band == None:
+            if band is None:
                 for l in range(nbands): 
                     A[i, j] += -g[j, l, l].imag
             else:
@@ -165,21 +165,21 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
     ax.set_ylim(0, (1+len(k)) * offset + 1 / eta)
     for j in range(len(k)):
         ax.plot(np.real(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
-    if title == None and plt_ax == None:
+    if title is None and plt_ax is None:
         ax.set_title(r'$A(\mathbf{k},\omega)$: '+pyqcm.parameter_string(), fontsize=9)
     else:
         ax.set_title(title, fontsize=9)    
     ax.axvline(0, ls='solid', lw=0.5)
     ax.set_yticks(offset * tick_pos)
     ax.set_yticklabels(tick_str)
-    if plt_ax == None:
+    if plt_ax is None:
         ax.set_xlabel(r'$\omega$')
         plt.tight_layout()
 
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
         
 
@@ -200,7 +200,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
     :returns: None
 
     """
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -232,7 +232,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
     for j in range(d*d):
         ax.plot(np.real(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
     ax.axvline(0, c='r', ls='solid', lw=0.5)
-    if plt_ax == None:
+    if plt_ax is None:
         plt.xlabel(r'$\omega$')
         plt.ylabel(r'$\Gamma(\omega)$')
         plt.title(r'$\Gamma(\omega)$: '+pyqcm.parameter_string())
@@ -240,7 +240,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 
@@ -263,7 +263,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     :returns: the array of frequencies, the spectral weight
 
     """
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -312,7 +312,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
     return w.real, A    
@@ -335,7 +335,7 @@ def spectral_function_Lehmann(path='triangle', nk=32, label=0, band=1, offset=0.
 
     """
     
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -364,7 +364,7 @@ def spectral_function_Lehmann(path='triangle', nk=32, label=0, band=1, offset=0.
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 
@@ -416,7 +416,7 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
     """
     from cycler import cycler
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -455,7 +455,7 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
 
     if colors != None:
         plt.rc('axes', prop_cycle=cycler(color=colors))
-    if labels == None:
+    if labels is None:
         labels = [str(i+1) for i in range(d//2)]
     plt.xlim(w[0].real, w[-1].real)
     for i in range(d//2):
@@ -475,7 +475,7 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 
@@ -503,7 +503,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
     
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -533,7 +533,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
         if band is None:
             for l in range(d): 
                 A += -pyqcm.periodized_Green_function_element(l, l, freq + eta * 1j, k, spin_down=spin_down, label=label).imag
-        elif band_basis == False:
+        elif not band_basis:
             A = -pyqcm.periodized_Green_function_element(band-1, band-1, freq + eta * 1j, k, spin_down=spin_down, label=label).imag
         else:
             A = -pyqcm.band_Green_function(freq + eta * 1j, k, spin_down=spin_down, label=label)[:, band-1, band-1].imag
@@ -565,14 +565,14 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
     elif opt == 'Z':
         title = r"$Z(k,0)$ : "+title
 
-    if max == None:
+    if max is None:
         max = A.max()
     else:
         print('maximum level = ', A.max()/max)
     # plot per se
     CS = ax.contourf(x, x, A, np.linspace(0, max, 40), extend="max", cmap='jet', **kwargs)
 
-    if plt_ax == None:
+    if plt_ax is None:
         title = set_legend_mdc(plane, k_perp)
         if freq != 0.0 :
             title += ', $\omega = {:1.3f}$'.format(freq)
@@ -585,7 +585,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
     
     return CS
@@ -614,7 +614,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
     
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -681,12 +681,12 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
         CS = ax.quiver(X, Y, Sx, Sy, pivot='mid', angles='xy', scale_units='xy', scale=10, width=0.003, headlength = 4.5, **kwargs)
     elif opt == 'sz':
         A = np.reshape(A, (nk, nk))
-        if max == None:
+        if max is None:
             max = np.abs(A).max()*1.2
         CS = ax.contourf(x, x, A, np.linspace(-max, max, 40), extend="max", cmap='bwr', **kwargs)
     elif opt == 'spinp':
         A = np.reshape(A, (nk, nk))
-        if max == None:
+        if max is None:
             max = A.max()*1.2
         else:
             print('maximum level (spin) = ', A.max()*1.2/max)
@@ -694,7 +694,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
 
 #------------------------------------------------------------------
 
-    if plt_ax == None:
+    if plt_ax is None:
         title = set_legend_mdc(plane, k_perp)
         if freq != 0.0 :
             title += ', $\omega = {:1.3f}$'.format(freq)
@@ -708,7 +708,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
     return CS
@@ -733,7 +733,7 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, im_part=Fals
     :returns: None
     
     """
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -789,7 +789,7 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, im_part=Fals
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 ################################################################################
@@ -812,7 +812,7 @@ def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafi
 
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         if contour:
@@ -838,7 +838,7 @@ def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafi
     print('plotting...')
 
     if contour:
-        if band == None:
+        if band is None:
             print('Contour plots of the dispersion with more than one band make no sense visually! band set to 1')
             band=1
         CS = plt.contour(x, x, e[:, :, band-1], linewidths=0.5)
@@ -851,14 +851,14 @@ def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafi
         else:
             ax.plot_surface(x, y, e[:, :, band-1], rstride=1,cstride=1, linewidth=0.2, antialiased=False)
             
-    if plt_ax == None:
+    if plt_ax is None:
         axis = set_legend_mdc(plane, k_perp)
         plt.title(axis+' '+pyqcm.parameter_string(), fontsize=9)
 
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 ################################################################################
@@ -875,7 +875,7 @@ def segment_dispersion(path='triangle', nk=64, label=0, file=None, plt_ax=None, 
 
     """
     
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -888,25 +888,26 @@ def segment_dispersion(path='triangle', nk=64, label=0, file=None, plt_ax=None, 
     e = pyqcm.dispersion(k, label=label)
 
     for i in range(d):
-        plt.plot(e[:,i], **kwargs)
+        ax.plot(e[:,i], **kwargs)
 
     if pyqcm.mixing() == 4:
         e = pyqcm.dispersion(k, True)
         for i in range(d):
-            plt.plot(e[:,i], **kwargs)
+            ax.plot(e[:,i], **kwargs)
 
     
     for x in tick_pos:
-        plt.axvline(x, ls='solid', lw=0.5)
-    plt.axhline(0, ls='solid', lw=0.5, color='r')
+        ax.axvline(x, ls='solid', lw=0.5)
+    ax.axhline(0, ls='solid', lw=0.5, color='r')
     
-    plt.xticks(tick_pos, tick_str)
-    plt.xlim(0,len(k))
+    ax.set_xticks(tick_pos)
+    ax.set_xticklabels(tick_str)
+    ax.set_xlim(0,len(k))
 
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 ################################################################################
@@ -926,7 +927,7 @@ def Fermi_surface(nk=64, label=0, band=None, quadrant=False, plane='xy', k_perp=
 
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -942,20 +943,20 @@ def Fermi_surface(nk=64, label=0, band=None, quadrant=False, plane='xy', k_perp=
     k.shape = (nk, nk, 3)
     e.shape = (nk, nk, d)
 
-    if band == None:
+    if band is None:
         for j in range(d):
             plt.contour(x, x, e[:, :, j], levels=[0.0], **kwargs)
     else:
         plt.contour(x, x, e[:, :, band-1], levels=[0.0], **kwargs)
 
-    if plt_ax == None:
+    if plt_ax is None:
         axis = set_legend_mdc('xy', 0.0)
         plt.title('Fermi surface: '+axis+' '+pyqcm.parameter_string(), fontsize=9)
     
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 ################################################################################
@@ -980,7 +981,7 @@ def G_dispersion(nk=64, label=0, band=None, period = 'G', contour=False, inv=Fal
     
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         if contour:
@@ -1013,7 +1014,7 @@ def G_dispersion(nk=64, label=0, band=None, period = 'G', contour=False, inv=Fal
         for j in range(nk):
             e[i,j,:] = np.linalg.eigvalsh(g[i,j,:,:])
 
-    if inv == False:
+    if not inv:
         e = 1.0/e
 
     if datafile != None:
@@ -1021,7 +1022,7 @@ def G_dispersion(nk=64, label=0, band=None, period = 'G', contour=False, inv=Fal
         return
 
     if contour:
-        if band == None:
+        if band is None:
             print('Contour plots of the dispersion with more than one band make no sense visually! band set to 1')
             band=1
         A = e[:, :, band-1]
@@ -1067,7 +1068,7 @@ def Luttinger_surface(nk=200, label=0, band=1, quadrant=False, k_perp = 0, plane
 
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -1110,7 +1111,7 @@ def momentum_profile(op, nk=50, label=0, quadrant=False, k_perp=0.0, plane='xy',
     
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()

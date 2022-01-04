@@ -23,7 +23,7 @@ def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, su
     :return: the contourplot object of matplotlib
 
     """
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -72,7 +72,7 @@ def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, su
     # plot per se
     max = np.abs(B).max()
     CS = ax.imshow(np.flip(B,0), vmin=-max, vmax = max, cmap='bwr', extent=ext, **kwargs)
-    if plt_ax == None:
+    if plt_ax is None:
         axis = pyqcm.spectral.set_legend_mdc(plane, k_perp)
         plt.colorbar(CS, shrink=0.8, extend='neither')
         ax.set_title(axis, fontsize=9)
@@ -80,7 +80,7 @@ def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, su
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
     
     return CS
@@ -187,7 +187,7 @@ def monopole_map(nk=40, label=0, band=0, plane='z', k_perp=0.0, file=None, plt_a
 
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -210,7 +210,7 @@ def monopole_map(nk=40, label=0, band=0, plane='z', k_perp=0.0, file=None, plt_a
     B2[nk,nk] = B2[0, 0]
     max = np.abs(B).max()
     CS = ax.imshow(np.flip(B2,0), vmin=-max, vmax = max, cmap='bwr', extent=ext, **kwargs)
-    if plt_ax == None:
+    if plt_ax is None:
         plt.xticks((-1, 0, 1), ('$-\pi$', '$0$', '$\pi$'))
         plt.yticks((-1, 0, 1), ('$-\pi$', '$0$', '$\pi$'))
         plt.colorbar(CS, shrink=0.8, extend='neither')
@@ -218,7 +218,7 @@ def monopole_map(nk=40, label=0, band=0, plane='z', k_perp=0.0, file=None, plt_a
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
     return CS
 
@@ -240,7 +240,7 @@ def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoin
 
     """
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -252,7 +252,7 @@ def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoin
 
     K = pyqcm.wavevector_grid(nk, orig=[-1.0, -1.0], side=2, k_perp = k_perp, plane=plane)
     B = np.zeros(nk*nk)
-    if radius == None:
+    if radius is None:
         radius = 0.8/nk
     for i, k in enumerate(K):
         B[i] = Berry_flux(2.0*k, radius, nk=npoints, plane=dir, band=band, label=label)
@@ -266,7 +266,7 @@ def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoin
     B2[nk,nk] = B2[0, 0]
     max = np.abs(B).max()
     CS = plt.imshow(np.flip(B2,0), vmin=-max, vmax = max, cmap='bwr', extent=ext)
-    if plt_ax == None:
+    if plt_ax is None:
         plt.xticks((-1, 0, 1), ('$-\pi$', '$0$', '$\pi$'))
         plt.yticks((-1, 0, 1), ('$-\pi$', '$0$', '$\pi$'))
         plt.colorbar(CS, shrink=0.8, extend='neither')
@@ -275,7 +275,7 @@ def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoin
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
     return CS
@@ -298,7 +298,7 @@ def Berry_field_map(nk=40, nsides = 4, plane='z', k_perp=0.0, label=0, band=0, f
     """
 
     ax = None
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)
         ax = plt.gca()
@@ -349,7 +349,7 @@ def Berry_field_map(nk=40, nsides = 4, plane='z', k_perp=0.0, label=0, band=0, f
     ky = np.linspace(-1,1,nk+1,endpoint=True)
     SP = ax.streamplot(kx, ky, B2x, B2y, linewidth=0.5, color='k')
 
-    if plt_ax == None:
+    if plt_ax is None:
         plt.colorbar(CS, shrink=0.8)
         ax.set_title(axis, fontsize=9)
         plt.xticks((-1, 0, 1), ('$-\pi$', '$0$', '$\pi$'))
@@ -358,7 +358,7 @@ def Berry_field_map(nk=40, nsides = 4, plane='z', k_perp=0.0, label=0, band=0, f
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
     
     return CS, SP

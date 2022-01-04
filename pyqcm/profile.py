@@ -214,7 +214,7 @@ def plot_profile(n_scale=1, bond_scale=1, current_scale=1, spin_scale=1,
     plt.gcf().suptitle(pyqcm.parameter_string()+', layer '+str(layer), y=1.0, fontsize=9)
     plt.tight_layout()
 
-    if file == None:
+    if file is None:
         plt.show()
     else:
         plt.savefig(file)

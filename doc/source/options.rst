@@ -63,10 +63,12 @@ Real-valued options
     :header: "name", "default", "description"
     :widths: 15, 10, 50
 
+    "Qmatrix_vtol", "1e-10", "minimum value of a Qmatrix contribution"
     "minimum_weight", "0.01", "minimum weight in the density matrix"
     "sim_ann_damping", "0.99", "damping of temperature in simulated annealing"
-    "band_lanczos_minimum_gap", "1e-05", "gap between the lowest two states in BL below which the method fails"
     "accur_lanczos", "1e-12", "tolerance of the Ritz residual estimate in the Lanczos method"
+    "band_lanczos_minimum_gap", "1e-05", "gap between the lowest two states in BL below which the method fails"
+    "Qmatrix_wtol", "1e-05", "maximum difference in frequencies in Q-matrix"
     "accur_Davidson", "1e-05", "maximum norm of residuals in the Davidson-Liu algorithm"
     "accur_SEF", "5e-08", "Accuracy of the Potthoff functional"
     "large_scale", "20", "high-frequency region for imaginary frequency axis integrals"
@@ -83,7 +85,6 @@ Real-valued options
     "accur_OP", "0.0001", "accuracy of lattice averages"
     "cutoff_scale", "1e+12", "high-frequency cutoff in integrals"
     "accur_Q_matrix", "1e-05", "tolerance in the normalization of the Q matrix"
-    "Qmatrix_tolerance", "0.0001", "minimum value of a Qmatrix coefficient"
     "small_scale", "0.5", "low-frequency region for imaginary frequency axis integrals"
     "asy_spin_scale", "0.1", "scale factor for spins in asy plots"
     "eta", "0.0001", "value of the imaginary part of the frequency in Chern number/Berry phase computations"

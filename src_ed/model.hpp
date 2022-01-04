@@ -23,7 +23,7 @@ struct model
   map<destruction_identifier, shared_ptr<destruction_operator<Complex>>> destruction_complex; //!< set of destruction operators
   map<destruction_identifier, shared_ptr<destruction_operator<double>>> destruction; //!< set of destruction operators
   map<sector, shared_ptr<ED_mixed_basis>> basis; //!< list of bases
-  map<sector, shared_ptr<ED_factorized_basis>> factorized_basis; //!< list of bases
+  map<sector, shared_ptr<ED_factorized_basis>> factorized_basis; //!< list of bases in the facto
   map<string, shared_ptr<Hermitian_operator>> term; //!< list of operators in the Hamiltonian, by name
   shared_ptr<symmetry_group> group; //!< contains data on symmetry operations
   size_t n_bath; //!< number of sites considered as 'bath' (no Green function computation for these)

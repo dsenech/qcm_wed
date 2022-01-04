@@ -91,8 +91,6 @@ Extended interaction terms
 Hund's coupling terms
 ---------------------
 
-
-
 .. math::
     \hat O = \sum_{i,j} J_{ij} H_{ij}
 
@@ -119,8 +117,6 @@ or as
     + c^\dagger_{j\uparrow}c^\dagger_{j\downarrow}c_{i\downarrow}c_{i\uparrow}
     - c^\dagger_{j\uparrow}c^\dagger_{i\downarrow}c_{i\uparrow}c_{j\downarrow}
     - c^\dagger_{i\uparrow}c^\dagger_{j\downarrow}c_{j\uparrow}c_{i\downarrow}
-
-
 
 Clusters
 ========

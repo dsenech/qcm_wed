@@ -413,11 +413,11 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     """Performs a VCA with the QN or NR method
     
     :param var2sef: function that converts variational parameters to model parameters
-    :param [str] names: names of the variational parameters
-    :param [float] start: starting values
-    :param [float] steps: initial steps
-    :param [float] accur: accuracy of parameters (also step for 2nd derivatives)
-    :param [float] max: maximum values that are tolerated
+    :param str or [str] names: names of the variational parameters
+    :param float or [float] start: starting values
+    :param float or [float] steps: initial steps
+    :param float or [float] accur: accuracy of parameters (also step for 2nd derivatives)
+    :param float or [float] max: maximum values that are tolerated
     :param float accur_grad: max value of gradient for convergence
     :param int max_iter: maximum number of iterations in the procedure
     :param float max_iter_diff: optional maximum value of the maximum step in the quasi-Newton method
@@ -427,6 +427,36 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     :return: None
     
     """
+    # type and length checks
+    if type(names) != list:
+        if type(names) != str:
+            raise ValueError('argument names of vca() must be a string or a list of strings')
+        single = True
+        names = [names]
+        if start != None:
+            if type(start) != float and type(start) != int:
+                raise ValueError('argument start of vca() must be a float or a list of float')
+            start = [start]
+        if type(steps) != float:
+            raise ValueError('argument steps of vca() must be a float')
+        if type(accur) != float:
+            raise ValueError('argument accur of vca() must be a float')
+        if type(max) != float and type(max) != int:
+            raise ValueError('argument max of vca() must be a float')
+        steps = [steps]
+        accur = [accur]
+        max = [max]
+        nvar = 1
+    else:
+        nvar = len(names)  # number of variational parameters
+        if start != None:
+            if len(start) != nvar:
+                raise ValueError('argument max of vca() must contain {:d} elements'.format(nvar))
+        if type(steps) != list or type(accur) != list or type(max) != list:
+            raise ValueError('arguments steps, accur and max of vca() must be lists of {:d} elements each'.format(nvar))
+        if len(steps) != nvar or len(accur) != nvar or len(max) != nvar:
+            raise ValueError('arguments steps, accur and max of vca() must be lists of {:d} elements each'.format(nvar))
+
     global first_time
     pyqcm.new_model_instance()
     L = pyqcm.model_size()[0]
@@ -441,7 +471,6 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         print('missing argument names : variational parameters must be specified')
         raise pyqcm.MissingArgError('names')
 
-    nvar = len(names)  # number of variational parameters
 
     if max is None:
         max = 10*np.ones(nvar)
@@ -450,7 +479,8 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         raise pyqcm.MissingArgError('max')
 
     if start is None:
-        assert var2sef == None, 'the start argument is missing in vca(). Should be specified if var2sef is not None'
+        if var2sef != None:
+            raise ValueError('the start argument is missing in vca(). Should be specified if var2sef is not None')
         start = [0.0]*nvar
         P = pyqcm.parameters()
         for i,v in enumerate(names):
@@ -479,7 +509,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         pyqcm.new_model_instance()
         return pyqcm.Potthoff_functional(hartree)
         
-    if hartree == None:
+    if hartree is None:
         pyqcm.banner('VCA procedure', '*')
     else:
         pyqcm.banner('VCA procedure (combined with Hartree procedure)', '*')
@@ -583,7 +613,7 @@ def plot_GS_energy(param, prm, clus=0, file=None, plt_ax=None, **kwargs):
 
     """
     import matplotlib.pyplot as plt
-    if plt_ax == None:
+    if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
         ax = plt.gca()
@@ -610,7 +640,7 @@ def plot_GS_energy(param, prm, clus=0, file=None, plt_ax=None, **kwargs):
     ax.axhline(omega[0], c='r', ls='solid', lw=0.5)
     ax.plot(prm, omega, 'b-')
     ax.set_xlim(prm[0], prm[-1])
-    if plt_ax == None:
+    if plt_ax is None:
         ax.set_xlabel(param)
         ax.set_ylabel('GS energy')
         ax.set_title(pyqcm.parameter_string())
@@ -618,20 +648,20 @@ def plot_GS_energy(param, prm, clus=0, file=None, plt_ax=None, **kwargs):
     if file is not None:
         plt.savefig(file)
         plt.close()
-    elif plt_ax == None:
+    elif plt_ax is None:
         plt.show()
 
 
 ################################################################################
-# performs the VCA
+# performs the VCA by minimization
 
 def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='Nelder-Mead', hartree=None):
     """Performs the VCA assuming that the solution is a minimum of the Potthoff functional
     Uses minimization routines from scipy.optimize.
     
-    :param [str] names: names of the variational parameters
-    :param [float] start: starting values 
-    :param [float] steps: initial steps (relevant to some minimization methods)
+    :param str or [str] names: names of the variational parameters
+    :param float or [float] start: starting values 
+    :param float or [float] steps: initial steps (relevant to some minimization methods)
     :param float accur: accuracy of parameters
     :param float ftol: convergence criterion for the value of the SEF
     :param str method: minimization method used in scipy.optimize.minimize()
@@ -639,30 +669,49 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
     :return: None
 
     """
-
-
+    # type and length checks
     if names is None:
         print('missing argument names : variational parameters must be specified')
         raise pyqcm.MissingArgError('names')
+    if steps is None:
+        steps = 10*np.array(accur)
 
-    nvar = len(names)  # number of variational parameters
+    if type(names) != list:
+        if type(names) != str:
+            raise ValueError('argument names of vca_min() must be a string or a list of strings')
+        single = True
+        names = [names]
+        if start != None:
+            if type(start) != float and type(start) != int:
+                raise ValueError('argument start of vca_min() must be a float or a list of floats')
+            start = [start]
+        if type(steps) != float:
+            raise ValueError('argument steps of vca_min() must be a float or a list of floats')
+        steps = [steps]
+        nvar = 1
+    else:
+        nvar = len(names)  # number of variational parameters
+        if start != None:
+            if len(start) == nvar:
+                raise ValueError('argument start of vca_min() must be have {:d} elements'.format(nvar))
+        if type(steps) != list or type(accur) != list:
+            raise ValueError('arguments steps and accur of vca_min() must be lists of {:d} elements each'.format(nvar))
+        if len(steps) != nvar or len(accur) != nvar:
+            raise ValueError('arguments steps and accur of vca_min() must be lists of {:d} elements each'.format(nvar))
+
     L = pyqcm.model_size()[0]
 
     if start is None:
-        print('missing argument start')
-        raise pyqcm.MissingArgError('start')
-    elif len(start) != nvar:
-        print('the argument "start" should have ', nvar, ' components')
-        raise pyqcm.MissingArgError('start')
+        pyqcm.new_model_instance()
+        start = [0.0]*nvar
+        P = pyqcm.parameters()
+        for i,v in enumerate(names):
+            start[i] = P[v]
 
     if accur is None:
         accur = 1e-4*np.ones(nvar)
 
-    if steps is None:
-        steps = 10*np.array(accur)
-    elif len(steps) != nvar:
-        print('the argument "steps" should have ', nvar, ' components')
-        raise pyqcm.MissingArgError('steps')
+
 
     def F(x):
         for i in range(len(names)): 
@@ -711,7 +760,7 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
         print('unknown method specified for minimization: ', method)
         exit()   
 
-    if sol.success == False:
+    if not sol.success:
         print(sol.message)
         raise pyqcm.MinimizationError()
 
@@ -765,7 +814,7 @@ def __transition(varia, P, bracket, step=0.001, verb=False):
 
 
     x0, r = brentq(F, bracket[0], bracket[1], maxiter=100, full_output=True, disp=True)
-    if r.converged == False:
+    if not r.converged:
         print('The root finding routine could not find a solution!')
         exit(1)
         

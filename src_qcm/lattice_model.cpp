@@ -713,8 +713,6 @@ void lattice_model::print(ostream &fout, bool asy_operators, bool asy_labels, bo
   }
   console::banner('*', "cluster models", fout);
   ED::print_models(fout);
-  
-  if(asy_operators) for(auto& x : term) asy_print(*x.second, asy_labels, asy_band, asy_neighbors, asy_working_basis);
 }
 
 

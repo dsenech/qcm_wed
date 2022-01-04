@@ -28,13 +28,13 @@ class DCA_cluster:
         
 
 
-        if lattice == None:  # default value for lattice
+        if lattice is None:  # default value for lattice
             self.lattice = np.eye(3, dtype='int')[0:self.dim,:]
         else:
             self.lattice = np.array(lattice)
             assert(self.lattice.shape[1] == 3 and self.lattice.shape[0] == self.dim), 'The lattice vectors have the wrong dimension or number'
 
-        if basis == None:   # default value for basis
+        if basis is None:   # default value for basis
             self.basis = np.eye(3)[0:self.dim,:]
         else:
             self.basis = np.array(basis)
@@ -185,21 +185,26 @@ class DCA_cluster:
 ###########################################################################
 
 ##### 2x3 #####
-# sites = [
-#     [0,0,0],
-#     [1,0,0],
-#     [2,0,0],
-#     [0,1,0],
-#     [1,1,0],
-#     [2,1,0],
-# ]
+sites = [
+    [0,0,0],
+    [1,0,0],
+    [2,0,0],
+    [0,1,0],
+    [1,1,0],
+    [2,1,0],
+]
 # superlattice=[
 #     [3,-1, 0],
 #     [3, 1, 0]
 # ]
+superlattice=[
+    [3, 0, 0],
+    [1, 2, 0]
+]
+basis = [[1, 0, 0], [-0.5, 0.866025403784438, 0]]
 
-# X = DCA_cluster(name='G6', sites=sites, superlattice=superlattice)
-# X.draw_patches()
+X = DCA_cluster(name='G6', sites=sites, superlattice=superlattice, basis=None)
+X.draw_patches()
 
 
 ##### G6 #####
@@ -220,22 +225,22 @@ class DCA_cluster:
 
 
 ##### 9 sites triangular #####
-sites = [
-    [ 0, 0, 0],
-    [ 1, 0, 0],
-    [ 2, 0, 0],
-    [ 1, 1, 0],
-    [ 2, 1, 0],
-    [ 3, 1, 0],
-    [ 2, 2, 0],
-    [ 3, 2, 0],
-    [ 4, 2, 0]
-]
-superlattice= [[3, 0, 0], [3, 3, 0]]
-basis = [[1, 0, 0], [-0.5, 0.866025403784438, 0]]
+# sites = [
+#     [ 0, 0, 0],
+#     [ 1, 0, 0],
+#     [ 2, 0, 0],
+#     [ 1, 1, 0],
+#     [ 2, 1, 0],
+#     [ 3, 1, 0],
+#     [ 2, 2, 0],
+#     [ 3, 2, 0],
+#     [ 4, 2, 0]
+# ]
+# superlattice= [[3, 0, 0], [3, 3, 0]]
+# basis = [[1, 0, 0], [-0.5, 0.866025403784438, 0]]
 
-X = DCA_cluster(name='G6', sites=sites, superlattice=superlattice, basis=basis)
-X.draw_patches(lim=2)
+# X = DCA_cluster(name='G6', sites=sites, superlattice=superlattice, basis=basis)
+# X.draw_patches(lim=2)
 
 ##### T3 #####
 # sites = [

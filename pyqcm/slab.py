@@ -19,7 +19,7 @@ class slab:
         """
         self.nlayer = nlayer
         self.name = name
-        if thickness == None:
+        if thickness is None:
             self.thickness=(nlayer+1)//2
             for i in range(nlayer):
                 pyqcm.add_cluster(cluster, [0,0,i], sites)

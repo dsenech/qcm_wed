@@ -707,13 +707,13 @@ def parameter_set(opt='all'):
     if opt == 'independent':
         P2 = {}
         for x in P:
-            if P[x][1] == None:
+            if P[x][1] is None:
                 P2[x] = P[x][0]
         return P2
     elif opt == 'report':
         rep = ''
         for x in P:
-            if P[x][1] == None:
+            if P[x][1] is None:
                 rep += x + ' = ' + str(P[x][0]) + '\n'
             else:
                 rep += x + ' = ' + str(P[x][2]) + ' x ' + P[x][1] + '\n'
@@ -817,23 +817,14 @@ def print_options(opt=0):
     return qcm.print_options(opt)
 
 ################################################################################
-def print_model(filename, **kwargs):
+def print_model(filename):
     """Prints a description of the model into a file
 
     :param str filename: name of the file
-
+    
     :return: None
- 
-   :Keyword Arguments:
-
-        * asy_operators (``str``) -- true if asymptote files are produced for each operator
-        * asy_labels (``str``) -- true if sites labels are indicated in the asymptote program
-        * asy_band (``str``) -- true if band labels are indicated in the asymptote program
-        * asy_neighbors (``str``) -- true if neighbors are drawn in the asymptote program
-        * asy_working_basis (``str``) -- true if the working basis is used instead of the physical basis
-
     """
-    qcm.print_model(filename, **kwargs)
+    qcm.print_model(filename)
 
 ################################################################################
 def projected_Green_function(z, spin_down=False, label=0):
@@ -902,7 +893,7 @@ def set_global_parameter(name, value=None):
     :return: None
 
     """
-    if value == None:
+    if value is None:
         return qcm.set_global_parameter(name)
     else:
         return qcm.set_global_parameter(name, value)

@@ -117,7 +117,7 @@ def controlled_loop(
 	
 		# predicting the starting value from previous solutions (do nothing if loop_counter=0)
 		fit_type = ''
-		if loop_counter == 1 or predict == False:
+		if loop_counter == 1 or not predict:
 			start = sol[1, :]  # the starting point is the previous value in the loop
 		elif loop_counter > 1:
 			if loop_counter == 2:
@@ -147,21 +147,21 @@ def controlled_loop(
 
 		except pyqcm.OutOfBoundsError as E:
 			print('variable ', E.variable + 1, ' is out of bounds: abs(', varia[E.variable], ') > ', max[E.variable])
-			if loop_counter == 0 or adjust == False:
+			if loop_counter == 0 or not adjust:
 				print('Out of bound on starting values, aborting')
 				return
 			else:
 				retry = True
 				continue
 		except pyqcm.TooManyIterationsError as E:
-			if loop_counter == 0 or adjust == False:
+			if loop_counter == 0 or not adjust:
 				print('Cannot converge on starting values, aborting')
 				return 
 			else:
 				retry = True
 				continue
 
-		if loop_counter > 2 and (retry == False) and (adjust == True):
+		if loop_counter > 2 and not retry and adjust:
 			if(__predict_good(sol[0, :], start, 0.01) and step <  loop_range[2]):
 				step *= 1.5
 				print('readjusting step to ', step)
@@ -172,8 +172,8 @@ def controlled_loop(
 		loop_counter += 1
 
 		if control_func is not None:
-			if control_func() == False:
-				if loop_counter < 2 or adjust == False:
+			if not control_func():
+				if loop_counter < 2 or not adjust:
 					print('control failed on starting. aborting. Maybe try with different starting point')
 					break
 				retry = True
@@ -327,7 +327,7 @@ def fixed_density_loop(
 					for v in var_param:
 						pyqcm.set_parameter(v, poly_predictor(n, var2[v], j+1, 2))
 
-		if mu_converged == False:
+		if not mu_converged:
 			print('failed to find the value of chemical potential. Aborting')
 			exit(1)
 		mu_list[i] = mu
@@ -479,7 +479,7 @@ def linear_loop(
 		sol = np.roll(sol, 1, 0)  # cycles the solutions
 		# predicting the starting value from previous solutions (do nothing if loop_counter=0)
 		fit_type = ''
-		if iter == 1 or predict == False:
+		if iter == 1 or not predict:
 			start = sol[1, :]  # the starting point is the previous value in the loop
 		elif iter > 1:
 			if iter == 2:

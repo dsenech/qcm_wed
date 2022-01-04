@@ -66,7 +66,7 @@ class hartree:
         par = pyqcm.parameters()
         v = par[self.V]
         vm0 = par[self.Vm]
-        if self.lattice == False:
+        if not self.lattice:
             self.ave = pyqcm.cluster_averages()[self.Vm][0]*self.size0
         else:
             self.ave = pyqcm.averages()[self.Vm]*self.size0
@@ -93,7 +93,7 @@ class hartree:
         par = pyqcm.parameters()
         v = par[self.V]
         vm0 = par[self.Vm]
-        if self.lattice == False:
+        if not self.lattice:
             self.ave = pyqcm.cluster_averages()[self.Vm][0]
         else:
             self.ave = pyqcm.averages()[self.Vm]
@@ -193,7 +193,7 @@ class counterterm:
         """
         self.ave0 = self.ave
         self.ave = pyqcm.cluster_averages(self.clus-1)[self.name][0]
-        if first == False:
+        if not first:
             self.S = (self.ave-self.ave0)/(self.v-self.v0)
         self.v0 = self.v
         self.v -= self.ave/self.S
