@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import re
 
-def draw_operator(file, op_name, neighbors=False, values=False):
+def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=False):
 
     fin = open(file, 'r')
 
@@ -49,6 +49,45 @@ def draw_operator(file, op_name, neighbors=False, values=False):
         S[i,:] = (np.array(s)@B).T
     print('sites:\n', S)        
     print('bands:\n', band)
+
+    #-------------------------------------------------------------------------
+    # reading superlattice
+    L = ''
+    while "superlattice:" not in L:
+        L = fin.readline()
+        if not L:
+            print('file ended without superlattice')
+
+    super = []
+    L = fin.readline()
+    X = re.split(" ", L)
+    dimension = int(X[1])
+
+    for i in range(dimension):
+        L = fin.readline()
+        X = re.split("[(,) ]+", L)
+        super += [(float(X[1]), float(X[2]), float(X[3]))]
+    print('superlattice = \n', super)        
+
+    #-------------------------------------------------------------------------
+    # reading neighbors
+    L = ''
+    while "neighbors" not in L:
+        L = fin.readline()
+        if not L:
+            print('file ended without neighbors')
+
+    neighbors = []
+    while True:
+        L = fin.readline()
+        if L == '\n': break
+        X = re.split("[(,): ]+", L)
+        print('N : ', X)
+        neighbors += [(float(X[1]), float(X[2]), float(X[3]))]
+    Neigh = np.zeros((len(neighbors), 3))
+    for i,s in enumerate(neighbors):
+        Neigh[i,:] = (np.array(s)@B).T
+    print('neighbors = \n', Neigh)        
 
     #-------------------------------------------------------------------------
     # reading operator
@@ -120,7 +159,7 @@ def draw_operator(file, op_name, neighbors=False, values=False):
     ncol = len(bcol)
     plt.gca().set_aspect(1)
     plt.gca().axis('off')
-    offset = 0.15
+    offset = 0.03*np.max(S)
 
     zmin = np.min(S[:,2])
     zmax = np.max(S[:,2])
@@ -129,12 +168,21 @@ def draw_operator(file, op_name, neighbors=False, values=False):
             pass
         else:
             plt.plot(S[i,0], S[i,1], 'ko', ms = 6 + 6*(S[i,2]-zmin)/(zmax-zmin+0.1), mfc='w', c=bcol[band[i]%ncol])
-            plt.text(S[i,0], S[i,1]+offset, f'${i+1}$', va='bottom', ha='center', color='b', fontsize=8)
+            if show_labels: plt.text(S[i,0], S[i,1]+offset, f'${i+1}$', va='bottom', ha='center', color='b', fontsize=8)
     for i in range(S.shape[0]):
         if S[i,2]-0.001 < zmin:
             plt.plot(S[i,0], S[i,1], 'ko', ms = 6, c=bcol[band[i]%ncol])
-            plt.text(S[i,0], S[i,1]-offset, f'${i+1}$', va='top', ha='center', color='b', fontsize=8)
+            if show_labels: plt.text(S[i,0], S[i,1]-offset, f'${i+1}$', va='top', ha='center', color='b', fontsize=8)
 
+    #-------------------------------------------------------------------------
+    # plotting the neighbors
+
+    if show_neighbors:
+        for j in range(Neigh.shape[0]):
+            for i in range(S.shape[0]):
+                plt.plot(S[i,0]+Neigh[j,0], S[i,1]+Neigh[j,1], 'ko', ms = 6, alpha=0.5)
+
+    #-------------------------------------------------------------------------
     plt.title(f'${op_name}$', pad=18)
     plt.show()
 
