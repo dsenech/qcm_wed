@@ -6,7 +6,7 @@ COMPILER	= g++
 LINKER	= $(COMPILER)
 
 #dynamic link library will vary quite a bit from one platform to the other
-LINK =  -L/$(HOME)/MYLIB/Qcm -lcuba $(python3-config --ldflags) -llapack -lblas -liomp5
+LINK =  -lcuba $(python3-config --ldflags) -llapack -lblas -liomp5
 
 #include path, should be left empty for most platform
 LOCAL_INCLUDE 	= -I/usr/local/include/  -I${MKLROOT}/include $(shell python3-config --includes) -I$(shell python3 -c 'import numpy; print(numpy.get_include())')/numpy	

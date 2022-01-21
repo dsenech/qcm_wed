@@ -146,7 +146,7 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
             alpha = 1.0
         else:
             alpha = 0.5
-        if np.linalg.norm(S[e[0],0:1] -  S[e[1],0:1]) < 0.0001 :
+        if np.linalg.norm(S[e[0],0:2] -  S[e[1],0:2]) < 0.0001 :
             plt.plot([S[e[0],0]], [S[e[0],1]], 'ro', ms = 18, c='w', mec='r', mew=2, alpha = alpha)
         else:
             plt.plot([S[e[0],0], S[e[1],0]], [S[e[0],1], S[e[1],1]], pf, mew=2, alpha = alpha)
