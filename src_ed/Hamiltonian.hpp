@@ -383,7 +383,7 @@ template<typename HilbertField>
 void Hamiltonian<HilbertField>::print(ostream& fout)
 {
   if(H_dense.v.size() == 0) return;
-  console::banner('~', "Hamiltonian", fout);
+  banner('~', "Hamiltonian", fout);
   fout << *B;
   fout << "Hamiltonian (dense form):\n";
   fout << H_dense;

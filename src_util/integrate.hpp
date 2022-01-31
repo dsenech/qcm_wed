@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <vector>
-#include "console.hpp"
+#include "parser.hpp"
 #include "vector_num.hpp"
 
 #define MAX_GAUSS_KRONROD_RECURSION 10 //! maximum recursion level in gauss_kronrod

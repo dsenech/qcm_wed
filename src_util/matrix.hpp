@@ -6,7 +6,7 @@
 #include <cstring>
 #include <ctype.h>
 
-#include "console.hpp"
+#include "parser.hpp"
 #include "lapack-blas.h"
 #include "vector_num.hpp"
 

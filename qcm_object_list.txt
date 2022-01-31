@@ -19,7 +19,6 @@ parameter_set.o \
 profile.o \
 qcm_lib.o \
 binary_state.o \
-console.o \
 continued_fraction_set.o \
 continued_fraction.o \
 destruction_operator.o \

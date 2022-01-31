@@ -3,7 +3,7 @@
 #include<unordered_map>
 
 #include "global_parameter.hpp"
-#include "console.hpp"
+#include "parser.hpp"
 
 bool is_global_parameter_initialized = false;
 

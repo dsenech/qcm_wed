@@ -4,7 +4,6 @@
 #include "lattice_model_instance.hpp"
 #include "integrate.hpp"
 #include "parser.hpp"
-#include "console.hpp"
 #include "QCM.hpp"
 #ifdef _OPENMP
   #include <omp.h>

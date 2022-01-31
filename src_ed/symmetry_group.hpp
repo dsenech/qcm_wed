@@ -9,7 +9,7 @@
 #include "matrix.hpp"
 #include "binary_state.hpp"
 #include "sector.hpp"
-#include "console.hpp"
+#include "parser.hpp"
 #include "index.hpp"
 #include "symmetric_orbital.hpp"
 #include "block_matrix.hpp"

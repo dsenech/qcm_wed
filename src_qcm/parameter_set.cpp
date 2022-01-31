@@ -2,7 +2,6 @@
 #include <set>
 
 #include "parameter_set.hpp"
-#include "console.hpp"
 #include "parser.hpp"
 #include "global_parameter.hpp"
 #include "lattice_model.hpp"

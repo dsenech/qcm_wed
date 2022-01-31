@@ -279,7 +279,7 @@ namespace ED{
   void print_models(ostream& fout)
   {
     for(auto& x : models) x.second->print(fout);
-    console::banner('=', "model instances",fout);
+    banner('=', "model instances",fout);
     for(auto& x : model_instances) x.second->print(fout);
   }
   

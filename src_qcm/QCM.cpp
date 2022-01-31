@@ -18,7 +18,6 @@
 #include "parser.hpp"
 #include "qcm_ED.hpp"
 #include "parameter_set.hpp"
-#include "console.hpp"
 #include "model.hpp"
 
 //==============================================================================

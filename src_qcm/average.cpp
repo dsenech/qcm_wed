@@ -1,7 +1,7 @@
 #include <fstream>
 #include "lattice_model_instance.hpp"
 #include "integrate.hpp"
-#include "console.hpp"
+#include "parser.hpp"
 #include "QCM.hpp"
 
 double tr_sigma_inf(0.0);

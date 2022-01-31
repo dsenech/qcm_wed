@@ -2,7 +2,7 @@
 #define sector_h
 
 #include <cstring>
-#include "console.hpp"
+#include "parser.hpp"
 
 namespace HS_mixing {
   const int normal=0;

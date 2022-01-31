@@ -24,7 +24,7 @@ map<pair<int, int>, shared_ptr<ED_halfbasis>> halfbasis; //!< list of bases of t
 //------------------------------------------------------------------------------
 // declarations local to this file
 
-bool ED_basis::verb = true;
+bool ED_basis::verb = false;
 
 /**
  Constructor of the basis in the sector the_sec

@@ -641,24 +641,24 @@ vector<Complex> lattice_model::periodize(const vector3D<double> &k, vector<Compl
 */
 void lattice_model::print(ostream &fout, bool asy_operators, bool asy_labels, bool asy_band, bool asy_neighbors, bool asy_working_basis)
 {
-  console::banner('=', "clusters", fout);
+  banner('=', "clusters", fout);
   fout << "No\tmodel\tn_sites\tposition\tref.\n";
   for(int i=0; i<clusters.size(); i++){
     cluster& s = clusters[i];
     fout << i+1 << '\t' << s.name << '\t' << s.n_sites << '\t' << s.position << '\t' << s.ref << endl;
   }
-  console::banner('=', "sites", fout);
+  banner('=', "sites", fout);
   fout << "No\tcluster\tNo in cluster\tband\tposition\n";
   for(int i=0; i<sites.size(); i++){
     site& s = sites[i];
     fout << i+1 << '\t' << s.cluster+1 << '\t' << s.index_within_cluster+1 << '\t' << s.band+1 << '\t' << s.position << endl;
   }
-  console::banner('.', "NN bonds", fout);
+  banner('.', "NN bonds", fout);
   fout << "No\tcluster\tNo in cluster\tband\tposition\n";
   for(auto& b : bonds){
     fout << b.first+1 << '\t' << sites[b.first].position << '\t' << b.second+1 << '\t' << sites[b.second].position << endl;
   }
-	console::banner('.', "bases", fout);
+	banner('.', "bases", fout);
 	fout << "dual:\n" << dual << endl;
 	fout << "phys:\n" << phys << endl;
 	fout << "physdual:\n" << physdual << endl;
@@ -666,10 +666,10 @@ void lattice_model::print(ostream &fout, bool asy_operators, bool asy_labels, bo
 	fout << "superlattice:\n" << superlattice << endl;
 	fout << "unit_cell:\n" << unit_cell << endl;
 
-	console::banner('.', "neighbors", fout);
+	banner('.', "neighbors", fout);
 	for(size_t i=1; i<neighbor.size(); i++) fout << i << " : " << neighbor[i] << endl;
 
-  console::banner('=', "lattice operators", fout);
+  banner('=', "lattice operators", fout);
   for(auto& x : term){
 		lattice_operator& h = *x.second;
 		fout << '\n' << h.name << '\t';
@@ -710,7 +710,7 @@ void lattice_model::print(ostream &fout, bool asy_operators, bool asy_labels, bo
 			else fout << '[' << x.r+1 << ',' << x.c+1 << ',' << neighbor[x.n] << "] : " << x.v << endl;
 		}
   }
-  console::banner('*', "cluster models", fout);
+  banner('*', "cluster models", fout);
   ED::print_models(fout);
 }
 

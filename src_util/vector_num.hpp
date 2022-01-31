@@ -12,7 +12,7 @@
 
 #include "types.hpp"
 #include "global_parameter.hpp"
-#include "console.hpp"
+#include "parser.hpp"
 #include "lapack-blas.h"
 
 #define SMALL_VALUE 1.0e-12

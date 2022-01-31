@@ -8,28 +8,23 @@
 #include <cstdlib>
 #include <iomanip>
 #include <limits>
+#include "types.hpp"
 
-#include "console.hpp"
-
-void qcm_ED_throw(const std::string& s);
+#define SHORT_DISPLAY 7
+#define NORMAL_DISPLAY 9
+#define LONG_DISPLAY 14
 
 using namespace std;
 
-istream & operator==(istream &input, const char* search);
-istream & operator>>(istream &input, const char* search);
-istream & operator==(istream &input, const string &search);
-istream & operator>>(istream &input, const string &search);
-
-vector<string> read_strings(istream &s);
-
 namespace parser{
   extern	bool no_rewind;
-  extern int display_accur;
   inline void next_line(std::istream &flux){flux.ignore(numeric_limits<streamsize>::max(), '\n');};
   istream & find_next(istream &flux, const char* search);
-  bool has_only_digits(const string &s);
-  bool find_string(const string& s, vector<string>& input);
 }
+
+
+//-----------------------------------------------------------------------------
+// Templates
 
 //! converts a string to a generic type
 template<typename T>
@@ -52,7 +47,37 @@ string to_string(const T &x){
   return sout.str();
 }
 
+//-----------------------------------------------------------------------------
+// Declarations
+
 int cluster_index_from_string(string& S);
+istream & operator==(istream &input, const char* search);
+istream & operator==(istream &input, const string &search);
+istream & operator>>(istream &input, const char* search);
+istream & operator>>(istream &input, const string &search);
+vector<std::string> split_string(const string &s, char delim);
+vector<string> read_strings(istream &s);
+void banner(const char c, const char s[128], std::ostream &fout = std::cout);
+void banner(const char c, const string &s, ostream &fout = std::cout);
 void check_name(const string& S);
+void check_signals();
+void qcm_catch(const std::string& s);
+void qcm_ED_catch(const std::string& s);
+void qcm_ED_throw(const std::string& s);
+void qcm_throw(const std::string& s);
+
+//-----------------------------------------------------------------------------
+// Declarations and code
+
+/**
+ Chops a real number \a x if its absolute value is smaller than the limit \a c
+ */
+inline double chop(double x, double c=1e-6){return (fabs(x)<c) ? 0 : x;}
+
+/**
+ Chops a complex number \a x separately for its real and imaginary parts
+ */
+inline Complex chop(Complex x, double c=1e-6){return Complex(fabs(x.real()) < c ? 0 : x.real(),fabs(x.imag()) < c ? 0:x.imag());}
+
 
 #endif

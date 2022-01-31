@@ -2,7 +2,7 @@
  \brief Methods of the struct \a lattice
  */
 
-#include "console.hpp"
+#include "parser.hpp"
 #include "lattice3D.hpp"
 
 #define LARGE_UNIT 2048 // ! WARNING !! must not be too large for fear of overflow!

@@ -7,7 +7,7 @@
 
 #include "lattice_model_instance.hpp"
 #include "integrate.hpp"
-#include "console.hpp"
+#include "parser.hpp"
 
 bool recursive=false;
 const double threshold = 0.1*M_PI;

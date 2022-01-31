@@ -44,7 +44,7 @@ is_factorized(false)
  */
 void model::print(ostream& fout)
 {
-  console::banner('-', "cluster " + name, fout);
+  banner('-', "cluster " + name, fout);
   fout << *group << endl;
   for(auto& x: term) x.second->print(fout);
 }

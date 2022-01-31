@@ -3,7 +3,7 @@
 
 // #include "matrix.hpp"
 #include "continued_fraction.hpp"
-#include "console.hpp"
+#include "parser.hpp"
 
 void EigensystemTridiagonal(bool evector_flag, vector<double> &alpha, vector<double> &beta, vector<double> &energy, vector<double> &evector);
 extern std::normal_distribution<double> normal_dis;

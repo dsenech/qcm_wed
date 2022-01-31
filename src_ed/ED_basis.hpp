@@ -7,7 +7,7 @@
 #include <memory>
 #include <tuple>
 
-#include "console.hpp"
+#include "parser.hpp"
 #include "symmetry_group.hpp"
 #include "sector.hpp"
 #include "binary_state.hpp"
