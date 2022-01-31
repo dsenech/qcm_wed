@@ -10,9 +10,9 @@ extern std::normal_distribution<double> normal_dis;
 
 //! Implementation of the Lanczos method
 template<typename T, typename HilbertField>
-void Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x)
+void Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x, bool verb=false)
 {
-	if(global_bool("modified_Lanczos")) Modified_Lanczos(hamil, dim, val, x);
+	if(global_bool("modified_Lanczos")) Modified_Lanczos(hamil, dim, val, x, verb);
 	else{
 		vector<double> energy;
 		vector<double> alpha;
@@ -20,23 +20,23 @@ void Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x)
 		size_t niter = 0;
 		random(x, normal_dis);
 
-		LanczosEigenvalue(hamil, x, alpha, beta, energy, niter);
+		LanczosEigenvalue(hamil, x, alpha, beta, energy, niter, verb);
 		val = energy[0];
-		LanczosEigenvector(hamil, x, alpha, beta);
+		LanczosEigenvector(hamil, x, alpha, beta, verb);
 	}
 }
 
 
 //! Implementation of the modified Lanczos method
 template<typename T, typename HilbertField>
-void Modified_Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x)
+void Modified_Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x, bool verb=false)
 {
 	vector<HilbertField> psi1(dim);
 	vector<HilbertField> psi2(dim);
 	size_t max_iter_lanczos = global_int("max_iter_lanczos");
 	double accur_lanczos = global_double("accur_lanczos");
 
-	console::message(5,"Modified Lanczos method; dim = " + to_string(dim));
+	if(verb) cout << "\nModified Lanczos method; dim = " << dim << endl;
 
 	random(x, normal_dis);
 	int niter;
@@ -49,7 +49,7 @@ void Modified_Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x
 		double delta = sqrt(delta2);
 		if(niter%10==0) cout << "--> iteration " << niter << "\tdelta = " << delta2 << "\tE0 = " << E0 << endl; // tempo
 		if(delta2 < accur_lanczos*E0*E0) break;
-		// console::message(7,"--> iteration " + to_string(niter) + "; delta = " + to_string(delta) + ", E0 = " +  to_string(E0));
+		if(verb && niter%10==0) cout << "--> iteration " << niter << "; delta = " << delta << ", E0 = " << E0 << endl;
 		to_zero(psi2);
 		hamil.mult_add(psi1,psi2);
 		double E2 = realpart(psi1*psi2);
@@ -81,7 +81,7 @@ void Modified_Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x
  - A method hamil.multadd(vector<HilbertField> &x, vector<HilbertField> &y) that does y -->  y + H.x
  */
 template<typename T, typename HilbertField>
-void LanczosEigenvalue(T &H, vector<HilbertField> &gs, vector<double> &alpha, vector<double> &beta, vector<double> &energy, size_t &niter)
+void LanczosEigenvalue(T &H, vector<HilbertField> &gs, vector<double> &alpha, vector<double> &beta, vector<double> &energy, size_t &niter, bool verb=false)
 {
 	size_t dim = gs.size();
 	size_t max_iter_lanczos = global_int("max_iter_lanczos");
@@ -89,7 +89,8 @@ void LanczosEigenvalue(T &H, vector<HilbertField> &gs, vector<double> &alpha, ve
 	if(niter>dim) niter = dim;
 	else niter = max_iter_lanczos;
   
-	
+	if(verb) cout << "\nLanczos method for the ground state; dim = " << dim << endl;
+
 	energy.clear();
 	alpha.clear();
 	beta.clear();
@@ -124,23 +125,16 @@ void LanczosEigenvalue(T &H, vector<HilbertField> &gs, vector<double> &alpha, ve
 		
 		// computing beta_j
 		beta.push_back(norm(r));
-		
 		EigensystemTridiagonal(true,alpha,beta,energy,evector);
-		
 		Ritz = abs(evector.back()*beta.back());
-		
-		if(alpha.size()%10 == 0){
-			console::message(7,"--> iteration " + to_string(beta.size())
-							 + ", evalue = " + to_string(energy[0])
-							 + ", residual = " + to_string(Ritz));
+		if(verb && alpha.size()%10 == 0){
+			cout.precision(10);
+			cout << "--> iteration " << beta.size() << ", evalue = " << energy[0] << ", residual = " << Ritz << endl;
 		}
-		
-    if(alpha.size() > max_iter_lanczos) qcm_ED_throw("Lanczos procedure exceeded " + to_string(max_iter_lanczos) + " iterations");
+    	if(alpha.size() > max_iter_lanczos) qcm_ED_throw("Lanczos procedure exceeded " + to_string(max_iter_lanczos) + " iterations");
 	}
 	niter = beta.size();
 }
-
-
 
 
 
@@ -155,9 +149,9 @@ void LanczosEigenvalue(T &H, vector<HilbertField> &gs, vector<double> &alpha, ve
  @param beta  Second Diagonal of the tridiagonal matrix (computed by LanczosEigenvalue).
  */
 template<typename T, typename HilbertField>
-void LanczosEigenvector(T &H, vector<HilbertField> &gs, vector<double> &alpha, vector<double> &beta)
+void LanczosEigenvector(T &H, vector<HilbertField> &gs, vector<double> &alpha, vector<double> &beta, bool verb=false)
 {
-	console::message(4,"Lanczos: calculation of the eigenvector");
+	if(verb) cout << "Lanczos: calculation of the eigenvector..." << endl;
 	vector<HilbertField> r(gs); // residue. beware of the default copy constructor !!!
 	vector<HilbertField> q(gs.size()); // Lanczos basis vector
 	
@@ -177,7 +171,7 @@ void LanczosEigenvector(T &H, vector<HilbertField> &gs, vector<double> &alpha, v
 			q[i] = -beta[j-1]*tmp;
 		}
 		mult_add(evector[j],r,gs);
-		if(j%10 == 0) console::message(7,"--> iteration " + to_string(j));
+		if(verb && j%20 == 0) cout << "--> iteration " << j << endl;
 	}
 
 	// elective check at the end
@@ -202,7 +196,7 @@ void LanczosEigenvector(T &H, vector<HilbertField> &gs, vector<double> &alpha, v
  @param psi	[in] starting vector (provided on input).
  */
 template<typename T, typename HilbertField>
-pair<vector<double>, vector<double>> LanczosGreen(T &H, vector<HilbertField> &psi)
+pair<vector<double>, vector<double>> LanczosGreen(T &H, vector<HilbertField> &psi, bool verb=false)
 {
 	vector<HilbertField> q(psi.size());
 	
@@ -266,7 +260,8 @@ bool BandLanczos(
 				 vector<double> &evalues,
 				 matrix<HilbertField> &evec_red,
 				 matrix<HilbertField> &P0,
-				 int &M0
+				 int &M0,
+				 bool verb=false
 				 )
 {
 	int i,j,k;
@@ -284,8 +279,7 @@ bool BandLanczos(
   
 	size_t dim = phi[0].size();
 	
-	console::message(4, "band Lanczos procedure with " + to_string(phi.size())
-						   + " starting vectors. Dimension " + to_string(dim));
+	if(verb) cout << "\nband Lanczos procedure with " << phi.size() << " starting vectors. Dimension " << dim << endl;
 	
 	// make sure the targeted number of iterations is a multiple of the number of starting vectors
 	int pc = (int)phi.size();
@@ -317,7 +311,7 @@ bool BandLanczos(
     check_signals();
 		double z = norm(v[j]); // step (3)
     if(z < accur_deflation){	// need to deflate vector (step (4))
-			console::message(4,"deflating vector no " + to_string(j));
+			if(verb) cout << "deflating vector no " << j << endl;
 			if(j >= pc){		// step (4a) [adjusted]
 				I[nd] = j-pc;	// note : at any time, j > indices in I[]
 				def[j-pc] = 1;
@@ -400,19 +394,18 @@ bool BandLanczos(
 #endif
 			
 			evalue_test = abs(evalues[0]-ev_old); ev_old = evalues[0];
-      if(evalue_test < accur_band_lanczos) converged = true;
+		if(evalue_test < accur_band_lanczos) converged = true;
 			
 			int num=0;
 			for(size_t i=0; i<v.size(); i++) if(v[i].size()>0) num++;
-			
-			
-			console::message(7,"--> iteration " + to_string(j) + " of " + to_string(M0) + " delta E = " + to_string(evalue_test) +
-							 "\tgap = " + to_string(evalues[1]-evalues[0]) + "  " + to_string(num) + " vectors in RAM");
-			
-      if (evalues[1]-evalues[0] < band_lanczos_minimum_gap and no_degenerate_BL){
-        qcm_ED_throw("Band Lanczos: the gap between the first two eigenvalues is smaller than " + to_string(band_lanczos_minimum_gap));
+			if(verb){
+				cout.precision(10);
+				cout << "--> iteration " << j << ",\tdelta E = " << evalue_test << "\tgap = " << evalues[1]-evalues[0] << endl;
 			}
 			
+			if (evalues[1]-evalues[0] < band_lanczos_minimum_gap and no_degenerate_BL){
+        		qcm_ED_throw("Band Lanczos: the gap between the first two eigenvalues is smaller than " + to_string(band_lanczos_minimum_gap));
+			}
 			if(converged) break;
 		}
 	}
@@ -434,7 +427,7 @@ bool BandLanczos(
 	fev.close();
 #endif
 	
-	console::message(4,to_string(M0) + " iterations");
+	if(verb) cout << M0 << " iterations" << endl;
 	return true;
 }
 

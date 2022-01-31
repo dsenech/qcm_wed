@@ -176,7 +176,7 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
 
   // building a set of trial sectors according to the target sector;
   
-  console::message(3, "computing low-energy state for cluster instance "+full_name());
+  if(global_bool("verb_ED")) cout << "computing low-energy state for cluster instance " << full_name() << endl;
   
   sector_set = target_sectors;
   
@@ -212,7 +212,7 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
     if(x->energy < GS_energy) GS_energy = x->energy;
     ostringstream sout;
     sout << *x;
-    console::message(6, sout.str());
+    if(global_bool("verb_ED")) cout << sout.str() << endl;
   }
   
   // average and variances of operators
@@ -391,7 +391,8 @@ void model_instance<HilbertField>::Green_function_solve()
   }
 	if(!gs_solved) low_energy_states();
   
-  console::message(2, "GF solver for cluster instance " + full_name());
+  if(global_bool("verb_ED")) cout << "GF solver for cluster instance " << full_name() << endl;
+
   for(auto& x : states){
 
     bool is_complex = (typeid(HilbertField) == typeid(Complex));
@@ -523,8 +524,10 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
   Q_matrix_set<HilbertField> Qm(the_model->group, mixing);
   Q_matrix_set<HilbertField> Qp(the_model->group, mixing);
 
-   console::message(3, "\ncomputing Q-matrix for state of energy "+to_string(Omega.energy)+" in sector "+Omega.sec.name());
-   if(spin_down) console::message(3, "spin down part");
+  if(global_bool("verb_ED")){
+    cout << "\ncomputing Q-matrix for state of energy " << Omega.energy << " in sector " << Omega.sec.name() << endl;
+    if(spin_down) cout << "spin down part" << endl;
+  }
  
   // building the Q matrices
   int ns = 2*sym_orb.size();
@@ -573,7 +576,6 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     Q->q[r].check_norm(global_double("accur_Q_matrix"));
     Q->q[r].v.v *= sqrt(Omega.weight);
   }
-  // if(console::level>5) cout << "Q-matrix:\n" << *Q << endl; // TEMPO
 
 //??????????????????????????????????????????????????????????????????????????????????????
 // CHECKING ANTICOMMUTATION RELATIONS TO CHECK THE VALIDITY OF THE DESTRUCTION OPERATORS

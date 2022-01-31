@@ -315,7 +315,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     elif plt_ax is None:
         plt.show()
 
-    return w.real, A    
+    return w.real, A    # why returning this? check. Could be triggered by optional argument.
 
 
 ################################################################################

@@ -29,23 +29,6 @@ vector<std::string> split_string(const string &s, char delim) {
  */
 
 double console::precision=1e-6;
-int console::level=0;
-
-void console::message(int verb, const string &str){
-  if(level < verb) return;
-#ifdef _OPENMP
-  if(omp_get_thread_num() != 0) return;
-  if((omp_get_num_threads() > 1 or omp_get_level() > 0))
-    cout << str << "\t[" << omp_get_num_threads() << " threads, level " << omp_get_level() << "]" << endl;
-  else
-    cout  << str << endl;
-#else
-    cout  << str << endl;
-#endif    
-}
-
-
-
 
 /**
  Prints a banner-like message with message \a s, padded with character \a c

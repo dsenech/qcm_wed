@@ -31,9 +31,9 @@ string strip_at(const string& s)
 /** 
  default constructor
  @param _model [in] : lattice model
- @param _params [in] : values of the model parameters, as a map
+ @param _params [in] : values of the model parameters, as a map
  @param _sectors [in] : sectors to look for the ground state 
- @param _label [in] : label given to the instance 
+ @param _label [in] : label given to the instance 
  */
 
 lattice_model_instance::lattice_model_instance(shared_ptr<lattice_model> _model, const map<string, double>& _params, const vector<string>& _sectors, int _label)
@@ -47,7 +47,6 @@ lattice_model_instance::lattice_model_instance(shared_ptr<lattice_model> _model,
   SEF_solved = false;
   E_pot = 0.0;
   E_kin = 0.0;
-  console::level = (int)global_int("verbose");
   if(sectors.size() == 0) qcm_throw("target sectors were not specified!");
   
   model->close_model();
@@ -208,7 +207,7 @@ void lattice_model_instance::build_cluster_H()
 /** 
  returns the cluster Green function for cluster # i at frequency w
  @param i [in] index of the cluster (1 to the number of clusters)
- @param w [in] complex frequency
+ @param w [in] complex frequency
  @param spin_down [in] true if we are asking for the spin down part (mixing = 4)
  @returns a complex-valued matrix containing the cluster Green function
  */
@@ -243,7 +242,7 @@ matrix<complex<double>> lattice_model_instance::cluster_Green_function(size_t i,
 /** 
  returns the cluster Green function for cluster # i at frequency w
  @param i [in] index of the cluster (1 to the number of clusters)
- @param w [in] complex frequency
+ @param w [in] complex frequency
  @param spin_down [in] true if we are asking for the spin down part (mixing = 4)
  @returns a complex-valued matrix containing the cluster self-energy
  */
@@ -276,7 +275,7 @@ matrix<complex<double>> lattice_model_instance::cluster_self_energy(size_t i, co
 /** 
  returns the hybridization function for cluster # i at frequency w
  @param i [in] index of the cluster (1 to the number of clusters)
- @param w [in] complex frequency
+ @param w [in] complex frequency
  @param spin_down [in] true if we are asking for the spin down part (mixing = 4)
  @returns a complex-valued matrix containing the cluster hybridization function
  */
@@ -414,7 +413,7 @@ double lattice_model_instance::Potthoff_functional()
   
   // lambda function
   auto F = [this] (Complex w, vector3D<double> &k, const int *nv, double *I) {SEF_integrand(w, k, nv, I);};
-  QCM::wk_integral(model->spatial_dimension, F, Iv, global_double("accur_SEF"));
+  QCM::wk_integral(model->spatial_dimension, F, Iv, global_double("accur_SEF"), global_bool("verb_integrals"));
 	double omega_trace = -Iv[0];
 	
 	
@@ -639,7 +638,7 @@ void lattice_model_instance::print_info()
 //==============================================================================
 /** 
  Produces the Lehmann form of an array of Green functions at fixed frequency 
- @param k [in] array of wavevectors
+ @param k [in] array of wavevectors
  @param band [in] band (=orbital) label
  @param spin_down [in] true if the spin-down part is to be produced (mixing = 4)
  @returns for each wavevector, a pair of arrays giving the location of the pole and the residue
@@ -664,7 +663,6 @@ vector<pair<vector<double>, vector<double>>> lattice_model_instance::Lehmann_Gre
   const double threshold = 1e-6;
 	
   for(int i=0; i<k.size(); i++){
-    console::message(3, "k = "+to_string<vector3D<double>>(k[i]));
     res[i].first.resize(m);
     res[i].second.resize(m);
     Green_function_k K(G, k[i]);
@@ -716,7 +714,7 @@ vector<pair<vector<double>, vector<double>>> lattice_model_instance::Lehmann_Gre
  lattice model's mixing latt_mix. No additional anomalous component required. 
  @param latt_mix [in] mixing state of the lattice model
  @param clus_mix [in] mixing state of the cluster
- @param g [in] the cluster Green function 
+ @param g [in] the cluster Green function 
  @returns the upgraded Green function
  */
 matrix<Complex> lattice_model_instance::upgrade_cluster_matrix(int latt_mix, int clus_mix, matrix<Complex> &g)
@@ -759,8 +757,8 @@ matrix<Complex> lattice_model_instance::upgrade_cluster_matrix(int latt_mix, int
  lattice model's mixing latt_mix.
  @param latt_mix [in] mixing state of the lattice model
  @param clus_mix [in] mixing state of the cluster
- @param g [in] the cluster Green function 
- @param gm [in] Nambu version of the cluster Green function 
+ @param g [in] the cluster Green function 
+ @param gm [in] Nambu version of the cluster Green function 
  @returns the upgraded Green function
  */
 matrix<Complex> lattice_model_instance::upgrade_cluster_matrix_anomalous(int latt_mix, int clus_mix, matrix<Complex> &g, matrix<Complex> &gm)

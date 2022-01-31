@@ -101,9 +101,10 @@ Hamiltonian<HilbertField>::Hamiltonian(shared_ptr<model> _the_model, const map<s
       if(global_bool("CSR_sym_store") and num>1) csr.sym_store = true; // set up the CSR format for openMP parallelization
       else csr.sym_store = false;
       csr.diag.assign(dim, 0.0);
-      if(csr.sym_store)
-        console::message(5, "constructing the CSR Hamiltonian (stored symmetrically for openMP with "+to_string(num)+" threads)...");
-      else console::message(5, "constructing the CSR Hamiltonian...");
+      if(global_bool("verb_Hilbert")){
+        if(csr.sym_store) cout << "constructing the CSR Hamiltonian (stored symmetrically for openMP with " << num << " threads)..." << endl;
+        else cout << "constructing the CSR Hamiltonian..." << endl;
+      }
       for(auto& h : sparse_ops){
         h.first->CSR_map(E, csr.diag, h.second, csr.sym_store);
       }
@@ -240,7 +241,7 @@ double Hamiltonian<HilbertField>::GS_energy()
     size_t niter = 0;
     vector<HilbertField> x(dim);
     random(x, normal_dis);
-    LanczosEigenvalue(*this, x, alpha, beta, energy, niter);
+    LanczosEigenvalue(*this, x, alpha, beta, energy, niter,  global_bool("verb_ED"));
 	  return energy[0];
   }
 }
@@ -277,17 +278,17 @@ vector<shared_ptr<state<HilbertField>>> Hamiltonian<HilbertField>::states(double
     vector<vector<HilbertField> > evectors;
     size_t Davidson_states = global_int("Davidson_states");
     if(Davidson_states > 1){
-      Davidson(*this, dim, Davidson_states, evalues, evectors, global_double("accur_Davidson"));
+      Davidson(*this, dim, Davidson_states, evalues, evectors, global_double("accur_Davidson"),  global_bool("verb_ED"));
       if(evalues[0] < GS_energy) GS_energy = evalues[0];
       if(evalues.back()-GS_energy < max_gap){
-        console::message(1,"ED WARNING! : not enough Davidson states (" + to_string(Davidson_states) + ") in sector " + sec.name());
+        cout << "ED WARNING! : not enough Davidson states (" << Davidson_states << ") in sector " << sec.name() << endl;
       }
     }
     else{
       evalues.resize(1);
       evectors.resize(1);
       evectors[0].resize(dim);
-      Lanczos(*this, dim, evalues[0], evectors[0]);
+      Lanczos(*this, dim, evalues[0], evectors[0],  global_bool("verb_ED"));
       if(evalues[0] < GS_energy) GS_energy = evalues[0];
     }
     for(size_t i=0; i<evectors.size(); i++){
@@ -333,7 +334,7 @@ Q_matrix<HilbertField> Hamiltonian<HilbertField>::build_Q_matrix(vector<vector<H
   // case of small dimensions : the Hamiltonian is already stored in dense form
   
   if(format == H_format_dense){
-    console::message(5,"Q_matrix : full diagonalization");
+    if(global_bool("verb_ED")) cout << "Q_matrix : full diagonalization" << endl;
     Q_matrix<HilbertField> Q(phi.size(), dim);
     vector<HilbertField> y(dim);
     matrix<HilbertField> U(H_dense);
@@ -358,7 +359,7 @@ Q_matrix<HilbertField> Hamiltonian<HilbertField>::build_Q_matrix(vector<vector<H
   matrix<HilbertField> U;  // eigenvectors of the reduced Hamiltonian
   matrix<HilbertField> P; // matrix of inner products <b[i]|v[j]>
   
-  if(BandLanczos(*this, phi, eval, U, P, M)){
+  if(BandLanczos(*this, phi, eval, U, P, M,  global_bool("verb_ED"))){
     Q_matrix<HilbertField> Q(phi.size(),M);
     if(Q.M > 0){
       Q.e = eval; 

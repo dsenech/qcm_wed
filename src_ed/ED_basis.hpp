@@ -25,7 +25,7 @@ struct ED_basis
 	std::string name; //!< Name of basis (identifies the sector and the irrep)
 	uint32_t dim; //!< dimension of the Hilbert space
 	
-	static bool verbose;
+	static bool verb;
 	
 	ED_basis(const sector &_sec, int L);
 	virtual binary_state bin(uint32_t I) const = 0;

@@ -39,7 +39,8 @@ namespace ED{
   
   void new_model(const string &name, const size_t L, const size_t nb, const vector<vector<int>> &gen, bool bath_irrep)
   {
-    console::level = (int)global_int("verbose");
+    if(global_bool("verb_Hilbert")) ED_basis::verb = true;
+
     if(models.find(name) != models.end()){
       qcm_ED_throw("The name "+name+" has already been used for a model");
     }
@@ -71,7 +72,7 @@ namespace ED{
     else if(_type == "X") M->term[_name] = make_shared<Heisenberg_operator>(_name, M, elements, 'X');
     else if(_type == "Y") M->term[_name] = make_shared<Heisenberg_operator>(_name, M, elements, 'Y');
     else if(_type == "Z") M->term[_name] = make_shared<Heisenberg_operator>(_name, M, elements, 'Z');
-    else console::message(0, "ED_WARNING : type of operator "+_name+" is not yet implemented");
+    else cout << "ED_WARNING : type of operator " << _name << " is not yet implemented" << endl;
   }
   
   
@@ -82,7 +83,7 @@ namespace ED{
     if(M->is_closed) qcm_ED_throw("model " + model_name + " has already been instantiated and is closed for modifications");
     if(_type == "one-body") M->term[_name] = make_shared<one_body_operator<Complex>>(_name, M, elements);
     else if(_type == "anomalous") M->term[_name] = make_shared<anomalous_operator<Complex>>(_name, M, elements);
-    else console::message(0, "ED_WARNING : type of operator "+_name+" is not yet implemented");
+    else cout << "ED_WARNING : type of operator " << _name << " is not yet implemented" << endl;
   }
   
   
@@ -119,7 +120,6 @@ namespace ED{
     auto it = param.begin();
     while(it != param.end()){
       if(mod.term.find(it->first) == mod.term.end()){
-        // console::message(5, "ED WARNING : operator "+it->first+" in instance "+to_string(label)+" does not exist in cluster model "+mod.name);
         param.erase(it++);
       }
       else ++it;
@@ -297,7 +297,7 @@ namespace ED{
     auto it = param1.begin();
     while(it != param1.end()){
       if(mod.term.find(it->first) == mod.term.end()){
-        console::message(0, "ED WARNING : operator "+it->first+" does not exist in cluster model "+mod.name);
+        cout << "ED WARNING : operator " << it->first << " does not exist in cluster model " << mod.name << endl;
         param1.erase(it++);
       }
       else ++it;
@@ -305,7 +305,7 @@ namespace ED{
     it = param2.begin();
     while(it != param2.end()){
       if(mod.term.find(it->first) == mod.term.end()){
-        console::message(0, "ED WARNING : operator "+it->first+" does not exist in cluster model "+mod.name);
+        cout << "ED WARNING : operator " << it->first << " does not exist in cluster model " << mod.name << endl;
         param2.erase(it++);
       }
       else ++it;

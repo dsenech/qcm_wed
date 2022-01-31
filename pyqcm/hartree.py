@@ -34,6 +34,9 @@ class hartree:
         :param boolean lattice: if True, the lattice average is used, otherwise the cluster average
 
         """
+        # if len(pyqcm.the_model.clusters) > 1:
+        #     raise ValueError('For the moment, Hartree couplings are only possible in a model with a single cluster')
+
         self.Vm = Vm
         self.V = V
         self.eig = eig
@@ -51,7 +54,8 @@ class hartree:
         # assert Vm in par, 'Hartree : '+Vm+' is not a parameter in the model!'
 
         if lattice:
-            self.size0 = pyqcm.cluster_info()[0][1]
+            self.size0 = pyqcm.the_model.sites.shape[0]
+            # self.size0 = pyqcm.cluster_info()[0][1]
         else:
             self.size0 = pyqcm.model_size()[2][0]
     

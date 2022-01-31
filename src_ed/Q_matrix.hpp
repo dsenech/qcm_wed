@@ -214,7 +214,7 @@ void Q_matrix<HilbertField>::streamline()
     }
     i += n-1;
   }
-  if(console::level>5) cout << "streamlining Q-matrix from " << M << " to " << i2 << " rows" << endl;
+  if(global_bool("verb_ED")) cout << "streamlining Q-matrix from " << M << " to " << i2 << " rows" << endl;
   M = i2;
   e = e2;
   e.resize(M);
@@ -251,7 +251,7 @@ void Q_matrix<HilbertField>::check_norm(double threshold, double norm)
     }
   }
   double ztot2 = realpart(ztot);
-  if(console::level > 5) cout << "Q-matrix norm error : " << ztot2 << endl;
+  if(global_bool("verb_ED")) cout << "Q-matrix norm error : " << ztot2 << endl;
   if(ztot2 > threshold){
     cout << "faulty Q-matrix:\n" << *this << endl;
     cout << "Q-matrix norm is off by :\n" << tmp << endl;

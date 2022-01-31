@@ -41,7 +41,7 @@ struct lattice_model{
 	bool is_closed; //!< true if operators can no longer be added, as the first instance of the model was created
 	int mixing; //!< spin-Nambu mixing of the model (cannot be changed once set)
 	int n_mixed; //!< = 2 for mixing=1, 2 and 4 for mixing=3
-	int spatial_dimension; //!< dimension of the superlattice
+	int spatial_dimension; //!< dimension of the superlattice
 	lattice3D superlattice; //!< superlattice (for the super unit cell)
 	lattice3D unit_cell; //!< lattice (useful in case of multiband models)
 	map<string, shared_ptr<lattice_operator>> term; //!< pointers to the terms of the Hamiltonian
@@ -60,7 +60,7 @@ struct lattice_model{
 	vector<site> sites; //!< list of sites
 	vector<size_t> GF_dims; // dimensions of the Green functions for each cluster
 	vector<size_t> GF_offset; // position of the cluster #i in GF index space (depends on mixing)
-	vector<size_t> opposite_neighbor; //!< indices of opposite neighbors
+	vector<size_t> opposite_neighbor; //!< indices of opposite neighbors
 	vector<size_t> reduced_Green_index; // lattice Green index (n_band*n_mixed) associated with full Green index (n_mixed*n_sites)
 	vector<vector<vector<Complex>>> pauli; //!< Pauli matrices
 	vector<vector3D<double>> Green_to_position; // position associated (in superlattice basis) with each Green function index
@@ -125,12 +125,12 @@ void lattice_model::build_cluster_operators(lattice_operator& op)
 		}
 		
 		if(elem.size() == 0){
-			console::message(1, "WARNING : operator "+op.name+" has no element in cluster "+to_string(c+1));
+			cout << "WARNING : operator " << op.name << " has no element in cluster " << c+1 << endl;
 			continue;
 		}
 		else{
 			is_built.insert(clusters[c].name);
-			console::message(1, "building operator "+op.name+" on cluster no "+to_string(c+1)+" (model "+clusters[c].name+")");
+			if(global_bool("verb_Hilbert")) cout << "building operator " << op.name << " on cluster no " << c+1 << " (model " << clusters[c].name << ")" << endl;
 		}
 		string opname = op.name;
 		if(op.is_density_wave){

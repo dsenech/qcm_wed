@@ -130,8 +130,8 @@ parameter_set::parameter_set(shared_ptr<lattice_model> _model, vector<pair<strin
 
 /**
  sets the value of the parameter and its children
- @param name [in] name of parameter
- @param v [in] value to set the parameter to
+ @param name [in] name of parameter
+ @param v [in] value to set the parameter to
  */
 void parameter_set::set_value(const string& name, const double &v)
 {
@@ -145,8 +145,8 @@ void parameter_set::set_value(const string& name, const double &v)
 
 /**
  sets the value of the parameter and its children
- @param P [in] pointer to parameter
- @param v [in] value to set the parameter to
+ @param P [in] pointer to parameter
+ @param v [in] value to set the parameter to
  */
 void parameter_set::set_value(shared_ptr<parameter> P, const double &v)
 {
@@ -159,7 +159,7 @@ void parameter_set::set_value(shared_ptr<parameter> P, const double &v)
 
 /**
  checks the existence of a parameter name in the parameter_set
- @param name [in] name of the parameter
+ @param name [in] name of the parameter
  */
 void parameter_set::check_existence(string& name)
 {

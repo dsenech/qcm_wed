@@ -37,11 +37,24 @@ class WrongArgumentError(ValueError):
 # CLASSES
 
 class model:
+    cluster_model = []
+    clusters = []
+    sites = []
+
     def __init__(self):
         self.record = ''
 
     def __repr__(self):
         return self.record
+
+    def _finalize(self):
+        self.sites = np.array(self.sites, int)
+
+class cluster_model:
+    def __init__(self, name, ns, nb=0):
+        self.name = name
+        self.n_sites = ns
+        self.n_bath = nb
 
 class model_instance:
     def __init__(self, model, label):
@@ -85,7 +98,7 @@ def get_git_hash():
 get_git_hash()
 
 ################################################################################
-def new_cluster_model(name, n_sites, n_bath, generators=None, bath_irrep=False):
+def new_cluster_model(name, n_sites, n_bath=0, generators=None, bath_irrep=False):
     """Initiates a new model (no operators yet)
 
     :param str name: name to be given to the model
@@ -100,6 +113,7 @@ def new_cluster_model(name, n_sites, n_bath, generators=None, bath_irrep=False):
     global the_model
     the_model.record += "new_cluster_model('"+name+"', "+str(n_sites)+', '+str(n_bath)+', generators='+str(generators)+', bath_irrep='+str(bath_irrep)+')\n'
 
+    the_model.cluster_model += [cluster_model(name, n_sites, n_bath)]
     qcm.new_model(name, n_sites, n_bath, generators, bath_irrep)
 
 
@@ -225,7 +239,11 @@ def add_cluster(name, pos, sites, ref=0):
 
     global the_model
     the_model.record += "add_cluster('"+name+"', "+str(pos)+', '+str(sites)+', ref = '+str(ref)+')\n'
-
+    
+    the_model.clusters += [(name, pos, sites)]
+    for x in sites:
+        the_model.sites += [np.array(pos, int) + np.array(x, int)]
+    
     qcm.add_cluster(name, pos, sites, ref)
 
 ############################   WRAPPERS for qcm   ##############################
@@ -477,10 +495,16 @@ def lattice_model(name, superlattice, lattice=None):
 
     """
     global the_model
+    if lattice_model.called:
+        raise RuntimeError('lattice_model() can only be called once.')
+    lattice_model.called = True    
+
     the_model.record += "lattice_model('"+name+"', "+str(superlattice)+', '+str(lattice)+')\n'
 
     
     qcm.lattice_model(name, superlattice, lattice)
+    
+lattice_model.called = False
 
 ################################################################################
 def mixing():
@@ -610,7 +634,10 @@ def set_parameters(params, dump=True):
     
     """
     global parameter_set_str
+    if set_parameters.called:
+        raise RuntimeError('The function set_parameters() can only be called once')
 
+    set_parameters.called = True
 
     if type(params) is str:
         elems = []
@@ -642,6 +669,8 @@ def set_parameters(params, dump=True):
         qcm.set_parameters(params)
         return params
 
+set_parameters.called = False        
+
 ################################################################################
 def set_target_sectors(sec):
     """Define the Hilbert space sectors in which to look for the ground state
@@ -651,7 +680,9 @@ def set_target_sectors(sec):
     :return: None
 
     """
-    
+    if set_target_sectors.called:
+        raise RuntimeError('set_target_sectors() can only be called once.')
+    set_target_sectors.called = True    
     global the_model
     the_model.record += """
 try:
@@ -662,6 +693,8 @@ except:
     the_model.record += 'set_target_sectors('+str(sec)+')\n'
 
     qcm.set_target_sectors(sec)
+
+set_target_sectors.called = False
 
 ################################################################################
 def parameters(label=0):
@@ -976,6 +1009,7 @@ def interaction_operator(name, **kwargs):
     """
 
     global the_model
+    if type(the_model.sites) is list: the_model._finalize()
     the_model.record += "interaction_operator('"+name+"'"
     for x in kwargs:
         if type(kwargs[x]) is str:
@@ -1007,6 +1041,7 @@ def hopping_operator(name, link, amplitude, **kwargs):
     """
 
     global the_model
+    if type(the_model.sites) is list: the_model._finalize()
     the_model.record += "hopping_operator('"+name+"', "+str(link)+', '+str(amplitude)
     for x in kwargs:
         if type(kwargs[x]) is str:

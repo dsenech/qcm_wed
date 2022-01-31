@@ -13,7 +13,8 @@ destruction_operator<double>::destruction_operator(shared_ptr<ED_mixed_basis> _B
 {
   int n = B->L;
   shared_ptr<symmetry_group> group = B->group;
-  ostringstream sout; sout << *this; console::message(6, sout.str());
+  ostringstream sout; sout << *this; 
+  if(global_bool("verb_ED")) cout << sout.str() << endl;
   for(uint32_t I=0; I<B->dim; ++I){
     auto R = group->Representative(B->bin(I), B->sec.irrep); // just to get 'length'
     for(int site=0; site < group->n_sites; ++site){
@@ -40,7 +41,8 @@ destruction_operator<Complex>::destruction_operator(shared_ptr<ED_mixed_basis> _
 {
   int n = B->L;
   shared_ptr<symmetry_group> group = B->group;
-  ostringstream sout; sout << *this; console::message(6, sout.str());
+  ostringstream sout; sout << *this;
+  if(global_bool("verb_ED")) cout << sout.str() << endl;
   for(uint32_t I=0; I<B->dim; ++I){
     auto R = group->Representative(B->bin(I), B->sec.irrep); // just to get 'length'
     for(int site=0; site < group->n_sites; ++site){

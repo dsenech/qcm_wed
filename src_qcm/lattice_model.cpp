@@ -123,7 +123,7 @@ int lattice_model::neighbor_index(vector3D<int64_t> &R){
 /**
  finds the second site, given a first site and a link
  @param s1 [in] site
- @param link [in] link
+ @param link [in] link
  @param s2 [out] second site
  @param ni [out] neighbor index
  @param ni_opp [out] opposite neighbor index
@@ -169,7 +169,7 @@ void lattice_model::add_chemical_potential()
 //===============================================================================
 /**
  add anomalous elements associated with a given pair of sites
- @param [in] E : vector of matrix elements
+ @param [in] E : vector of matrix elements
  @param [in] s1 : site no 1
  @param [in] s2 : site no 2
  @param [in] ni : neighbor index
@@ -313,7 +313,6 @@ void lattice_model::post_parameter_consolidate(size_t label)
 	auto it = term.begin();
 	while(it != term.end()){
 		if(it->second->is_active == false){
-			console::message(6,"erasing operator " + it->second->name);
 			term.erase(it++);
 		}
 		else ++it;

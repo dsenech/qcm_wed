@@ -24,11 +24,11 @@ vector<pair<string,double>> lattice_model_instance::averages()
   // lambda function
   if(periodized_averages){
     auto F = [this] (Complex w, vector3D<double> &k, const int *nv, double *I) mutable {average_integrand_per(w, k, nv, I);};
-    QCM::wk_integral(model->spatial_dimension, F, Iv, accur_OP);
+    QCM::wk_integral(model->spatial_dimension, F, Iv, accur_OP, global_bool("verb_integrals"));
   }
   else{
     auto F = [this] (Complex w, vector3D<double> &k, const int *nv, double *I) mutable {average_integrand(w, k, nv, I);};
-    QCM::wk_integral(model->spatial_dimension, F, Iv, accur_OP);
+    QCM::wk_integral(model->spatial_dimension, F, Iv, accur_OP, global_bool("verb_integrals"));
   }
 	
   if(global_bool("potential_energy")) E_pot = potential_energy();
@@ -192,7 +192,7 @@ vector<double> lattice_model_instance::dos(const complex<double> w)
   };
 
   vector<double> Iv(model->dim_reduced_GF,0.0);
-  QCM::k_integral(model->spatial_dimension, F, Iv, accur_OP);
+  QCM::k_integral(model->spatial_dimension, F, Iv, accur_OP, global_bool("verb_integrals"));
   for(size_t i=0; i<d; i++) D[i] = -M_1_PI*Iv[i]/model->Lc;
 
   if(model->mixing == HS_mixing::up_down){
@@ -206,7 +206,7 @@ vector<double> lattice_model_instance::dos(const complex<double> w)
     };
 
     to_zero(Iv);
-    QCM::k_integral(model->spatial_dimension, F_down, Iv, accur_OP);
+    QCM::k_integral(model->spatial_dimension, F_down, Iv, accur_OP, global_bool("verb_integrals"));
     for(size_t i=0; i<D_dim; i++) D[i+D_dim] = -M_1_PI*Iv[i]/model->Lc;
   }
   else if(model->mixing == HS_mixing::normal){
@@ -219,8 +219,8 @@ vector<double> lattice_model_instance::dos(const complex<double> w)
 //==============================================================================
 /**
  calculates the contribution of a frequency to the average of the operator 'name'
- @param name [in] name of the operator
- @param w [in] complex frequency
+ @param name [in] name of the operator
+ @param w [in] complex frequency
  */
 double lattice_model_instance::spectral_average(const string& name, const complex<double> w)
 {
@@ -244,7 +244,7 @@ double lattice_model_instance::spectral_average(const string& name, const comple
     I[0] = imag(z);
   };
   vector<double> Iv(1,0.0);
-  QCM::k_integral(model->spatial_dimension, F, Iv, accur_OP);
+  QCM::k_integral(model->spatial_dimension, F, Iv, accur_OP, global_bool("verb_integrals"));
 
   double result = -M_1_PI*Iv[0]/model->Lc;
   
@@ -269,7 +269,7 @@ double lattice_model_instance::spectral_average(const string& name, const comple
     };
     
     to_zero(Iv);
-    QCM::k_integral(model->spatial_dimension, F_down, Iv, accur_OP);
+    QCM::k_integral(model->spatial_dimension, F_down, Iv, accur_OP, global_bool("verb_integrals"));
     result += -M_1_PI*Iv[0]/model->Lc;
   }
   if(model->mixing == HS_mixing::normal) result *= 2;
@@ -281,7 +281,7 @@ double lattice_model_instance::spectral_average(const string& name, const comple
 
 //==============================================================================
 /** calculates the momentum-dependent average of an operator
- @param op [in] lattice operator
+ @param op [in] lattice operator
  @param k_set [in] array of wavevectors
  @returns an array of average values, one for each wavevector 
  */
@@ -318,7 +318,7 @@ vector<double> lattice_model_instance::momentum_profile(const lattice_operator& 
     }
   };
   vector<double> A(k_set.size(), 0.0);
-  QCM::wk_integral(0, Fmp, A, accur_OP);
+  QCM::wk_integral(0, Fmp, A, accur_OP, global_bool("verb_integrals"));
   if(model->mixing == HS_mixing::normal) A *= 2;
   else if((model->mixing&HS_mixing::anomalous)  == HS_mixing::anomalous) A += op.nambu_correction;
   else if(model->mixing == HS_mixing::full) {A += op.nambu_correction_full; A *= 0.5;}
@@ -328,7 +328,7 @@ vector<double> lattice_model_instance::momentum_profile(const lattice_operator& 
 
 //==============================================================================
 /** calculates the momentum-dependent average of an operator, from the periodized operator
- @param op [in] lattice operator
+ @param op [in] lattice operator
  @param k_set [in] array of wavevectors
  @returns an array of average values, one for each wavevector 
  */
@@ -371,7 +371,7 @@ vector<double> lattice_model_instance::momentum_profile_per(const lattice_operat
     }
   };
   vector<double> A(k_set.size(), 0.0);
-  QCM::wk_integral(0, Fmp, A, accur_OP);
+  QCM::wk_integral(0, Fmp, A, accur_OP, global_bool("verb_integrals"));
   if(model->mixing == HS_mixing::normal) A *= 2;
   else if((model->mixing&HS_mixing::anomalous)  == HS_mixing::anomalous) A += op.nambu_correction;
   else if(model->mixing == HS_mixing::full) {A += op.nambu_correction_full; A *= 0.5;}
@@ -393,7 +393,6 @@ double lattice_model_instance::potential_energy()
   double accur_OP = global_double("accur_OP");
   if(!gf_solved) Green_function_solve();
  
-  console::message(3, "computing the potential energy");
   // computing the infinite frequency limit
   double prev_cutoff = global_double("cutoff_scale");
   set_global_double("cutoff_scale", WINF); // important for convergence
@@ -408,7 +407,7 @@ double lattice_model_instance::potential_energy()
   vector<double> I(1);
   // lambda function
   auto F = [this] (Complex w, vector3D<double> &k, const int *nv, double *I) mutable {potential_energy_integrand(w, k, nv, I);};
-  QCM::wk_integral(model->spatial_dimension, F, I, 0.1*accur_OP);
+  QCM::wk_integral(model->spatial_dimension, F, I, 0.1*accur_OP, global_bool("verb_integrals"));
 
   set_global_double("cutoff_scale", prev_cutoff); // restores to previous value
   if(model->mixing == HS_mixing::full) I[0] *= 0.5; // full Nambu doubling overestimates by a factor of 2

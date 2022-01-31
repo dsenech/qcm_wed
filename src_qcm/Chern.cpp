@@ -29,7 +29,7 @@ Computes the eigenvalues and eigenvectors of a Green function at zero frequency
 @param k0 [in] wave vector
 @param e [out] eigenvalues
 @param U [out] matrix whose columns are the eigenvectors
-@param opt [in] option:  
+@param opt [in] option:  
   opt = 0 : physical basis (periodized Green function)
   opt = 1 : dual_basis (periodized Green function)
   opt = 2 : non periodized Green function
@@ -235,7 +235,7 @@ double lattice_model_instance::Berry_plaquette(Green_function &G, const vector3D
  
  @param k1 [in] lower left corner of the wavevector domain
  @param k2 [in] upper right of the wavevector domain
- @param nk [in] number of wavevectors on the side of the Brillouin zone (nk x nk grid) 
+ @param nk [in] number of wavevectors on the side of the Brillouin zone (nk x nk grid) 
  @param band [in] band number (0 means a sum over all bands)
  @param rec [in] if true, refines reursively the grid if needed
  @param dir [in] direction of perpendicular to plaquette (x=1, y=2, z=3)
@@ -378,9 +378,9 @@ double lattice_model_instance::monopole_part(vector3D<double>& k, double a, int 
 
 /**
  Computes the Chern number integral on the surface of a cube
- @param k [in] wavevector at the center of the cube
- @param a [in] half side of the cube
- @param nk [in] number of wavevectors on the side of the Brillouin zone 
+ @param k [in] wavevector at the center of the cube
+ @param a [in] half side of the cube
+ @param nk [in] number of wavevectors on the side of the Brillouin zone 
  @param band [in] band number (0 means a sum over all bands)
  @param rec [in] if true, refines reursively the grid if needed
  */

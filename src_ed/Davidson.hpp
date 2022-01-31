@@ -36,7 +36,7 @@
  */
 
 template<typename T, typename HilbertField>
-void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector<HilbertField>> &x, double accuracy)
+void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector<HilbertField>> &x, double accuracy, bool verb=false)
 {
 	if(K > dim) K=dim;
 	val.resize(K);
@@ -51,9 +51,10 @@ void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector
 	if(J > dim) J = dim;
 	size_t Q; //! number of vectors added at each iteration
 	
-	console::message(3,"Davidson method for " + to_string(K)
-						   + " vectors in sector " + hamil.B->sec.name()
-						   + " (dim = " + to_string(dim) + ")");
+	if(verb){
+		cout << "\nDavidson method for " << K << " vectors in sector " << hamil.B->sec.name() << ", dim = "  << dim << endl;
+	}
+
 	// finds the lowest diagonal elements of hamil and puts them into the index array lowest_diag_H
 	vector<double> d(dim);
 	hamil.diag(d);
@@ -143,9 +144,10 @@ void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector
 		// if number of vectors in b in too few because of previous deletions, then allocated more:
 		for(size_t i=b.size(); i<K+2*Q; i++) b.push_back(vector<HilbertField>(dim));
 		
-		console::message(4,"--> iteration " + to_string(iter)
-						 + ", evalue = " + to_string(mu[0]) + ", residual = " + to_string(residuals[K-1]));
-		
+		if(verb && iter%10==0){
+			cout.precision(12);
+			cout << "--> iteration " << iter << ", evalue = " << mu[0] << ",\tresidual = " << residuals[K-1] << endl;
+		}
 		
 		//--------------------------------------------------------------------------
 		// STEP D
@@ -223,7 +225,7 @@ void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector
 		
 	}
 	if(iter == max_iter_lanczos) qcm_ED_throw("Davidson method failed to converge!");
-	else console::message(3, to_string(ncall) + " calls to H and " + to_string(iter) + " iterations");
+	else if(verb) cout << ncall << " calls to H and " << iter << " iterations" << endl;
 }
 
 

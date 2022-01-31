@@ -413,11 +413,11 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     """Performs a VCA with the QN or NR method
     
     :param var2sef: function that converts variational parameters to model parameters
-    :param str or [str] names: names of the variational parameters
-    :param float or [float] start: starting values
-    :param float or [float] steps: initial steps
-    :param float or [float] accur: accuracy of parameters (also step for 2nd derivatives)
-    :param float or [float] max: maximum values that are tolerated
+    :param str or [str] names: names of the variational parameters
+    :param float or [float] start: starting values
+    :param float or [float] steps: initial steps
+    :param float or [float] accur: accuracy of parameters (also step for 2nd derivatives)
+    :param float or [float] max: maximum values that are tolerated
     :param float accur_grad: max value of gradient for convergence
     :param int max_iter: maximum number of iterations in the procedure
     :param float max_iter_diff: optional maximum value of the maximum step in the quasi-Newton method
@@ -659,11 +659,11 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
     """Performs the VCA assuming that the solution is a minimum of the Potthoff functional
     Uses minimization routines from scipy.optimize.
     
-    :param str or [str] names: names of the variational parameters
-    :param float or [float] start: starting values 
-    :param float or [float] steps: initial steps (relevant to some minimization methods)
-    :param float accur: accuracy of parameters
-    :param float ftol: convergence criterion for the value of the SEF
+    :param str or [str] names: names of the variational parameters
+    :param float or [float] start: starting values 
+    :param float or [float] steps: initial steps (relevant to some minimization methods)
+    :param float accur: accuracy of parameters
+    :param float ftol: convergence criterion for the value of the SEF
     :param str method: minimization method used in scipy.optimize.minimize()
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :return: None
@@ -789,10 +789,10 @@ def __transition(varia, P, bracket, step=0.001, verb=False):
     :math:`\Omega(h=s)` and :math:`\Omega(h=0)` where *h* is a single variational parameter (Weiss field)
     and *s* is a step. 
     
-    :param str varia: name of the variational parameter
+    :param str varia: name of the variational parameter
     :param str P: name of the control parameter (the parameter that controls the transition)
     :param (float,float) bracket: bracketing values for parameter P that enclose the transition
-    :param float step: small, but finite value *s* of the Weiss field 
+    :param float step: small, but finite value *s* of the Weiss field 
     :param boolean verb: If True, prints progress
     :returns: the value of P at the transition
 

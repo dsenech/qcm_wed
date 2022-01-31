@@ -12,7 +12,7 @@ extern shared_ptr<parameter_set> param_set;
  then Calculates V, defined as \f$ t(k) - t' - \Gamma(\omega)\f$
  if nohybrid is true, then only \f$ t(k) - t' \f$
  @param M [in, out] Green_function_k object
- @param nohybrid [in] if true, does not add the hybridization function (used in producing the Lehmann form of the Green function)
+ @param nohybrid [in] if true, does not add the hybridization function (used in producing the Lehmann form of the Green function)
  */
 void lattice_model_instance::set_V(Green_function_k &M, bool nohybrid){
 	
@@ -226,7 +226,7 @@ void lattice_model_instance::self_energy(Green_function_k &M)
 //==============================================================================
 /** 
  Calculates the integral of Gcpt over wavevectors, using the grid kgrid
- @param w [in] complex frequency
+ @param w [in] complex frequency
  @param spin_down [in] if true, computes the spin-down component (mixing = 4)
  */
 matrix<Complex> lattice_model_instance::projected_Green_function(Complex w, bool spin_down)
@@ -297,8 +297,8 @@ matrix<Complex> lattice_model_instance::projected_Green_function(Complex w, bool
 //==============================================================================
 /** 
  Computes the CDMFT host
- @param freqs [in] frequency array (along the imaginary axis)
- @param weights [in] weights of the different frequencies in the distance function
+ @param freqs [in] frequency array (along the imaginary axis)
+ @param weights [in] weights of the different frequencies in the distance function
  */
 void lattice_model_instance::CDMFT_Host(const vector<double>& freqs, const vector<double>& weights)
 {

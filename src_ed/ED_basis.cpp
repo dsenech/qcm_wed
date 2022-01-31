@@ -24,6 +24,7 @@ map<pair<int, int>, shared_ptr<ED_halfbasis>> halfbasis; //!< list of bases of t
 //------------------------------------------------------------------------------
 // declarations local to this file
 
+bool ED_basis::verb = true;
 
 /**
  Constructor of the basis in the sector the_sec
@@ -32,7 +33,7 @@ map<pair<int, int>, shared_ptr<ED_halfbasis>> halfbasis; //!< list of bases of t
  */
 ED_basis::ED_basis(const sector &_sec, int _L): sec(_sec) , L(_L), dim(0)
 {
-	console::message(5, "construction of basis in sector " + sec.name());
+	if(verb) cout << "construction of basis in sector " << sec.name() << endl;
 	name = sec.name();
 }
 
@@ -356,7 +357,7 @@ ED_basis(_sec, _group->N), group(_group)
   
   dim = binlist.size();
   sort(binlist.begin(), binlist.end());
-  console::message(5,"dimension = " + to_string(dim));
+  if(verb) cout << "dimension = " << dim << endl;
 }
 
 /**

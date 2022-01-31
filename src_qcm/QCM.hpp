@@ -71,7 +71,7 @@ namespace QCM{
   void global_parameter_init();
   void hopping_operator(const string &name, vector3D<int64_t> &link, double amplitude, int band1, int band2, int tau, int sigma);
   void interaction_operator(const string &name, vector3D<int64_t> &link, double amplitude, int band1, int band2, const string &type);
-  void k_integral(int dim, function<void (vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy);
+  void k_integral(int dim, function<void (vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy, bool verb=false);
   void new_lattice_model(const string &name, vector<int64_t> &superlattice, vector<int64_t> &lattice);
   void new_model_instance(int label);
   void print_model(const string& filename, bool asy_operators=false, bool asy_labels=false, bool asy_band=false, bool asy_neighbors=false, bool asy_working_basis=false);
@@ -79,7 +79,7 @@ namespace QCM{
   void set_basis(vector<double> &basis);
   void set_parameter(const string& name, double value);
   void set_parameters(vector<pair<string,double>>&, vector<tuple<string, double, string>>&);
-  void wk_integral(int dim, function<void (Complex w, vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy);
+  void wk_integral(int dim, function<void (Complex w, vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy,bool verb=false);
   void Green_function_solve(int label);
   void CDMFT_variational_set(vector<string>& varia);
   void CDMFT_host(const vector<double>& freqs, const vector<double>& weights, int label);

@@ -160,9 +160,9 @@ struct Integrator{
 			regions.erase(it);
 			regions.insert(Integrator_GK_region<T>(ap, 0.5*(ap+bp), integrand));
 			regions.insert(Integrator_GK_region<T>(0.5*(ap+bp), bp, integrand));
-			if(console::level>6) cout << "subdivide interval (" << ap << "," << bp << "), total error = " << total_error << endl;
+			if(global_bool("verb_integrals")) cout << "subdivide interval (" << ap << "," << bp << "), total error = " << total_error << endl;
 		}
-		if(regions.size() == max_regions) console::message(0, "warning: max. number of integration regions exceeded");
+		if(regions.size() == max_regions) cout << "warning: max. number of integration regions exceeded" << endl;
 		for(auto& x : regions){
 			for(int i=0; i<ncomp; i++) value[i] += x.value[i];
 		}

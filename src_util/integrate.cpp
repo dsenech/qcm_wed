@@ -94,7 +94,7 @@ double GK_gw[4] = { // Gauss-Kronrod rule weights for the 7-point rule
  @param Iv	value of the integral (adds to previous value: must be properlyl initialized)
  @param accuracy		required absolute accuracy of the integral
  */
-void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy)
+void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy, bool verb)
 {
 	int ndim = dim+1;
 	int cuba_mineval, cuba_maxpoints;
@@ -140,7 +140,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 	else{
 		Cuhre(ndim, ncomp, (integrand_t)low_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
 	}
-  console::message(4, "region 1 : "+to_string(neval)+" evaluations");
+	if(verb) cout << "region 1 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 	
 	//------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 	else{
 		Cuhre(ndim, ncomp, (integrand_t)mid_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
 	}
-  console::message(4, "region 2 : "+to_string(neval)+" evaluations");
+	if(verb) cout << "region 2 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 	
 	//------------------------------------------------------------------------------
@@ -176,7 +176,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
   else{
     Cuhre(ndim, ncomp, (integrand_t)high_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
   }
-  console::message(4, "region 3 : "+to_string(neval)+" evaluations");
+  if(verb) cout << "region 3 : " << neval << " evaluations" << endl;
   for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 }
 
@@ -195,7 +195,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
  @param Iv		value of the integral (adds to previous value: must be properlyl initialized)
  @param accuracy		required absolute accuracy of the integral
  */
-void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy)
+void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy, bool verb)
 {
   int cuba_mineval, cuba_maxpoints;
   cuba_threads=max_num_threads;
@@ -221,7 +221,7 @@ void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv,
     neval=0;
     int cubaneval, nregions, fail;
     Cuhre(dim, ncomp, (integrand_t)k_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
-    console::message(6, "Cuhre : "+to_string(neval)+" points in "+to_string(nregions)+" regions");
+	if(verb) cout << "Cuhre  : " << neval << " points in " << nregions << "regions" << endl;
   }
   for(int i=0; i<ncomp; ++i) Iv[i] += value[i];
 }
@@ -236,7 +236,7 @@ void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv,
  @param Iv	value of the integral (adds to previous value: must be properlyl initialized)
  @param accuracy		required absolute accuracy of the integral
  */
-void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy)
+void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy, bool verb)
 {
 	int ncomp = (int)Iv.size();
 	vector<double> value(ncomp,0);
@@ -260,7 +260,7 @@ void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vec
 	double fac = w_domain*M_1_PI;
   neval=0;
 	gauss_kronrod(ncomp, low_freq_w_integrand, 0, 1, accur, value.data(), false);
-  console::message(4, "region 1 : "+to_string(neval)+" evaluations");
+	if(verb) cout << "region 1 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 	
 	//------------------------------------------------------------------------------
@@ -273,7 +273,7 @@ void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vec
   neval=0;
 
 	gauss_kronrod(ncomp, mid_freq_w_integrand, 0, 1, accur, value.data(), false);
-  console::message(4, "region 2 : "+to_string(neval)+" evaluations");
+	if(verb) cout << "region 2 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 	
 	//------------------------------------------------------------------------------
@@ -286,7 +286,7 @@ void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vec
   to_zero(value);
   
   gauss_kronrod(ncomp, high_freq_w_integrand, 0, 1, accur, value.data(), false);
-  console::message(4, "region 3 : "+to_string(neval)+" evaluations");
+  if(verb) cout << "region 3 : " << neval << " evaluations" << endl;
   for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 }
 

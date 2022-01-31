@@ -11,7 +11,6 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
   E0(0.0), SEF_bath(0.0), GS_energy(0.0), is_correlated(false)
 {
   // checking that the values are associated with actual operators, and setting the mixing field
-  console::level = (int)global_int("verbose");
   bool nonzero_anomalous = false;
   if(value.size() == 0) qcm_ED_throw("ED model instance (label = "+to_string(_label)+") for model "+_the_model->name+" has no parameters!");
 
@@ -29,7 +28,7 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
 
   for(auto& v : value){
     if(the_model->term.find(v.first) == the_model->term.end()){
-      console::message(0, "ED WARNING : operator "+v.first+" does not exist in cluster model "+the_model->name);
+      cout << "ED WARNING : operator " << v.first << " does not exist in cluster model " << the_model->name << endl;
     }
     Hermitian_operator& op = *the_model->term.at(v.first);
     op.is_active = true;

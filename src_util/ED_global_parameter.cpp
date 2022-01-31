@@ -237,6 +237,7 @@ namespace ED {
     new_global_bool(false,"strip_anomalous_self","sets to zero the anomalous part of the self-energy");
     new_global_bool(false,"modified_Lanczos","Uses the modified Lanczos method for the ground state instead of the usual Lanczos method");
     new_global_bool(false,"continued_fraction","Uses the continued fraction solver for the Green function instead of the band Lanczos method");
+    new_global_bool(false,"verb_ED","prints ED information and progress");
 
 
     new_global_double(1e-12,"accur_band_lanczos","energy difference tolerance for stopping the BL process");
@@ -257,7 +258,6 @@ namespace ED {
     new_global_int(400,"max_iter_CF","Maximum number of iterations in the continuous fraction Lanczos procedure");
     new_global_int(600,"max_iter_lanczos","Maximum number of iterations in the Lanczos procedure");
     new_global_int(0,"seed","seed of the random number generator");
-    new_global_int(0,"verbose","level of verbosity");
 
     new_global_char('S', "Hamiltonian_format", "Desired Hamiltonian format: S (CSR matrix), O (individual operators), F (factorized), N (none = on the fly)");
   }
