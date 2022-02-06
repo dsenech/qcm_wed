@@ -836,7 +836,22 @@ static PyObject* model_size_python(PyObject *self, PyObject *args)
   return Py_BuildValue("iiOOO", qcm_model->sites.size(), qcm_model->n_band, elem, bath, ref);
 }
   
-  
+
+//==============================================================================
+const char* model_is_closed_help =
+R"(
+arguments:
+None
+returns:
+  True if the model is no longer modifiable, False otherwise  
+)";
+//------------------------------------------------------------------------------
+static PyObject* model_is_closed_python(PyObject *self, PyObject *args)
+{
+  return Py_BuildValue("i", (int)qcm_model->is_closed);
+}
+
+
 //==============================================================================
 const char* momentum_profile_help =
 R"{(

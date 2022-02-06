@@ -11,7 +11,7 @@ class DCA_cluster:
         :param [[int]] superlattice: superlattice basis vectors (integer components, the number of vectors is the dimension)
         :param [[int]] gen: generators of translation (one per dimension)
         :param [[float]]lattice: lattice basis vectors (integer components, optional). 
-        :param [[float]] basis: basis vectors (real components). Optional. 
+        :param [[float]] basis: basis vectors (real components). Optional. 
 
         """
         self.name = name

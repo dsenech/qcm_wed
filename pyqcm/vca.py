@@ -591,7 +591,7 @@ def plot_sef(param, prm, accur_SEF=1e-4, hartree=None, show=True):
         plt.xlim(prm[0], prm[-1])
         plt.plot(prm, omega, 'b-')
         plt.xlabel(param)
-        plt.ylabel(r'$\omega$')
+        plt.ylabel(r'$\Omega$')
         plt.axhline(omega[0], c='r', ls='solid', lw=0.5)
         plt.title(pyqcm.parameter_string())
         plt.show()

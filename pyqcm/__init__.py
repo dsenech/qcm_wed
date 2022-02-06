@@ -98,6 +98,15 @@ def get_git_hash():
 get_git_hash()
 
 ################################################################################
+def model_is_closed():
+
+    """returns True if the model can no longer be modified. False otherwise.
+
+    """
+
+    return qcm.model_is_closed()
+
+################################################################################
 def new_cluster_model(name, n_sites, n_bath=0, generators=None, bath_irrep=False):
     """Initiates a new model (no operators yet)
 
@@ -110,6 +119,9 @@ def new_cluster_model(name, n_sites, n_bath=0, generators=None, bath_irrep=False
 
     """
 
+    if model_is_closed():
+        print('WARNING : new_cluster_model() cannot be called any more : the model is closed')
+        return
     global the_model
     the_model.record += "new_cluster_model('"+name+"', "+str(n_sites)+', '+str(n_bath)+', generators='+str(generators)+', bath_irrep='+str(bath_irrep)+')\n'
 
@@ -131,6 +143,11 @@ def new_cluster_operator(name, op_name, op_type, elem):
     """
 
     global the_model
+
+    if model_is_closed():
+        print('WARNING : new_cluster_operator() cannot be called any more : the model is closed')
+        return
+
     the_model.record += "new_cluster_operator('"+name+"', '"+op_name+"', '"+op_type+"', "+str(elem)+')\n'
 
     if op_type == 'anomalous':
@@ -155,6 +172,11 @@ def new_cluster_operator_complex(name, op_name, op_type, elem):
     """
 
     global the_model
+
+    if model_is_closed():
+        print('WARNING : new_cluster_operator_complex() cannot be called any more : the model is closed')
+        return
+
     the_model.record += "new_cluster_operator_complex('"+name+"', '"+op_name+"', '"+op_type+"', "+str(elem)+')\n'
 
     qcm.new_operator_complex(name, op_name, op_type, elem)
@@ -238,6 +260,11 @@ def add_cluster(name, pos, sites, ref=0):
     """
 
     global the_model
+
+    if model_is_closed():
+        print('WARNING : add_cluster() cannot be called any more : the model is closed')
+        return
+
     the_model.record += "add_cluster('"+name+"', "+str(pos)+', '+str(sites)+', ref = '+str(ref)+')\n'
     
     the_model.clusters += [(name, pos, sites)]
@@ -495,6 +522,11 @@ def lattice_model(name, superlattice, lattice=None):
 
     """
     global the_model
+
+    if model_is_closed():
+        print('WARNING : lattice_model() cannot be called any more : the model is closed')
+        return
+
     if lattice_model.called:
         raise RuntimeError('lattice_model() can only be called once.')
     lattice_model.called = True    
@@ -635,7 +667,8 @@ def set_parameters(params, dump=True):
     """
     global parameter_set_str
     if set_parameters.called:
-        raise RuntimeError('The function set_parameters() can only be called once')
+        print('WARNING : The function set_parameters() can only be called once')
+        return
 
     set_parameters.called = True
 
@@ -681,7 +714,8 @@ def set_target_sectors(sec):
 
     """
     if set_target_sectors.called:
-        raise RuntimeError('set_target_sectors() can only be called once.')
+        print('WARNING : set_target_sectors() can only be called once.')
+        return
     set_target_sectors.called = True    
     global the_model
     the_model.record += """

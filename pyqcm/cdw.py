@@ -240,8 +240,8 @@ def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3)):
     Vic = np.zeros((C.N, C.N))
     Vc = np.zeros((C.N, C.N))
     S2 = C.sites@basis
-    plt_ax.set_aspect(1.0)
     if plt_ax:
+        plt_ax.set_aspect(1.0)
         plt_ax.scatter(S2[:,0], S2[:,1], [24]*S2.shape[0],color='gray')
 
     assert type(_V) == list
