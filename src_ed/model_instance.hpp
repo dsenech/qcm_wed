@@ -421,9 +421,12 @@ void model_instance<HilbertField>::Green_function_solve()
 template<typename HilbertField>
 matrix<complex<double>> model_instance<HilbertField>::Green_function(const Complex &z, bool spin_down, bool blocks)
 {
-  if(spin_down and !(mixing&HS_mixing::up_down)) qcm_ED_throw("spin_down=True impossible with Hilbert space mixing "+to_string(mixing));
-  if(!gf_solved) Green_function_solve();
-
+  #pragma omp master
+  {
+    if(spin_down and !(mixing&HS_mixing::up_down))
+      qcm_ED_throw("spin_down=True impossible with Hilbert space mixing "+to_string(mixing));
+    if(!gf_solved) Green_function_solve();
+  }
   block_matrix<Complex> gf_block_matrix(the_model->group->site_irrep_dim*n_mixed);
   if(spin_down and mixing&HS_mixing::up_down){
     for(auto& x : states) x->gf_down->Green_function(z, gf_block_matrix);

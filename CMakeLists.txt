@@ -1,22 +1,36 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
+
 
 # specify the C++ standard
+# set(CMAKE_C_COMPILER_WORKS 1)
+# set(CMAKE_CXX_COMPILER_WORKS 1)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+if(APPLE)
+    set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+    set(CMAKE_HAVE_THREADS_LIBRARY 1)
+    set(CMAKE_USE_WIN32_THREADS_INIT 0)
+    set(CMAKE_USE_PTHREADS_INIT 1)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    set(LAPACK_LIBRARIES "-framework accelerate")
+else()
+    find_package(LAPACK REQUIRED)
 endif()
+
+# if(NOT CMAKE_BUILD_TYPE)
+#   set(CMAKE_BUILD_TYPE Release)
+# endif()
 
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
+message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+message(STATUS "Architecture: ${ARCHITECTURE}")
 
 # set the project name and version
-project(qcm VERSION 1.0 DESCRIPTION "Quantum Cluster Methods shared library")
-message(STATUS "Host processor : ${CMAKE_SYSTEM_PROCESSOR}")
+project(qcm LANGUAGES CXX VERSION 1.0 DESCRIPTION "Quantum Cluster Methods shared library")
 
 find_package(Python3 3.7 COMPONENTS Interpreter NumPy REQUIRED)
 find_package(PythonLibs REQUIRED)
@@ -28,8 +42,6 @@ find_library(CUBA_LIBRARY
     HINTS "/usr/local/lib" "$ENV{HOME}/lib"
 )
 
-#set(BLA_VENDOR Intel10_64lp)
-find_package(LAPACK)
 
 add_library(qcm SHARED
 src_qcm/CPT.cpp
@@ -70,28 +82,22 @@ src_util/vector_num.cpp
 set_target_properties(qcm PROPERTIES VERSION ${PROJECT_VERSION} PREFIX "" SUFFIX ".so")
 target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
 
-target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util PRIVATE ${PYTHON_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS}/numpy)
+target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS}/numpy)
 
- 
-# set(CMAKE_INSTALL_LIBDIR $ENV{HOME}/lib)
-install(TARGETS qcm
+if(SKBUILD)
+  install(TARGETS qcm DESTINATION .)
+else()
+  install(TARGETS qcm
   DESTINATION $ENV{HOME}/lib
-  RENAME qcm.so
 )
-message(STATUS "output file = ${OUTPUT_NAME}")
-message(STATUS "source directory = ${CMAKE_SOURCE_DIR}")
+endif()
+
+# message(STATUS "output file = ${OUTPUT_NAME}")
+# message(STATUS "source directory = ${CMAKE_SOURCE_DIR}")
 
 # file(COPY ${CMAKE_SOURCE_DIR}/pyqcm DESTINATION $ENV{HOME}/lib/)
 file(CREATE_LINK ${CMAKE_SOURCE_DIR}/pyqcm $ENV{HOME}/lib/pyqcm SYMBOLIC)
-# install(FILES ${OUTPUT_NAME}
-#   DIRECTORY $ENV{HOME}/lib
-#   RENAME qcm.so
-# )
 
-# add_custom_command(OUTPUT $ENV{HOME}/lib/qcm.so
-#   COMMAND ln -s ${OUTPUT_NAME} $ENV{HOME}/lib/qcm.so
-#   COMMENT "Generating symbolic link in $ENV{HOME}/lib/"
-# )
 
 #configure_file(qcm.pc.in qcm.pc @ONLY)
 

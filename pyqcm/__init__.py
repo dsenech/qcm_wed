@@ -398,7 +398,7 @@ def CPT_Green_function_inverse(z, k, spin_down=False, label=0):
     computes the inverse CPT Green function at a given frequency
 
     :param z: complex frequency
-    :param k: array of wavevectors (ndarray(N,	:param)
+    :param k: array of wavevectors (ndarray(3) or array of wavevectors (ndarray(N,3))
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices

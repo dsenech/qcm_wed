@@ -22,3 +22,18 @@ anomalous_operator('Px', [1, 0, 0], 1, type='dx')  # NN triplet
 density_wave('M', 'Z', [1, 0, 0])
 density_wave('H', 'Z', [0, 0, 0])
 density_wave('Hx', 'X', [0, 0, 0])
+density_wave('cdw', 'N', [1, 0, 0])
+
+e = np.sqrt(0.5)
+explicit_operator('V0m', [
+([0,0,0], [0,0,0], e),
+([3,0,0], [0,0,0], e),
+], tau=0, type='one-body')
+
+explicit_operator('V1m', [
+([0,0,0], [0,0,0], e),
+([3,0,0], [0,0,0],-e),
+], tau=0, type='one-body')
+
+
+# print_model('model.out')

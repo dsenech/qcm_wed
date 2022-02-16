@@ -7,6 +7,7 @@ lattice_model('1D_L4', [[4, 0, 0]])
 interaction_operator('U')
 interaction_operator('J', link=[1,0,0], type='Hund')
 hopping_operator('t', [1, 0, 0], -1)  # NN hopping
+hopping_operator('tsi', [1, 0, 0], -1, sigma=3, tau=2)  # NN hopping
 hopping_operator('ti', [1, 0, 0], -1, tau=2)  # NN hopping with imaginary amplitude
 hopping_operator('tp', [2, 0, 0], -1)  # NNN hopping
 hopping_operator('hx', [0, 0, 0], 1, tau=0, sigma=1)  # field in the x direction

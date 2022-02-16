@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.set_printoptions(precision=6, linewidth=512, suppress=True)
+np.set_printoptions(precision=10, linewidth=512, suppress=True)
 
 ################################################################################
 class cluster:
@@ -53,6 +53,13 @@ class cluster:
         print('liste of sites and folded sites:')
         for i in range(self.N):
             print(i+1, '\t', self.sites[i], '\t', self.sitesF[i], '\tdiff = ', self.sitesF[i]-self.sites[i])
+        # dictionary of sites (for getting the index from the position)
+        self.siteF_index = {}
+        for i,c in enumerate(sitesF):
+            S = '[{:d},{:d},{:d}]'.format(c[0], c[1], c[2])
+            self.siteF_index[S] = i
+
+
 
 
     def fold_shifted(self, r):
@@ -107,21 +114,15 @@ class cluster:
         if(self.dim < 3):
             R -= self.E[2]*Q[2]
             S += self.E[2]*Q[2]
-            # S[2] = r[2]
         if(self.dim  < 2):
             R -= self.E[1]*Q[1]
             S += self.E[1]*Q[1]
-            # S[1] = r[1]
 
-        I = None
-        
         try:
-            for i,r0 in enumerate(self.sitesF):
-                if np.linalg.norm(S-r0) < 1e-6:
-                    I = i
-                    break
+            Sstr = '[{:d},{:d},{:d}]'.format(S[0], S[1], S[2])
+            I = self.siteF_index[Sstr]
         except:
-            pass
+            I = None
 
         assert np.linalg.norm(S+R-r)<1e-6, 'folding operation failed! r = {}, S={}, R={}'.format(r,S,R)
         return I, S, R
@@ -254,42 +255,31 @@ def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3)):
     # print('\ninter-cluster V matrix contributions:\n')
     print('-'*80)
     for v in V:
-        for i,x in enumerate(C.sites):
-            X = x + v[0]
-            out=True
-            for j,y in enumerate(C.sites):
-                if np.linalg.norm(X-y) < 1e-6 and C.clus[i] == C.clus[j]:
-                    out=False
+        for i,x in enumerate(C.sites):  # loop over site 1
+            j, S, R = C.fold(C.sites[i] + v[0])
+            if j != None:
+                if C.clus[i] == C.clus[j] and np.linalg.norm(R) < 1e-6:
                     Vc[i,j] += v[1]
-                    break
-            if out:
-                j, S, R = C.fold(C.sitesF[i] + v[0])
-                if j != None:
-                    # print(v[0], '\t(', i+1, ',', j+1, ')\t', S, '\t', R, '\t', v[1])
+                else:
                     Vic[i,j] += v[1]
-                    if plt_ax != None:
-                        DX = v[0]@basis
-                        plt_ax.plot([S2[i,0], S2[i,0]+DX[0]], [S2[i,1], S2[i,1]+DX[1]])
-            X = x - v[0]
-            out=True
-            for j,y in enumerate(C.sites):
-                if np.linalg.norm(X-y) < 1e-6 and C.clus[i] == C.clus[j]:
-                    out=False
+                if plt_ax != None:
+                    DX = v[0]@basis
+                    plt_ax.plot([S2[i,0], S2[i,0]+DX[0]], [S2[i,1], S2[i,1]+DX[1]])
+            j, S, R = C.fold(C.sites[i] - v[0])
+            if j != None:
+                if C.clus[i] == C.clus[j] and np.linalg.norm(R) < 1e-6:
                     Vc[i,j] += v[1]
-                    break
-            if out:
-                j, S, R = C.fold(C.sitesF[i] - v[0])
-                if j != None:
-                    # print(-v[0], '\t(', i+1, ',', j+1, ')\t', S, '\t', R, '\t', v[1])
+                else:
                     Vic[i,j] += v[1]
-                    if plt_ax != None:
-                        DX = v[0]@basis
-                        plt_ax.plot([S2[i,0], S2[i,0]-DX[0]], [S2[i,1], S2[i,1]-DX[1]])
+                if plt_ax != None:
+                    DX = v[0]@basis
+                    plt_ax.plot([S2[i,0], S2[i,0]-DX[0]], [S2[i,1], S2[i,1]-DX[1]])
 
+    print('intra-cluster V matrix:\n',Vc)
     print('inter-cluster V matrix:\n',Vic)
 
     w, v = np.linalg.eigh(Vic)
-    w = np.round(w,8)
+    w = np.round(w,10)
     for i in range(C.N):
         # y = v[:,i]
         # for j in range(C.N):
