@@ -85,7 +85,8 @@ target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES
 target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS}/numpy)
 
 if(SKBUILD)
-  install(TARGETS qcm DESTINATION .)
+  message(STATUS "The project is built using scikit-build")
+  install(TARGETS qcm DESTINATION lib/python3.9/site-packages)
 else()
   install(TARGETS qcm
   DESTINATION $ENV{HOME}/lib

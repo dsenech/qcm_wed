@@ -6,6 +6,13 @@ import time
 parameter_set_str = ''
 first_time = True
 
+try:
+    import pyqcm.qcm_git_hash
+    git_hash = pyqcm.qcm_git_hash.git_hash
+except:
+    print('submodule qcm_git_hash not found. Will not be able to record git version in output files')
+    git_hash = 'NA'
+
 ################################################################################
 # GLOBAL MODULE VARIABLES
 solver = 'ED'
@@ -75,27 +82,7 @@ class model_instance:
 
 
 the_model = model()
-################################################################################
-# Produces the git hash for the current version
 
-git_hash = 'NA'
-def get_git_hash():
-    global git_hash
-    if git_hash != 'NA':
-        return
-    import os
-    import subprocess
-    pyqcm_dir = os.path.dirname(os.path.realpath(__file__))
-    current_dir = os.getcwd()
-    os.chdir(pyqcm_dir)
-    try:
-        git_hash = str(subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']))
-        git_hash = git_hash[2:-3]
-        # git_hash = str(os.system('git rev-parse --short HEAD'))
-    except:
-        pass
-    os.chdir(current_dir)
-get_git_hash()
 
 ################################################################################
 def model_is_closed():
