@@ -718,7 +718,7 @@ class general_bath:
         :param boolean singlet: if True, defines anomalous singlet hybridizations
         :param boolean triplet: if True, defines anomalous triplet hybridizations
         :param boolean complex: if True, defines imaginary parts as well, when appropriate
-        :param [[int]] sites: 2-level list of sites to couple to the bath orbitals (labels from 1 to ns)
+        :param [[int]] sites: 2-level list of sites to couple to the bath orbitals (labels from 1 to ns). Format resembles [[site labels to bind to orbital 1], ...] . 
 
         """
         from pyqcm import new_cluster_model, new_cluster_operator, new_cluster_operator_complex
