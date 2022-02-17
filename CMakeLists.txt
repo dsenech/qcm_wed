@@ -43,6 +43,7 @@ find_library(CUBA_LIBRARY
 )
 
 
+
 add_library(qcm SHARED
 src_qcm/CPT.cpp
 src_qcm/Chern.cpp
@@ -80,7 +81,13 @@ src_util/vector_num.cpp
 )
 
 set_target_properties(qcm PROPERTIES VERSION ${PROJECT_VERSION} PREFIX "" SUFFIX ".so")
-target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES} OpenMP::OpenMP_CXX)
+else()
+  target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
+endif()
 
 target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS}/numpy)
 
@@ -97,7 +104,7 @@ endif()
 # message(STATUS "source directory = ${CMAKE_SOURCE_DIR}")
 
 # file(COPY ${CMAKE_SOURCE_DIR}/pyqcm DESTINATION $ENV{HOME}/lib/)
-file(CREATE_LINK ${CMAKE_SOURCE_DIR}/pyqcm $ENV{HOME}/lib/pyqcm SYMBOLIC)
+# file(CREATE_LINK ${CMAKE_SOURCE_DIR}/pyqcm $ENV{HOME}/lib/pyqcm SYMBOLIC)
 
 
 #configure_file(qcm.pc.in qcm.pc @ONLY)

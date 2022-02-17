@@ -1,0 +1,8 @@
+*.o
+*.d
+*.out
+*.zip
+*.vscode
+_skbuild
+qcm.egg-info
+**/__pycache__
