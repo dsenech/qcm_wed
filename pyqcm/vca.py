@@ -693,7 +693,7 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
         nvar = len(names)  # number of variational parameters
         if start != None:
             if len(start) == nvar:
-                raise ValueError('argument start of vca_min() must be have {:d} elements'.format(nvar))
+                raise ValueError('argument start of vca_min() must have {:d} elements'.format(nvar))
         if type(steps) != list or type(accur) != list:
             raise ValueError('arguments steps and accur of vca_min() must be lists of {:d} elements each'.format(nvar))
         if len(steps) != nvar or len(accur) != nvar:

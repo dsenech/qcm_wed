@@ -1,0 +1,9 @@
+# C extensions
+*.so
+
+# Makefile stuff
+*.o
+*.d
+
+# Ignore the Cython files created locally
+*.pyc

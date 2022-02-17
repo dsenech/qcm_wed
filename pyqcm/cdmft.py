@@ -35,10 +35,11 @@ maxfev = 500000
 ################################################################################
 
 def moving_std(x, min):
-    """
-    finds the subsequence with the smallest standard deviation, with minimum size min
-    :param x: sequence 
+    """finds the subsequence with the smallest standard deviation, with minimum size min
+    
+    :param [float] x: sequence 
     :param int min: minimum length of subsequence
+
     """
     n = len(x)
     if n<min :

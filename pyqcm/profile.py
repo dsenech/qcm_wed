@@ -23,7 +23,7 @@ def plot_profile(n_scale=1, bond_scale=1, current_scale=1, spin_scale=1,
     :param float singlet_scale: scale factor applied to the singlet pairing amplitudes
     :param float triplet_scale: scale factor applied to the triplet pairing amplitudes
     :param str file: name of the output file, if not None
-    :param float z: layer number (z coordinate)
+    :param float layer: layer number (z coordinate)
         
     """
 

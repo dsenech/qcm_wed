@@ -200,7 +200,7 @@ def susceptibility(op_name, freqs, label=0):
 
         :param str op_name: name of the operator
         :param [complex] freqs: array of complex frequencies
-        :para int label: label of cluster model instance
+        :param int label: label of cluster model instance
         :return: array of complex susceptibilities
 
     """
@@ -1121,7 +1121,7 @@ def explicit_operator(name, elem, **kwargs):
     Defines an explicit operator
 
     :param str name: name of operator
-    :param [(int,int,complex)] elem: matrix elements
+    :param [(list, list, complex)] elem: List of tuples. Each tuple contains three elements (in order): a list representing position, a list representing link and a complex amplitude.
 
     :Keyword Arguments:
 
@@ -1671,7 +1671,7 @@ def read_from_file(out_file, n=0):
 
     :param str out_file: name of output file from which parameters are read
     :param int n: line number of data in output file (excluding titles)
-    :return: string to be added to an enventual input file
+    :return: string to be added to an eventual input file
 
     """
 

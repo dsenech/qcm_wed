@@ -8,6 +8,7 @@ np.set_printoptions(precision=4, linewidth=512, suppress=True)
 sec = 'R0:N6:S0'
 set_global_parameter('verbose',0)
 set_target_sectors([sec])
+
 set_parameters("""
     U=3.9
     mu=1
@@ -20,3 +21,6 @@ set_parameters("""
 
 pyqcm.solver='dvmc'
 pyqcm.new_model_instance()
+
+from pyqcm.spectral import *
+spectral_function(path="line")

@@ -66,7 +66,7 @@ def __kgrid(ax, nk, quadrant=False, k_perp=0.0, plane='xy', size=1.0):
 ################################################################################
 def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=None, offset=2, opt='A', Nambu_redress=True, inverse_path=False, title=None, file=None, plt_ax=None, **kwargs):
     """Plots the spectral function :math:`A(\mathbf{k},\omega)` along a wavevector path in the Brillouin zone.
-    This version plots the spin-down part with the correct sign of the frequency in the Nambu formalism
+    This version plots the spin-down part with the correct sign of the frequency in the Nambu formalism.
 
     :param float wmax: the frequency range is from -wmax to wmax if w is a float. Otherwise wmax is a tuple and the range is (wmax[0], wmax[1])
     :param float eta: Lorentzian broadening
@@ -251,9 +251,9 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     :param float  wmax: the frequency range is from -wmax to wmax
     :param float eta: Lorentzian broadening
     :param int clus: label of the cluster within the super unit cell (starts at 0)
-    :param int label: label of the instance of the model
+    :param int label: label of the model instance
     :param float offset: vertical offset in the plot between the curves associated to successive wavevectors
-    :param boolean full: if True, plots off diagonal components as well
+    :param boolean full: if True, plots off-diagonal components as well
     :param boolean self: if True, plots the self-energy instead of the spectral function
     :param boolean spin_down: if True, plots the spin down part, if different
     :param boolean blocks: if True, gives the GF in the symmetry basis (block diagonal)
@@ -919,7 +919,7 @@ def Fermi_surface(nk=64, label=0, band=None, quadrant=False, plane='xy', k_perp=
     :param int band: if None, plots all the bands. Otherwise just plots the FS for that band (starts at 1)
     :param boolean quadrant: if True, plots the first quadrant of a square Brillouin zone only
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
-    :param float k_perp: momentum component in the third direction (in multiple of pi)
+    :param float k_perp: momentum component in the third direction (in multiple of :math:`\pi`)
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
     :param kwargs: keyword arguments passed to the matplotlib 'plot' function
@@ -972,7 +972,7 @@ def G_dispersion(nk=64, label=0, band=None, period = 'G', contour=False, inv=Fal
     :param boolean quadrant: if True, plots the first quadrant of a square Brillouin zone only
     :param str datafile: if different from None, just writes the data in a file and does not plot
     :param float max: energy range (from -max to max) 
-    :param float k_perp: momentum component in the third direction (in multiple of pi)
+    :param float k_perp: momentum component in the third direction (in multiple of :math:`pi`)
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
