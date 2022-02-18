@@ -1,7 +1,11 @@
 import numpy as np
-import qcm
 import re
 import time
+
+try:
+    import pyqcm.qcm as qcm
+except:
+    import qcm
 
 parameter_set_str = ''
 first_time = True

@@ -1,26 +1,12 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.15)
 
+# set the project name and version
+project(qcm LANGUAGES CXX VERSION 1.0 DESCRIPTION "Quantum Cluster Methods shared library")
 
 # specify the C++ standard
-# set(CMAKE_C_COMPILER_WORKS 1)
-# set(CMAKE_CXX_COMPILER_WORKS 1)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(APPLE)
-    set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-    set(CMAKE_HAVE_THREADS_LIBRARY 1)
-    set(CMAKE_USE_WIN32_THREADS_INIT 0)
-    set(CMAKE_USE_PTHREADS_INIT 1)
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    set(LAPACK_LIBRARIES "-framework accelerate")
-else()
-    find_package(LAPACK REQUIRED)
-endif()
-
-# if(NOT CMAKE_BUILD_TYPE)
-#   set(CMAKE_BUILD_TYPE Release)
-# endif()
 
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -29,20 +15,28 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
 
-# set the project name and version
-project(qcm LANGUAGES CXX VERSION 1.0 DESCRIPTION "Quantum Cluster Methods shared library")
 
 find_package(Python3 3.7 COMPONENTS Interpreter NumPy REQUIRED)
+message(STATUS "python executable: ${Python3_EXECUTABLE}")
 find_package(PythonLibs REQUIRED)
 message(STATUS "python include dir: ${PYTHON_INCLUDE_DIRS}")
-message(STATUS "numpy include dir: ${Python3_NumPy_INCLUDE_DIRS}")
+message(STATUS "python libs: ${PYTHON_LIBRARIES}")
+set(NUMPY_INCLUDE_DIR ${Python3_NumPy_INCLUDE_DIRS})
+
+if(SKBUILD)
+message(STATUS "this is built with SciKit-build")
+else()
+execute_process (COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
+
+message(STATUS "numpy dir : ${NUMPY_INCLUDE_DIR}")
+
+include(FindLAPACK)
 
 find_library(CUBA_LIBRARY
     NAMES libcuba.a
     HINTS "/usr/local/lib" "$ENV{HOME}/lib"
 )
-
-
 
 add_library(qcm SHARED
 src_qcm/CPT.cpp
@@ -89,24 +83,8 @@ else()
   target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
 endif()
 
-target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS}/numpy)
+target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy)
 
-if(SKBUILD)
-  message(STATUS "The project is built using scikit-build")
-  install(TARGETS qcm DESTINATION lib/python3.9/site-packages)
-else()
-  install(TARGETS qcm
-  DESTINATION $ENV{HOME}/lib
-)
-endif()
-
-# message(STATUS "output file = ${OUTPUT_NAME}")
-# message(STATUS "source directory = ${CMAKE_SOURCE_DIR}")
-
-# file(COPY ${CMAKE_SOURCE_DIR}/pyqcm DESTINATION $ENV{HOME}/lib/)
-# file(CREATE_LINK ${CMAKE_SOURCE_DIR}/pyqcm $ENV{HOME}/lib/pyqcm SYMBOLIC)
-
-
-#configure_file(qcm.pc.in qcm.pc @ONLY)
-
+# install(TARGETS qcm DESTINATION ${PYTHON_INCLUDE_DIRS}/site-packages)
+install(TARGETS qcm DESTINATION pyqcm)
 
