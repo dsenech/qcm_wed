@@ -55,7 +55,6 @@ class hartree:
 
         if lattice:
             self.size0 = pyqcm.the_model.sites.shape[0]
-            # self.size0 = pyqcm.cluster_info()[0][1]
         else:
             self.size0 = pyqcm.model_size()[2][0]
     
