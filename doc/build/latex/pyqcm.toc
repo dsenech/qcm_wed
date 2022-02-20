@@ -17,7 +17,7 @@
 \contentsline {section}{\numberline {2.5}Bath sites}{6}{section.2.5}%
 \contentsline {section}{\numberline {2.6}Site and orbital labels}{6}{section.2.6}%
 \contentsline {section}{\numberline {2.7}Green function indices and mixing states}{8}{section.2.7}%
-\contentsline {chapter}{\numberline {3}Defning models}{11}{chapter.3}%
+\contentsline {chapter}{\numberline {3}Defining models}{11}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Defining cluster models}{11}{section.3.1}%
 \contentsline {subsection}{\numberline {3.1.1}Defining operators on the cluster}{12}{subsection.3.1.1}%
 \contentsline {section}{\numberline {3.2}Defining lattice models}{13}{section.3.2}%

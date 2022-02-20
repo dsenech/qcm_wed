@@ -131,7 +131,7 @@
 
   \indexspace
   \bigletter N
-  \item \spxentry{new\_cluster\_model()}\spxextra{in module pyqcm}, \hyperpage{28}
+  \item \spxentry{new\_cluster\_model()}\spxextra{in module pyqcm}, \hyperpage{29}
   \item \spxentry{new\_cluster\_model\_instance()}\spxextra{in module pyqcm}, \hyperpage{29}
   \item \spxentry{new\_cluster\_operator()}\spxextra{in module pyqcm}, \hyperpage{29}
   \item \spxentry{new\_cluster\_operator\_complex()}\spxextra{in module pyqcm}, \hyperpage{29}

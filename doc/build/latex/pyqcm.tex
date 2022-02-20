@@ -61,7 +61,7 @@
 
 
 \title{pyqcm Documentation}
-\date{Feb 16, 2022}
+\date{Feb 20, 2022}
 \release{1.0}
 \author{David Sénéchal}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -435,8 +435,8 @@ Different clusters may have different mixings, for instance if one of them descr
 However, the lattice model will have the more general mixing of the two and the Green function of each cluster will be \sphinxstyleemphasis{upgraded} to the lattice mixing as needed, for instance by doubling it by adding a Nambu transformed part.
 
 
-\chapter{Defning models}
-\label{\detokenize{defining_models:defning-models}}\label{\detokenize{defining_models::doc}}
+\chapter{Defining models}
+\label{\detokenize{defining_models:defining-models}}\label{\detokenize{defining_models::doc}}
 \sphinxAtStartPar
 This section explains how to define models through python calls.
 
@@ -876,7 +876,7 @@ computes the CPT Green function at a given frequency
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -910,7 +910,7 @@ computes the inverse CPT Green function at a given frequency
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} array of wavevectors (ndarray(N,  :param)
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -970,7 +970,7 @@ computes the Lehmann representation of the periodized Green function for a set o
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -1058,7 +1058,7 @@ computes the k\sphinxhyphen{}dependent quasi\sphinxhyphen{}particle weight from 
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -1106,7 +1106,7 @@ Computes the matrix \(V=G_0^{-1}-G^{c-1}_0\) at a given frequency and wavevector
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} (\sphinxstyleliteralemphasis{\sphinxupquote{wavevector}}) \textendash{} wavevector (ndarray(3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} (\sphinxstyleliteralemphasis{\sphinxupquote{wavevector}}) \textendash{} wavevector (ndarray(3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -1259,7 +1259,7 @@ in the noninteracting model). It only differs from the periodized Green function
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -1569,7 +1569,7 @@ computes the dispersion relation for a single or an array of wavevectors
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} (\sphinxstyleliteralemphasis{\sphinxupquote{wavevector}}) \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} (\sphinxstyleliteralemphasis{\sphinxupquote{wavevector}}) \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -2028,7 +2028,7 @@ computes the momentum\sphinxhyphen{}resolved average of an operator
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} array of wavevectors (ndarray(N,  :param)
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -2321,7 +2321,7 @@ computes the periodized Green function at a given frequency and wavevectors
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -2363,7 +2363,7 @@ computes the element (r,c) of the periodized Green function at a given frequency
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -2682,7 +2682,7 @@ computes the self\sphinxhyphen{}energy associated with the periodized Green func
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -2919,7 +2919,7 @@ computes the k\sphinxhyphen{}dependent spin\sphinxhyphen{}resolved spectral func
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -3014,7 +3014,7 @@ computes the k\sphinxhyphen{}dependent one\sphinxhyphen{}body matrix of the latt
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+\sphinxstyleliteralstrong{\sphinxupquote{k}} \textendash{} single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of \(\pi\)
 
 \item {} 
 \sphinxAtStartPar
@@ -3955,7 +3955,7 @@ None
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{spectral:pyqcm.spectral.spectral_function_Lehmann}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.spectral.}}\sphinxbfcode{\sphinxupquote{spectral\_function\_Lehmann}}}{\emph{\DUrole{n}{path}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}triangle\textquotesingle{}}}, \emph{\DUrole{n}{nk}\DUrole{o}{=}\DUrole{default_value}{32}}, \emph{\DUrole{n}{label}\DUrole{o}{=}\DUrole{default_value}{0}}, \emph{\DUrole{n}{band}\DUrole{o}{=}\DUrole{default_value}{1}}, \emph{\DUrole{n}{offset}\DUrole{o}{=}\DUrole{default_value}{0.1}}, \emph{\DUrole{n}{lims}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{file}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{plt\_ax}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
 \sphinxAtStartPar
-Plots a Lehmann representation of the spectral function along a wavevector path in the Brillouin zone
+Plots a Lehmann representation of the spectral function along a wavevector path in the Brillouin zone. Singularities are plotted as impulses with heights proportionnal to the residue.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
@@ -4778,7 +4778,7 @@ Defines a general bath (constructor)
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{sites}} (\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxhref{https://docs.python.org/3/library/functions.html\#int}{\sphinxstyleliteralemphasis{\sphinxupquote{int}}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} 2\sphinxhyphen{}level list of sites to couple to the bath orbitals (labels from 1 to ns)
+\sphinxstyleliteralstrong{\sphinxupquote{sites}} (\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxhref{https://docs.python.org/3/library/functions.html\#int}{\sphinxstyleliteralemphasis{\sphinxupquote{int}}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} 2\sphinxhyphen{}level list of sites to couple to the bath orbitals (labels from 1 to ns). Format resembles {[}{[}site labels to bind to orbital 1{]}, …{]} .
 
 \end{itemize}
 
@@ -5515,7 +5515,7 @@ Performs a controlled loop for VCA or CDMFT with a predictor
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{func}} \textendash{} function called at each step of the loop
+\sphinxstyleliteralstrong{\sphinxupquote{func}} \textendash{} a function called at each step of the loop
 
 \item {} 
 \sphinxAtStartPar

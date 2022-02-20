@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021) (preloaded format=pdflatex 2022.2.10)  16 FEB 2022 16:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021) (preloaded format=pdflatex 2022.2.10)  20 FEB 2022 11:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -990,13 +990,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 248--249
 
 ]) (./pyqcm.aux)
 Package rerunfilecheck Info: File `pyqcm.out' has not changed.
-(rerunfilecheck)             Checksum: C1E4C4CBDDB1668407F2AD677AACD79A;8916.
+(rerunfilecheck)             Checksum: 4B2788581FD75E0D2906BC44C5D1900F;8921.
  ) 
 Here is how much of TeX's memory you used:
- 15234 strings out of 478278
- 245152 string characters out of 5846561
- 602260 words of memory out of 5000000
- 32727 multiletter control sequences out of 15000+600000
+ 15235 strings out of 478278
+ 245168 string characters out of 5846561
+ 602262 words of memory out of 5000000
+ 32728 multiletter control sequences out of 15000+600000
  525023 words of font info for 75 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
  70i,17n,76p,1663b,681s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1020,7 +1020,7 @@ gyre/qtmri.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/txfonts/t
 1xbtt.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/txfonts/t1xtt.
 pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb></
 usr/local/texlive/2021/texmf-dist/fonts/type1/public/txfonts/tcxtt.pfb>
-Output written on pyqcm.pdf (79 pages, 546736 bytes).
+Output written on pyqcm.pdf (79 pages, 547385 bytes).
 PDF statistics:
  1587 PDF objects out of 1728 (max. 8388607)
  1455 compressed objects within 15 object streams

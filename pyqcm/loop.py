@@ -62,7 +62,7 @@ def controlled_loop(
 ):
 	"""Performs a controlled loop for VCA or CDMFT with a predictor
 	
-	:param func: function called at each step of the loop
+	:param func: a function called at each step of the loop
 	:param [str] varia: names of the variational parameters
 	:param str loop_param: name of the parameter looped over
 	:param (float, float, float) loop_range: range of the loop (min, max, step)

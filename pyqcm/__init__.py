@@ -385,7 +385,7 @@ def CPT_Green_function(z, k, spin_down=False, label=0):
     computes the CPT Green function at a given frequency
 
     :param z: complex frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices
@@ -398,7 +398,7 @@ def CPT_Green_function_inverse(z, k, spin_down=False, label=0):
     computes the inverse CPT Green function at a given frequency
 
     :param z: complex frequency
-    :param k: array of wavevectors (ndarray(N,	:param)
+    :param k: array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices
@@ -411,7 +411,7 @@ def dispersion(k, spin_down=False, label=0):
     """
     computes the dispersion relation for a single or an array of wavevectors
 
-    :param wavevector k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param wavevector k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (ndarray(d)) or an array (ndarray(N,d)) of real values (energies). d is the reduced GF dimension.
@@ -487,7 +487,7 @@ def Lehmann_Green_function(k, band = 1, spin_down=False, label=0):
     """
     computes the Lehmann representation of the periodized Green function for a set of wavevectors
 
-    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param int band: band index (starts at 1)
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
@@ -575,7 +575,7 @@ def momentum_profile(name, k, label=0):
     computes the momentum-resolved average of an operator
 
     :param str name: name of the lattice operator
-    :param k: array of wavevectors (ndarray(N,	:param)
+    :param k: array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param int label:  label of the model instance
     :return: an array of values
 
@@ -795,7 +795,7 @@ def periodized_Green_function(z, k, spin_down=False, label=0):
     computes the periodized Green function at a given frequency and wavevectors
 
     :param complex z: frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -810,7 +810,7 @@ def band_Green_function(z, k, spin_down=False, label=0):
     in the noninteracting model). It only differs from the periodized Green function in multi-band models.
 
     :param complex z: frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -826,7 +826,7 @@ def periodized_Green_function_element(r, c, z, k, spin_down=False, label=0):
     :param int r: a row index (starts at 0)
     :param int c: a column index (starts at 0)
     :param complex z: frequency
-    :param k: array of wavevectors (ndarray(N,3))
+    :param k: array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a vector of complex numbers
@@ -941,7 +941,7 @@ def self_energy(z, k, spin_down=False, label=0):
     computes the self-energy associated with the periodized Green function at a given frequency and wavevectors
 
     :param complex z: frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance 
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -1196,7 +1196,7 @@ def V_matrix(z, k, spin_down=False, label=0):
     Computes the matrix :math:`V=G_0^{-1}-G^{c-1}_0` at a given frequency and wavevectors, where :math:`G_0` is the noninteracting Green function on the infinite lattice and :math:`G^c_0` is the noninteracting Green function on the cluster.
 
     :param complex z: frequency
-    :param wavevector k: wavevector (ndarray(3))
+    :param wavevector k: wavevector (ndarray(3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -1209,7 +1209,7 @@ def tk(k, spin_down=False, label=0):
     """
     computes the k-dependent one-body matrix of the lattice model
 
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices
@@ -1221,7 +1221,7 @@ def QP_weight(k, eta=0.01, band=1, spin_down=False, label=0):
     """
     computes the k-dependent quasi-particle weight from the self-energy derived from the periodized Green function
 
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param float eta: increment in the imaginary axis direction used to computed the derivative of the self-energy
     :param int band: band index (starts at 1)
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
@@ -1264,7 +1264,7 @@ def spin_spectral_function(freq, k, band=1, label=0):
     computes the k-dependent spin-resolved spectral function
 
     :param freq: complex freqency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param int band: band index (starts at 1)
     :param int label:  label of the model instance
     :return: depending on the shape of k, a nd.array(3) of nd.array(N,3)
@@ -1621,7 +1621,7 @@ def wavevector_path(n=32, shape='triangle'):
         ticks = np.array([0, n, 2 * n, 3 * n, 4 * n, 5 * n, 6 * n + 1])
         tick_labels = [r'$(0,0,0)$', r'$(0,\pi,0)$', r'$(\pi,\pi,0)$', r'$(0,0,0)$', r'$(\pi,\pi,\pi)$' , r'$(0,\pi,0)$', r'$(0,0,0)$']
     else:
-        print('-------> shape ', shape, ' unknown')
+        print(f'-------> shape {shape} unknown')
     return 0.5 * k, ticks, tick_labels
 
 

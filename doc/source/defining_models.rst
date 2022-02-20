@@ -1,6 +1,6 @@
-##############
-Defning models 
-##############
+###############
+Defining models 
+###############
 
 This section explains how to define models through python calls.
 

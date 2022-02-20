@@ -320,7 +320,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
 
 ################################################################################
 def spectral_function_Lehmann(path='triangle', nk=32, label=0, band=1, offset=0.1, lims=None, file=None, plt_ax=None, **kwargs):
-    """Plots a Lehmann representation of the spectral function along a wavevector path in the Brillouin zone
+    """Plots a Lehmann representation of the spectral function along a wavevector path in the Brillouin zone. Singularities are plotted as impulses with heights proportionnal to the residue.
     
     :param path: if a string, keyword passed to `pyqcm.wavevector_path()` to produce a set of wavevectors; else, explicit list of wavevectors (N x 3 numpy array).
     :param int nk: the number of wavevectors along each segment of the path (passed to pyqcm.wavevector_path())
