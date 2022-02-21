@@ -183,22 +183,22 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False)
 
 #=============================================================================
 
-def draw_bath_operator(clus_name, op_name, show_labels=True, values=False):
+def draw_cluster_operator(clus_name, op_name, show_labels=True, values=False):
 
     file = 'tmp_model.out'
     info = pyqcm.cluster_info()
     nb = 0
     found = False
-    for c in info:
+    clus_I = 0
+    for i,c in enumerate(info):
         if clus_name == c[0]:
             found = True
             nb = c[2]
+            clus_I = i+1
             break
 
     if not found:
         raise ValueError('The cluster model named {:s} does not exist!'.format(clus_name))
-    if nb == 0:
-        raise ValueError('The cluster model named {:s} has not bath sites!'.format(clus_name))
 
     pyqcm.print_model(file)
     fin = open(file, 'r')
@@ -219,9 +219,8 @@ def draw_bath_operator(clus_name, op_name, show_labels=True, values=False):
         L = fin.readline()
         if L == '\n': break
         X = re.split("[(,)\t ]+", L)
-        sites += [(int(X[4]), int(X[5]), int(X[6]))]
-        band += [int(X[3])-1]
-        cluster += [int(X[1])-1]
+        if int(X[1]) == clus_I:
+            sites += [(int(X[4]), int(X[5]), int(X[6]))]
 
     ns = len(sites)
     no = nb + ns
