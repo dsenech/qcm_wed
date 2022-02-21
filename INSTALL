@@ -1,20 +1,30 @@
 This files explains how to compile and install QCM.
------------------------------------------------------------------------------------------------  
-COMMON FEATURES
 
 1) The distribution can be obtained from bitbucket:
 
 git clone https://dsenech@bitbucket.org/dsenechQCM/qcm_wed.git 
 
-2) A local lib/ folder should be created, in $HOME.
-Then this folder should be added to the PYTHONPATH environment variable, as specified in .bash_profile:
+2) It is advised to create a python virtual environment and to work within such an environment. To create such an environment called q_env in your root directory, execute
 
-export PYTHONPATH=$PYTHONPATH:$HOME/lib
+python3 -m venv q_env/
 
-A symnolic link should be made from qcm_wed/pyqcm into $HOME/lib/, as follows
+Then to launch this environment, execute
 
-cd $HOME/lib/
-ln -s <path_to_qcm_wed>/pyqcm 
+source q_env/bin/activate
+
+If you want this to be activated every time a new terminal is launched, just add the above command at the end of your .bashrc or .zshrc, depending on which shell you use.
+
+Within this environment, you shoud install numpy, scipy, matplotlib, cmake and ninja using pip, e.g.:
+
+pip install numpy
+pip install cmake
+
+etc.
+
+Make sure you have the latest version of pip, by executing
+
+pip install --upgrade pip
+
 
 3) CUBA
 fetch CUBA at http://www.feynarts.de/cuba/ (take the latest version) and decompress locally.
@@ -31,45 +41,8 @@ Then run 'make lib' and move the resulting static library 'libcuba.a' to $HOME/l
 
 Also: define the environment variable
 export CUBACORES=0
-in your shell initialization (e.g. .bash_profile, .zsh_profile, .zprofile, etc.)
+in your shell initialization (e.g. .bash_profile, .bashrc, .zsh_profile, .zshrc, .zprofile, etc.)
    
-4) Go to the qcm_wed folder and to the subfolder appropriate for your platform (mac, CC, M1, linux). Compile with the makefile (or with make -f nodep.mk if you do not care about tracking dependencies and you want compilation to be faster).
+4) Go to the qcm_wed folder and execute
 
-You should be ready to use pyqcm then.
-
-Below are system-specific instructions.
-
------------------------------------------------------------------------------------------------  
-LINUX (UBUNTU LTS 16.04)
-
-Dependencies can be installed with the following:
-
-sudo apt-get install python3-dev python3-scipy build-essential libcuba3-dev liblapack-dev.
-
-Then just use the makefile in the linux sub-directory.
-
-This should also work on Mint.
-  
------------------------------------------------------------------------------------------------  
-MAC OS with M1 chip
-
-  Python should be installed from conda-forge. This will make scipy work (important in CDMFT).
-
------------------------------------------------------------------------------------------------  
-Compute Canada (graham, cedar, Mp2b, beluga)
-
-1) Modules
-One needs to add the modules python/3.8.10 and scipy-stack/2020b, or the equivalent for another version of Python3.
-If mpi is needed is some scripts, then it should be added as it resides in a distinct module: mpi4py/3.0.0
-
-This is the list of modules installed on my account:
-
- 1) CCconfig                  6) ucx/1.8.0             11) StdEnv/2020       (S)     16) libgd/2.3.0   (vis)
-  2) gentoo/2020      (S)      7) libfabric/1.10.1      12) libffi/3.3                17) libcerf/1.13  (math)
-  3) gcccore/.9.3.0   (H)      8) openmpi/4.0.3    (m)  13) python/3.8.10     (t)     18) qt/5.12.8     (t)
-  4) imkl/2020.1.217  (math)   9) flexiblas/3.0.4       14) ipykernel/2020b           19) gnuplot/5.2.8 (vis)
-  5) intel/2020.1.217 (t)     10) blis/0.8.1            15) scipy-stack/2020b (math)
-
-
-
-
+pip install .

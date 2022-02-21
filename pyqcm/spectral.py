@@ -210,7 +210,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
     w = __frequency_array(wmax, eta=0.05)  # defines the array of frequencies
     eta = 0.05j
     info = pyqcm.cluster_info()
-    d = info[clus][2]
+    d = info[clus][3]
     d = pyqcm.Green_function_dimension()
     print(info)
     nclus = len(info)
@@ -272,7 +272,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
 
     w = __frequency_array(wmax, eta)  # defines the array of frequencies
     info = pyqcm.cluster_info()
-    d = info[clus][2]
+    d = info[clus][3]
     if full:
         dd = (d*(d+1))//2
         T = []

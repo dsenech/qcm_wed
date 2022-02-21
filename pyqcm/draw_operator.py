@@ -1,9 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import re
+import pyqcm
 
-def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=False):
+def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False):
 
+    file = 'tmp_model.out'
+    pyqcm.print_model(file)
     fin = open(file, 'r')
 
     #-------------------------------------------------------------------------
@@ -22,7 +25,6 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
         L = fin.readline()
         if L == '\n': break
         X = re.split("[(,)\t ]+", L)
-        # print('site : ',X)
         sites += [(int(X[4]), int(X[5]), int(X[6]))]
         band += [int(X[3])-1]
         cluster += [int(X[1])-1]
@@ -42,13 +44,10 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
         basis += [(float(X[1]), float(X[2]), float(X[3]))]
     B = np.array(basis)
     B = np.linalg.inv(B)
-    print('basis = \n', B)        
 
     S = np.zeros((len(sites), 3))
     for i,s in enumerate(sites):
         S[i,:] = (np.array(s)@B).T
-    print('sites:\n', S)        
-    print('bands:\n', band)
 
     #-------------------------------------------------------------------------
     # reading superlattice
@@ -67,7 +66,6 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
         L = fin.readline()
         X = re.split("[(,) ]+", L)
         super += [(float(X[1]), float(X[2]), float(X[3]))]
-    print('superlattice = \n', super)        
 
     #-------------------------------------------------------------------------
     # reading neighbors
@@ -82,12 +80,10 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
         L = fin.readline()
         if L == '\n': break
         X = re.split("[(,): ]+", L)
-        print('N : ', X)
         neighbors += [(float(X[1]), float(X[2]), float(X[3]))]
     Neigh = np.zeros((len(neighbors), 3))
     for i,s in enumerate(neighbors):
         Neigh[i,:] = (np.array(s)@B).T
-    print('neighbors = \n', Neigh)        
 
     #-------------------------------------------------------------------------
     # reading operator
@@ -96,19 +92,16 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
     while "lattice operators" not in L:
         L = fin.readline()
         if not L:
-            print('file ended without lattice operators')
-            exit()
+            raise ValueError('file ended without lattice operators')
 
     nc = len(op_name)
     while op_name != L[0:nc]:
         L = fin.readline()
         if not L:
-            print(f'file ended without the operator {op_name}')
-            exit()
+            raise ValueError(f'file ended without the operator {op_name}')
 
     X = re.split(r"[\t(): ]+", L)
     op_type = X[1]
-    print(X[0], X[1])
     
     fin.readline()
     elements = []
@@ -133,7 +126,7 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
         if I > J : continue
         elements += [(I-1,J-1,v)]
 
-    print(elements)
+    fin.close()
 
     #-------------------------------------------------------------------------
     # plotting the elements
@@ -147,7 +140,7 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
         else:
             alpha = 0.5
         if np.linalg.norm(S[e[0],0:2] -  S[e[1],0:2]) < 0.0001 :
-            plt.plot([S[e[0],0]], [S[e[0],1]], 'ro', ms = 18, c='w', mec='r', mew=2, alpha = alpha)
+            plt.plot([S[e[0],0]], [S[e[0],1]], 'o', ms = 18, c='w', mec='r', mew=2, alpha = alpha)
         else:
             plt.plot([S[e[0],0], S[e[1],0]], [S[e[0],1], S[e[1],1]], pf, mew=2, alpha = alpha)
             if values:
@@ -167,11 +160,11 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
         if S[i,2]-0.001 < zmin:
             pass
         else:
-            plt.plot(S[i,0], S[i,1], 'ko', ms = 6 + 6*(S[i,2]-zmin)/(zmax-zmin+0.1), mfc='w', c=bcol[band[i]%ncol])
+            plt.plot(S[i,0], S[i,1], 'o', ms = 6 + 6*(S[i,2]-zmin)/(zmax-zmin+0.1), mfc='w', c=bcol[band[i]%ncol])
             if show_labels: plt.text(S[i,0], S[i,1]+offset, f'${i+1}$', va='bottom', ha='center', color='b', fontsize=8)
     for i in range(S.shape[0]):
         if S[i,2]-0.001 < zmin:
-            plt.plot(S[i,0], S[i,1], 'ko', ms = 6, c=bcol[band[i]%ncol])
+            plt.plot(S[i,0], S[i,1], 'o', ms = 6, c=bcol[band[i]%ncol])
             if show_labels: plt.text(S[i,0], S[i,1]-offset, f'${i+1}$', va='top', ha='center', color='b', fontsize=8)
 
     #-------------------------------------------------------------------------
@@ -188,10 +181,26 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
 
 
 
+#=============================================================================
 
+def draw_bath_operator(clus_name, op_name, show_labels=True, values=False):
 
-def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
+    file = 'tmp_model.out'
+    info = pyqcm.cluster_info()
+    nb = 0
+    found = False
+    for c in info:
+        if clus_name == c[0]:
+            found = True
+            nb = c[2]
+            break
 
+    if not found:
+        raise ValueError('The cluster model named {:s} does not exist!'.format(clus_name))
+    if nb == 0:
+        raise ValueError('The cluster model named {:s} has not bath sites!'.format(clus_name))
+
+    pyqcm.print_model(file)
     fin = open(file, 'r')
 
     #-------------------------------------------------------------------------
@@ -210,7 +219,6 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
         L = fin.readline()
         if L == '\n': break
         X = re.split("[(,)\t ]+", L)
-        # print('site : ',X)
         sites += [(int(X[4]), int(X[5]), int(X[6]))]
         band += [int(X[3])-1]
         cluster += [int(X[1])-1]
@@ -232,13 +240,19 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
         basis += [(float(X[1]), float(X[2]), float(X[3]))]
     B = np.array(basis)
     B = np.linalg.inv(B)
-    print('basis = \n', B)        
 
     S = np.zeros((len(sites), 3))
     for i,s in enumerate(sites):
         S[i,:] = (np.array(s)@B).T
-    print('sites:\n', S)        
-    print('bands:\n', band)
+
+    #-------------------------------------------------------------------------
+    # find the cluster description
+
+    L = ''
+    while clus_name+' ' not in L:
+        L = fin.readline()
+        if not L:
+            raise ValueError('file ended without findind cluster {:s}'.format(clus_name))
 
     #-------------------------------------------------------------------------
     # reading operator
@@ -246,9 +260,8 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
     L = ''
     while op_name+'\t' not in L:
         L = fin.readline()
-        if not L:
-            print('file ended without findind operator ', op_name)
-            exit()
+        if not L or '----' in L:
+            raise ValueError('file ended without findind operator {:s}'.format(op_name))
 
     elements = []
     while True:
@@ -277,7 +290,7 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
         if I > ns: elements += [(J-1,I-1,v,s2,s1)]
         else: elements += [(I-1,J-1,v, s1, s2)]
 
-    print(elements)
+    fin.close()
 
     
     # finding the maximum value of x and y among the sites
@@ -302,7 +315,7 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
     for e in elements:
         E += [(e[0]+no*e[3], e[1]+no*e[4], e[2])]
     elements = E
-    print('elements:\n', E)
+
     #-------------------------------------------------------------------------
     # plotting the elements
     for e in elements:
@@ -311,7 +324,7 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
         else:
             pf = 'k-'
         if np.linalg.norm(S[e[0],0:2] -  S[e[1],0:2]) < 0.0001 :
-            plt.plot([S[e[0],0]], [S[e[0],1]], 'ro', ms = 24, c='w', mec='r', mew=2)
+            plt.plot([S[e[0],0]], [S[e[0],1]], 'o', ms = 24, c='w', mec='r', mew=2)
         else:
             plt.plot([S[e[0],0], S[e[1],0]], [S[e[0],1], S[e[1],1]], pf, mew=2)
             if values:
@@ -320,7 +333,6 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
     is_in_cluster = np.zeros(2*no,int)
     is_in_cluster[0:ns] = 1
     is_in_cluster[no:no+ns] = 1
-    print('is_in_cluster = ', is_in_cluster)
     #-------------------------------------------------------------------------
     # plotting the sites
 
@@ -344,9 +356,9 @@ def draw_bath_operator(file, op_name, nb, show_labels=True, values=False):
     for i in range(S.shape[0]):
         if S[i,2]-0.001 < zmin:
             if is_in_cluster[i]:
-                plt.plot(S[i,0], S[i,1], 'ks', ms = 12, mfc='w', c='b')
+                plt.plot(S[i,0], S[i,1], 's', ms = 12, mfc='w', c='b')
             else:
-                plt.plot(S[i,0], S[i,1], 'ks', ms = 14, mfc='w', c='r')
+                plt.plot(S[i,0], S[i,1], 's', ms = 14, mfc='w', c='r')
             if show_labels: plt.text(S[i,0], S[i,1], f'${i+1}$', va='center', ha='center', color='b', fontsize=8)
 
     #-------------------------------------------------------------------------

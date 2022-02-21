@@ -310,13 +310,14 @@ returns:
 //------------------------------------------------------------------------------
 static PyObject* cluster_info_python(PyObject *self, PyObject *args)
 {
-  vector<tuple<string, int, int>> info = QCM::cluster_info();
+  vector<tuple<string, int, int, int>> info = QCM::cluster_info();
   PyObject *lst = PyList_New(info.size());
   for(size_t i=0; i< info.size(); i++){
-    PyObject* elem = PyTuple_New(3);
+    PyObject* elem = PyTuple_New(4);
     PyTuple_SetItem(elem, 0, Py_BuildValue("s", get<0>(info[i]).c_str()));
     PyTuple_SetItem(elem, 1, Py_BuildValue("i", get<1>(info[i])));
     PyTuple_SetItem(elem, 2, Py_BuildValue("i", get<2>(info[i])));
+    PyTuple_SetItem(elem, 3, Py_BuildValue("i", get<3>(info[i])));
     PyList_SET_ITEM(lst, i, elem);
   }
   return lst;

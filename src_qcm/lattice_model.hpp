@@ -23,6 +23,7 @@ struct site{
 //! describes a cluster
 struct cluster{
 	size_t n_sites; //!< size of cluster
+	size_t n_bath; //!< size of cluster's bath
 	size_t offset; //!< number of sites before the index for that cluster starts
 	string name; //!< name of model associated with cluster
 	vector3D<int64_t> position; //!< base position of cluster

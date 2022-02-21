@@ -117,7 +117,9 @@ def new_cluster_model(name, n_sites, n_bath=0, generators=None, bath_irrep=False
     the_model.record += "new_cluster_model('"+name+"', "+str(n_sites)+', '+str(n_bath)+', generators='+str(generators)+', bath_irrep='+str(bath_irrep)+')\n'
 
     the_model.cluster_model += [cluster_model(name, n_sites, n_bath)]
+    
     qcm.new_model(name, n_sites, n_bath, generators, bath_irrep)
+
 
 
 ################################################################################
@@ -338,7 +340,7 @@ def cluster_self_energy(cluster, z, spin_down=False, label=0):
 ################################################################################
 def cluster_info():
     """
-    :return:A list of 3-tuples: (str, int, int): name of the cluster model, number of sites, dimension of the Green function
+    :return:A list of 4-tuples: (str, int, int, int): name of the cluster model, number of physical sites, number of bath sites, dimension of the Green function
     """
     return qcm.cluster_info()
 

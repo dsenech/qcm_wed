@@ -62,7 +62,7 @@ namespace QCM{
   vector<pair<double,string>> ground_state(int label);
   vector<pair<string,double>> averages(int label=0);
   vector<pair<vector<double>, vector<double>>> Lehmann_Green_function(vector<vector3D<double>> &k, int band, bool spin_down, int label);
-  vector<tuple<string, int, int>> cluster_info();
+  vector<tuple<string, int, int, int>> cluster_info();
   vector<vector<double>> dispersion(const vector<vector3D<double>> &k, bool spin_down, int label);
   void add_cluster(const string &name, const vector3D<int64_t> &cpos, const vector<vector3D<int64_t>> &pos, int ref=0);
   void anomalous_operator(const string &name, vector3D<int64_t> &link, complex<double> amplitude, int band1, int band2, const string& type);
