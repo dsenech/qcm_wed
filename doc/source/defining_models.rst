@@ -189,7 +189,7 @@ The following example defines a model on the graphene lattice using two cluster 
 Of possible set of function calls to define the Hubbard model on this system is::
 
     import cluster_h4_6b_C3
-    import qcm
+    import pyqcm
 
     add_cluster('clus', [-1, 0, 0], [[0, 0, 0], [-1, 0, 0], [1, 1, 0], [0, -1, 0]])
     add_cluster('clus', [1, 0, 0], [[0, 0, 0], [1, 0, 0], [-1, -1, 0], [0, 1, 0]])

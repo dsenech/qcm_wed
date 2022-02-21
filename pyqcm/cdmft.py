@@ -6,7 +6,7 @@
 import numpy as np
 import pyqcm
 import time
-import qcm
+from pyqcm import qcm
 import timeit
 
 #-------------------------------------------------------------------------------

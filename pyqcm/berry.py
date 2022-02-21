@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyqcm
 import pyqcm.spectral
-import qcm
+from pyqcm import qcm
 
 ################################################################################
 def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, subdivide=False, plane='xy', k_perp=0.0, file=None, plt_ax=None, **kwargs):

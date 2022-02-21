@@ -7,7 +7,7 @@ project(qcm LANGUAGES CXX VERSION 1.0 DESCRIPTION "Quantum Cluster Methods share
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -15,8 +15,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
 
-
-find_package(Python3 3.7 COMPONENTS Interpreter NumPy REQUIRED)
+find_package(Python3 3.7 COMPONENTS Interpreter Development NumPy REQUIRED)
 message(STATUS "python executable: ${Python3_EXECUTABLE}")
 find_package(PythonLibs REQUIRED)
 message(STATUS "python include dir: ${PYTHON_INCLUDE_DIRS}")
@@ -78,9 +77,9 @@ set_target_properties(qcm PROPERTIES VERSION ${PROJECT_VERSION} PREFIX "" SUFFIX
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-  target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES} OpenMP::OpenMP_CXX)
+  target_link_libraries(qcm ${CUBA_LIBRARY} ${LAPACK_LIBRARIES} OpenMP::OpenMP_CXX)
 else()
-  target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
+  target_link_libraries(qcm ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
 endif()
 
 target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy)
