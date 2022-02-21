@@ -10,12 +10,12 @@ import subprocess
 git_hash = str(subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']))
 git_hash = git_hash[2:-3]
 
-fout = open("pyqcm/qcm_git_hash.py", "a")
+fout = open("pyqcm/qcm_git_hash.py", "w")
 fout.write("git_hash = '{:s}'\n".format(git_hash))
 fout.close() 
 
 skbuild.setup(
-    name="qcm",
+    name="pyqcm",
     version="1.0",
     description="Quantum cluster methods for the physics of strongly correlated systems",
     author="David Sénéchal",

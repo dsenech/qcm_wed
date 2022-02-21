@@ -4,5 +4,7 @@
 *.zip
 *.vscode
 _skbuild
-qcm.egg-info
+*egg-info*
 **/__pycache__
+build
+qcm_git_hash.py
