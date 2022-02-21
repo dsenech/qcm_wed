@@ -1,18 +1,14 @@
 import numpy as np
 import re
 import time
-
-try:
-    import pyqcm.qcm as qcm
-except:
-    import qcm
+from . import qcm
 
 parameter_set_str = ''
 first_time = True
 
 try:
-    import pyqcm.qcm_git_hash
-    git_hash = pyqcm.qcm_git_hash.git_hash
+    from . import qcm_git_hash
+    git_hash = qcm_git_hash.git_hash
 except:
     print('submodule qcm_git_hash not found. Will not be able to record git version in output files')
     git_hash = 'NA'

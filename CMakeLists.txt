@@ -77,7 +77,7 @@ set_target_properties(qcm PROPERTIES VERSION ${PROJECT_VERSION} PREFIX "" SUFFIX
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-  target_link_libraries(qcm ${CUBA_LIBRARY} ${LAPACK_LIBRARIES} OpenMP::OpenMP_CXX)
+  target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES} OpenMP::OpenMP_CXX)
 else()
   target_link_libraries(qcm ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
 endif()
