@@ -668,7 +668,7 @@ def set_parameters(params, dump=True):
     global parameter_set_str
     if set_parameters.called:
         print('WARNING : The function set_parameters() can only be called once')
-        return
+        return None
 
     set_parameters.called = True
 
@@ -697,9 +697,11 @@ def set_parameters(params, dump=True):
         if dump:
             parameter_set_str = 'set_parameters("""\n'+str(params)+'""")\n'
         qcm.set_parameters(elems)
+        new_model_instance() # Prevents user error by instantiating model
         return elems
     else:	
         qcm.set_parameters(params)
+        new_model_instance() # Prevents user error by instantiating model
         return params
 
 set_parameters.called = False        
@@ -1054,7 +1056,6 @@ def interaction_operator(name, **kwargs):
 
     qcm.interaction_operator(name, **kwargs)
 
-
 ################################################################################
 def hopping_operator(name, link, amplitude, **kwargs):
     """Defines a hopping term or, more generally, a one-body operator
@@ -1229,6 +1230,10 @@ def QP_weight(k, eta=0.01, band=1, spin_down=False, label=0):
     :return: a single float or an array of floats, depending on the shape of k
 
     """
+
+    if np.shape(k) == (3,):
+        k = np.array([k]) # this protects the case where k is an ndarray(3)
+
     sigma1 = qcm.self_energy(-eta*1j, k, spin_down, label)
     sigma2 = qcm.self_energy(eta*1j, k, spin_down, label)
     if len(sigma1.shape) == 3:

@@ -1042,7 +1042,7 @@ class general_bath:
 
         :param int c: cluster label
         :param (float) e: range of bath energies
-        :param (float) hyb: range of hybridizations
+        :param (float,float) hyb: average and deviation of the normal hybridization parameters
         :param [int] phi: PH phases of the cluster sites proper
         :param boolean pr: if True, prints info
         :return str: initialization string
@@ -1062,30 +1062,30 @@ class general_bath:
             for i in range(NE):
                 S += 'eb{:d}u_{:d} = -1.0*eb{:d}d_{:d}\n'.format(2*i+2, c, 2*i+1, c)
                 S += 'eb{:d}d_{:d} = -1.0*eb{:d}u_{:d}\n'.format(2*i+2, c, 2*i+1, c)
-                for s in range(self.ns):
-                    S += 'tb{:d}u{:d}u_{:d} = {:2.1f}*tb{:d}d{:d}d_{:d}\n'.format(2*i+2, s+1, c,  phi[s], 2*i+1, s+1, c)
-                    S += 'tb{:d}d{:d}d_{:d} = {:2.1f}*tb{:d}u{:d}u_{:d}\n'.format(2*i+2, s+1, c,  phi[s], 2*i+1, s+1, c)
+                for s in self.sites[i]:
+                    S += 'tb{:d}u{:d}u_{:d} = {:2.1f}*tb{:d}d{:d}d_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
+                    S += 'tb{:d}d{:d}d_{:d} = {:2.1f}*tb{:d}u{:d}u_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
                 if self.complex:
-                    for s in range(1,self.ns):
-                        S += 'tb{:d}u{:d}ui_{:d} = {:2.1f}*tb{:d}d{:d}di_{:d}\n'.format(2*i+2, s+1, c, -phi[s], 2*i+1, s+1, c)
-                        S += 'tb{:d}d{:d}di_{:d} = {:2.1f}*tb{:d}u{:d}ui_{:d}\n'.format(2*i+2, s+1, c, -phi[s], 2*i+1, s+1, c)
+                    for s in self.sites[i]:
+                        S += 'tb{:d}u{:d}ui_{:d} = {:2.1f}*tb{:d}d{:d}di_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
+                        S += 'tb{:d}d{:d}di_{:d} = {:2.1f}*tb{:d}u{:d}ui_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
                 if self.spin_flip:
-                    for s in range(self.ns):
-                        S += 'tb{:d}u{:d}d_{:d} = {:2.1f}*tb{:d}u{:d}d_{:d}\n'.format(2*i+2, s+1, c, -phi[s], 2*i+1, s+1, c)
-                        S += 'tb{:d}d{:d}u_{:d} = {:2.1f}*tb{:d}d{:d}u_{:d}\n'.format(2*i+2, s+1, c, -phi[s], 2*i+1, s+1, c)
+                    for s in self.sites[i]:
+                        S += 'tb{:d}u{:d}d_{:d} = {:2.1f}*tb{:d}u{:d}d_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
+                        S += 'tb{:d}d{:d}u_{:d} = {:2.1f}*tb{:d}d{:d}u_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
                     if self.complex:
-                        for s in range(1, self.ns):
-                            S += 'tb{:d}u{:d}di_{:d} = {:2.1f}*tb{:d}u{:d}di_{:d}\n'.format(2*i+2, s+1, c,  phi[s], 2*i+1, s+1, c)
-                            S += 'tb{:d}d{:d}ui_{:d} = {:2.1f}*tb{:d}d{:d}ui_{:d}\n'.format(2*i+2, s+1, c,  phi[s], 2*i+1, s+1, c)
+                        for s in self.sites[i]:
+                            S += 'tb{:d}u{:d}di_{:d} = {:2.1f}*tb{:d}u{:d}di_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
+                            S += 'tb{:d}d{:d}ui_{:d} = {:2.1f}*tb{:d}d{:d}ui_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
 
         else:
             for i in range(NE):
                 S += 'eb{:d}_{:d} = -1.0*eb{:d}_{:d}\n'.format(2*i+2, c, 2*i+1, c)
-                for s in range(self.ns):
-                    S += 'tb{:d}{:d}_{:d} = {:2.1f}*tb{:d}{:d}_{:d}\n'.format(2*i+2, s+1, c,  phi[s], 2*i+1, s+1, c)
+                for s in self.sites[i]:
+                    S += 'tb{:d}{:d}_{:d} = {:2.1f}*tb{:d}{:d}_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
                 if self.complex:
-                    for s in range(self.ns):
-                        S += 'tb{:d}{:d}i_{:d} = {:2.1f}*tb{:d}{:d}i_{:d}\n'.format(2*i+2, s+1, c, -phi[s], 2*i+1, s+1, c)
+                    for s in self.sites[i]:
+                        S += 'tb{:d}{:d}i_{:d} = {:2.1f}*tb{:d}{:d}i_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
 
         var_E = self.var_E
         self.var_E = []
