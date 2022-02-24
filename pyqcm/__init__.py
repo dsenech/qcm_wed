@@ -2,6 +2,7 @@ import numpy as np
 import qcm
 import re
 import time
+from warnings import warn
 
 parameter_set_str = ''
 first_time = True
@@ -402,6 +403,9 @@ def CPT_Green_function_inverse(z, k, spin_down=False, label=0):
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices
     """
+    if np.shape(k) == (3,):
+        k = np.array([k]) # this protects the case where k is an ndarray(3)
+
     return qcm.CPT_Green_function_inverse(z, k, spin_down, label)
 
 
@@ -1075,6 +1079,15 @@ def hopping_operator(name, link, amplitude, **kwargs):
     """
 
     global the_model
+
+    if link == [0,0,0]:
+        if "tau" in kwargs:
+            if kwargs["tau"] != 0:
+                warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
+                kwargs["tau"] = 0
+        else:
+            kwargs["tau"] = 0
+
     if type(the_model.sites) is list: the_model._finalize()
     the_model.record += "hopping_operator('"+name+"', "+str(link)+', '+str(amplitude)
     for x in kwargs:
@@ -1133,6 +1146,14 @@ def explicit_operator(name, elem, **kwargs):
 
     """
     global the_model
+
+    # if "tau" in kwargs:
+    #         if kwargs["tau"] != 0:
+    #             warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
+    #             kwargs["tau"] = 0
+    #     else:
+    #         kwargs["tau"] = 0
+
     the_model.record += "explicit_operator('"+name+"', "+str(elem)
     for x in kwargs:
         if type(kwargs[x]) is str:

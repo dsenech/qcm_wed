@@ -3,6 +3,8 @@ import pyqcm
 import pyqcm.cdmft
 import os
 
+from __init__ import new_model_instance
+
 first_time=True
 
 ################################################################################
@@ -31,6 +33,7 @@ def loop_from_file(func, file):
 			print(x, ' --> ', data[x][i])
 			pyqcm.set_parameter(x, data[x][i])
 		func()
+		new_model_instance()
 
 
 ################################################################################
@@ -141,6 +144,7 @@ def controlled_loop(
 		try:
 			pyqcm.banner('loop index = {:d}, {:s} = {:1.4f}'.format(loop_counter + 1, loop_param, prm[0]), '=', skip=1)
 			func()
+			new_model_instance()
 			P = pyqcm.parameters()
 			for i in range(len(varia)):
 				sol[0, i] = P[varia[i]]
@@ -287,6 +291,7 @@ def fixed_density_loop(
 			pyqcm.set_parameter('mu', mu)
 			pyqcm.banner('mu = {:1.4f}'.format(mu), '+')
 			func()
+			new_model_instance()
 			if cluster_density:
 				dens = pyqcm.cluster_averages()['mu'][0]
 			else:
@@ -410,6 +415,7 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 	iter = 0
 	while True:
 		F()
+		new_model_instance()
 		iter += 1
 		pyqcm.banner('Hartree iteration {:d}'.format(iter), '-')
 		diff_tot = 0
@@ -500,6 +506,7 @@ def linear_loop(
 			print('predictor: ', start, fit_type)
 		try:
 			func()
+			new_model_instance()
 			P = pyqcm.parameters()
 			for i in range(len(varia)):
 				sol[0, i] = P[varia[i]]
