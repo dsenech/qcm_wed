@@ -27,7 +27,7 @@ class slab:
             self.thickness=thickness
             if thickness > (nlayer+1)//2:
                 print('thickness cannot exceed ', (nlayer+1)//2)
-                exit(1)
+                raise ValueError(f'thickness value cannot exceed {(nlayer+1)//2}')
             if thickness == (nlayer+1)//2 and nlayer%2 :
                 l1 = nlayer-thickness+1
             else:
@@ -72,8 +72,7 @@ class slab:
             for i in range(self.nlayer-1):
                 pyqcm.hopping_operator(name, link, amplitude, band1=b1+self.nband*i,  band2=b2+self.nband*(i+1), tau=tau, sigma=sigma)
         else:
-            print('hopping operators in slabs can only have a z-component of the link = 0 or 1')
-            exit(1)
+            raise ValueError('hopping operators in slabs can only have a z-component of 0 or 1 for the link')
         
     def interaction_operator(self, name, **kwargs):
         """Defines an interaction operator
@@ -109,6 +108,5 @@ class slab:
             for i in range(self.nlayer-1):
                 pyqcm.interaction_operator(name, link=link, amplitude=amplitude, band1=b1+self.nband*i,  band2=b2+self.nband*i, type=the_type)
         else:
-            print('interaction operators in slabs can only have a z-component of the link = 0 or 1')
-            exit(1)
+            raise ValueError('hopping operators in slabs can only have a z-component of 0 or 1 for the link')
 

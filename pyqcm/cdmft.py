@@ -3,6 +3,7 @@
 # Cluster dynamical mean-field theory (CDMFT)
 ################################################################################
 
+from multiprocessing.sharedctypes import Value
 import numpy as np
 import pyqcm
 import time
@@ -43,11 +44,9 @@ def moving_std(x, min):
     """
     n = len(x)
     if n<min :
-        print('the sequence given to moving_std is too short (should be >= {:d}'.format(min))
-        exit()
+        raise ValueError('the sequence given to moving_std is too short (should be >= {:d})'.format(min))
     if min<2 :
-        print('the minimum value of argument "min" in moving_std() is 2')
-        exit()
+        raise ValueError('the minimum value of argument "min" in moving_std() is 2')
 
     std = np.empty(n-1) # stores the standard deviations of the subsequences
     for i in range(n-1):
@@ -258,8 +257,7 @@ def __optimize(F, x, method='Nelder-Mead', initial_step=0.1, accur = 1e-4, accur
         iter_done = sol.nfev
 
     else:
-        print('unknown method specified for minimization: ', method)
-        exit()   
+        raise ValueError(f'unknown method specified for minimization: {method}')
 
     if not sol.success:
         print(sol.message)
@@ -323,8 +321,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
     qcm.CDMFT_variational_set(var)
     var_data = np.empty((nvar, maxiter+1))
     if nvar == 0:
-        print('CDMFT requires variational parameters...Aborting.')
-        exit()
+        raise ValueError('CDMFT requires at least one variational parameter...Aborting.')
 
     print('minimization method = ', method)
     pyqcm.new_model_instance()
@@ -350,8 +347,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
     if observables != None:
         for x in observables:
             if x.name[-2:] != '_1':
-                print('observables must be cluster operators associated with cluster 1 only')
-                exit()
+                raise ValueError('observables must be cluster operators associated with cluster 1 only')
 
     # first define the frequency grid for the distance function
     print('frequency grid type = ', grid_type)
@@ -546,7 +542,7 @@ def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4
 
 
 ######################################################################
-# perform a sequece of forcing with an external fielf in CDMFT
+# perform a sequece of forcing with an external field in CDMFT
 
 def cdmft_forcing(field_name, seq, beta_seq=None, **kwargs):
     """performs a sequence of CDMFT runs with the external field 'field_name' takes the successive values in 'seq'
@@ -642,12 +638,10 @@ def __dual_minimization(params_array, N, method, initial_step=1e-3, accur=1e-4, 
     """
 
     if N == 0:
-        print('dual minimization requires that the variational parameters be split into energy and hybridization parameters.')
-        exit()
+        raise ValueError('dual minimization requires that the variational parameters be split into energy and hybridization parameters')
 
-    if(len(method) != 2):    
-        print('dual minimization requires that two methods be specified')
-        exit()
+    if(len(method) != 2):
+        raise ValueError('dual minimization requires that two methods be specified')
 
     global var, maxfev
     x0 = params_array
@@ -738,8 +732,8 @@ class general_bath:
             self.sites = [range(1,ns+1) for i in range(nb)]
         else:
             if len(sites) != nb :
-                print('The format of the argument "sites" is incorrect : it should be a list of ', ns, ' lists')
-                exit()
+                print('the format of the argument "sites" is incorrect : it should be a list of ', ns, ' lists')
+                raise ValueError(f'the format of the argument "sites" is incorrect : it should be a list of {ns} lists')
             self.sites = sites
 
         self.nmixed = 1
@@ -905,8 +899,7 @@ class general_bath:
         nn = no*self.nmixed//2
 
         if H.shape != (self.nmixed*self.nb, self.nmixed*self.ns):
-            print('shape of hybridization matrix does not match model in general bath back propagation')
-            exit()
+            raise ValueError('shape of hybridization matrix does not match model in general bath back propagation')
         
         D = {}
         # bath energies
@@ -1051,11 +1044,9 @@ class general_bath:
         S = ''
         fac = 1
         if self.nb%2:
-            print('The number of bath orbitals must be even for starting_values_PH() to apply')
-            exit()
+            raise ValueError('the number of bath orbitals must be even for starting_values_PH() to apply')
         if phi is None:
-            print('The PH phases of the sites must be specified')
-            exit()
+            raise ValueError('The PH phases of the sites must be specified')
         NE = self.nb//2
 
         if self.spin_dependent or self.spin_flip:
@@ -1133,8 +1124,7 @@ def cdmft_distance_debug(varia=None, vset=None, beta=50, wc=2.0, grid_type = 'sh
     nvar = len(var)
     qcm.CDMFT_variational_set(var)
     if nvar == 0:
-        print('CDMFT requires variational parameters...Aborting.')
-        exit()
+        raise ValueError('CDMFT requires at least one variational parameter...Aborting.')
 
     pyqcm.new_model_instance()
     mixing = pyqcm.mixing()

@@ -757,8 +757,7 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
         X = sol.x
         
     else:
-        print('unknown method specified for minimization: ', method)
-        exit()   
+        raise ValueError(f'unknown method specified for minimization: {method}') 
 
     if not sol.success:
         print(sol.message)
@@ -815,8 +814,7 @@ def __transition(varia, P, bracket, step=0.001, verb=False):
 
     x0, r = brentq(F, bracket[0], bracket[1], maxiter=100, full_output=True, disp=True)
     if not r.converged:
-        print('The root finding routine could not find a solution!')
-        exit(1)
+        raise RuntimeError('the root finding routine could not find a solution!')
         
     return x0
 

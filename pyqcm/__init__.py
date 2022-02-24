@@ -153,8 +153,7 @@ def new_cluster_operator(name, op_name, op_type, elem):
     if op_type == 'anomalous':
         for x in elem:  
             if x[0] >= x[1] :
-                print('anomalous matrix elements of ',op_name, ' must be such that row index < column index')
-                exit()
+                raise ValueError(f'anomalous matrix elements of {op_name} must be such that row index < column index')
 
     qcm.new_operator(name, op_name, op_type, elem)
 
@@ -1278,8 +1277,7 @@ def spin_spectral_function(freq, k, band=1, label=0):
     mix = mixing()
     ds, nbands = reduced_Green_function_dimension()
     if mix != 2 and mix != 3:
-        print('The function "spin_spectral_function()" makes sense only if spin-flip terms are present')
-        exit()
+        raise RuntimeError('The function "spin_spectral_function()" makes sense only if spin-flip terms are present')
     if mix == 2:
         ds //= 2
     elif mix == 3:
@@ -1644,8 +1642,7 @@ def wavevector_grid(n=100, orig=[-1.0, -1.0], side=2, k_perp = 0, plane='z'):
     
     """
     if spatial_dimension() < 2:
-        print('"calling wavevector_grid()" makes no sense for a spatial dimension < 2 "')
-        exit()
+        raise RuntimeError('calling "wavevector_grid()" makes no sense for a spatial dimension < 2')
 
     c = np.array([0,1,2])
     if plane in ['y', 'xz', 'zx']:
@@ -1812,8 +1809,7 @@ def read_from_file_legacy(filename):
     try:
         i1 = F.find('parameters')
     except:
-        print('"parameters" not found in "'+filename+' exiting')
-        exit()
+        raise RuntimeError(f'"parameters" not found in {filename}; exiting')
 
     data = F[i1:].splitlines()
     data = data[1:]
@@ -1836,8 +1832,7 @@ def read_from_file_legacy(filename):
     try:
         i1 = F.find('target_sectors')
     except:
-        print('"target_sectors" not found in "'+filename+' exiting')
-        exit()
+        raise RuntimeError('"target_sectors" not found in {filename}; exiting')
 
     i2 = F[i1:].find('\n\n')	
     data = F[i1:i2].splitlines()

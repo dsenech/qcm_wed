@@ -328,8 +328,7 @@ def fixed_density_loop(
 						pyqcm.set_parameter(v, poly_predictor(n, var2[v], j+1, 2))
 
 		if not mu_converged:
-			print('failed to find the value of chemical potential. Aborting')
-			exit(1)
+			raise RuntimeError('failed to find the value of chemical potential. Aborting')
 		mu_list[i] = mu
 
 		des, val = pyqcm.properties()
@@ -431,8 +430,7 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 			break
 
 		if iter > maxiter :
-			print('Maximum number of Hartree iterations exceeded! Aborting...')
-			exit(1)
+			raise RuntimeError('Maximum number of Hartree iterations exceeded! Aborting...')
 
 	pyqcm.banner('Hartree procedure has converged', c='*')
 	

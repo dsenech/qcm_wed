@@ -624,8 +624,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
 
     mix = pyqcm.mixing()
     if mix != 2 and mix != 3:
-        print('spin_mdc() makes sense only if spin-flip terms are present')
-        exit()
+        raise RuntimeError('spin_mdc() makes sense only if spin-flip terms are present')
     
     k, x = __kgrid(ax, nk, quadrant=quadrant, k_perp=k_perp, plane=plane)
 

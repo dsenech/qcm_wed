@@ -96,15 +96,13 @@ def draw_operator(file, op_name, show_labels=True, show_neighbors=False, values=
     while "lattice operators" not in L:
         L = fin.readline()
         if not L:
-            print('file ended without lattice operators')
-            exit()
+            raise RuntimeError('file ended without specified lattice operators')
 
     nc = len(op_name)
     while op_name != L[0:nc]:
         L = fin.readline()
         if not L:
-            print(f'file ended without the operator {op_name}')
-            exit()
+            raise RuntimeError(f'file ended without the operator {op_name}')
 
     X = re.split(r"[\t(): ]+", L)
     op_type = X[1]
