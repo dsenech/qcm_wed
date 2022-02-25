@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
@@ -31,11 +31,13 @@ endif()
 message(STATUS "numpy dir : ${NUMPY_INCLUDE_DIR}")
 
 include(FindLAPACK)
-
 find_library(CUBA_LIBRARY
     NAMES libcuba.a
-    HINTS "/usr/local/lib" "$ENV{HOME}/lib"
+    HINTS "${CUBA_DIR}" "/usr/local/lib" "$ENV{HOME}/lib"
 )
+get_filename_component(CUBA_DIR ${CUBA_LIBRARY} DIRECTORY)
+message(STATUS "LAPACK lib: ${LAPACK_LIBRARIES}")
+message(STATUS "CUBA lib: ${CUBA_LIBRARY}")
 
 add_library(qcm SHARED
 src_qcm/CPT.cpp
@@ -82,8 +84,7 @@ if(OpenMP_CXX_FOUND)
   target_link_libraries(qcm OpenMP::OpenMP_CXX)
 endif()
 
-target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy)
+target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy ${CUBA_DIR})
 
 # install(TARGETS qcm DESTINATION ${PYTHON_INCLUDE_DIRS}/site-packages)
 install(TARGETS qcm DESTINATION pyqcm)
-
