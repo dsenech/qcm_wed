@@ -792,7 +792,7 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, im_part=Fals
         plt.show()
 
 ################################################################################
-def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, **kwargs):
+def plot_dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, **kwargs):
     """Plots the dispersion relation in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
