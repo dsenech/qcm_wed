@@ -26,5 +26,6 @@ skbuild.setup(
     include_package_data=True,
     install_requires=["numpy", "matplotlib", "scipy"],
     python_requires=">=3.7",
+    cmake_args=['-DCMAKE_BUILD_TYPE="Release"'],
 )
 
