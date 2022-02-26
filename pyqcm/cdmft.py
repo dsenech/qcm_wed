@@ -271,7 +271,27 @@ def __optimize(F, x, method='Nelder-Mead', initial_step=0.1, accur = 1e-4, accur
 ######################################################################
 # main CDMFT function
 
-def cdmft(varia=None, beta=50, wc=2.0, maxiter=32, accur=1e-3, accur_hybrid=1e-4, accur_dist=1e-10, displaymin=False, method='CG', file='cdmft.tsv', skip_averages=False, eps_algo=0, initial_step = 0.1, hartree=None, check_sectors=None, grid_type = 'sharp', counterterms=None, SEF=False, observables=None):
+def cdmft(
+    varia=None, 
+    beta=50, 
+    wc=2.0, 
+    maxiter=32, 
+    accur=1e-3, 
+    accur_hybrid=1e-4, 
+    accur_dist=1e-10, 
+    displaymin=False, 
+    method='CG', 
+    file='cdmft.tsv', 
+    skip_averages=False, 
+    eps_algo=0, 
+    initial_step = 0.1, 
+    hartree=None, 
+    check_sectors=None, 
+    grid_type = 'sharp', 
+    counterterms=None, 
+    SEF=False, 
+    observables=None
+):
     """Performs the CDMFT procedure
 
     :param [str] varia: list of variational parameters 

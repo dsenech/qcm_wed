@@ -245,7 +245,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
 
 
 ################################################################################
-def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, self=False, spin_down=False, blocks=False, file=None, plt_ax=None, **kwargs):
+def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, opt=None, spin_down=False, blocks=False, file=None, plt_ax=None, realpart=False, **kwargs):
     """Plots the spectral function of the cluster in the site basis
     
     :param float  wmax: the frequency range is from -wmax to wmax
@@ -286,10 +286,14 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
 
     A = np.zeros((len(w), dd))
     for i in range(len(w)):
-        if self:
-            g = pyqcm.cluster_self_energy(clus, w[i], spin_down, label)
+        if opt is None:
+            g = pyqcm.cluster_Green_function(clus, w[i], spin_down, label, blocks) # run of the mill cluster green function
+        elif opt == "self":
+            g = pyqcm.cluster_self_energy(clus, w[i], spin_down, label) # self-energy functionnal
+        elif opt == "hyb":
+            g = pyqcm.hybridization_function(clus, w[i], realpart, label) # hybridization function
         else:
-            g = pyqcm.cluster_Green_function(clus, w[i], spin_down, label, blocks)
+            raise ValueError(f"'{opt}' is not a valid option, must be one of 'self', 'hyb' or None.")
         if full:
             l = 0
             for j in range(d):
@@ -792,7 +796,7 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, im_part=Fals
         plt.show()
 
 ################################################################################
-def plot_dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, **kwargs):
+def plot_dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, view_angle=None, **kwargs):
     """Plots the dispersion relation in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
@@ -806,7 +810,8 @@ def plot_dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, d
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
-    :param kwargs: keyword arguments passed to the matplotlib 'plot' function
+    :param tuple view_angle: optional projection angle to pass to view_init() in the format of (elevation, azimuth) in degrees
+    :param kwargs: keyword arguments passed to the matplotlib 'plot_surface' function
     :returns: None
 
     """
@@ -822,6 +827,9 @@ def plot_dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, d
     else:
         ax = plt_ax
     
+    if view_angle is not None:
+        ax.view_init(*view_angle) # adjusts viewing angle if specified
+
     k, x = __kgrid(ax, nk, quadrant=quadrant, k_perp=k_perp, plane=plane)
 
     d, nbands = pyqcm.reduced_Green_function_dimension()
@@ -846,9 +854,9 @@ def plot_dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, d
         x, y = np.meshgrid(x, x)
         if band is None:
             for j in range(d):
-                ax.plot_surface(x, y, e[:, :, j], rstride=1,cstride=1, linewidth=0.2, antialiased=False)
+                ax.plot_surface(x, y, e[:, :, j], rstride=1,cstride=1, linewidth=0.2, antialiased=False, **kwargs)
         else:
-            ax.plot_surface(x, y, e[:, :, band-1], rstride=1,cstride=1, linewidth=0.2, antialiased=False)
+            ax.plot_surface(x, y, e[:, :, band-1], rstride=1,cstride=1, linewidth=0.2, antialiased=False, **kwargs)
             
     if plt_ax is None:
         axis = set_legend_mdc(plane, k_perp)

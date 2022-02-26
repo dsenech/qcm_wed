@@ -1049,6 +1049,12 @@ def interaction_operator(name, **kwargs):
 
     global the_model
     if type(the_model.sites) is list: the_model._finalize()
+
+    # dim, nbands = reduced_Green_function_dimension()############################################### - To be continued - #####################################################
+
+    # if "band1" in kwargs or "band2" in kwargs:
+    #     if "band1" is None
+
     the_model.record += "interaction_operator('"+name+"'"
     for x in kwargs:
         if type(kwargs[x]) is str:
