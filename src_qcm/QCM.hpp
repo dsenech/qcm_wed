@@ -60,7 +60,7 @@ namespace QCM{
   vector<matrix<complex<double>>> self_energy(const complex<double> w, const vector<vector3D<double>> &k, bool spin_down, int label);
   vector<matrix<complex<double>>> tk(const vector<vector3D<double>> &k, bool spin_down, int label);
   vector<pair<double,string>> ground_state(int label);
-  vector<pair<string,double>> averages(int label=0);
+  vector<pair<string,double>> averages(const vector<string> &_ops = {}, int label=0);
   vector<pair<vector<double>, vector<double>>> Lehmann_Green_function(vector<vector3D<double>> &k, int band, bool spin_down, int label);
   vector<tuple<string, int, int, int>> cluster_info();
   vector<vector<double>> dispersion(const vector<vector3D<double>> &k, bool spin_down, int label);

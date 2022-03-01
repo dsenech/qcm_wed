@@ -275,7 +275,7 @@ def print_graph(name, sites):
     qcm.print_graph(name, sites)
 
 ################################################################################
-def averages(label=0, file='averages.tsv'):
+def averages(ops=[], label=0, file='averages.tsv'):
     """
     Computes the lattice averages of the operators present in the model
 
@@ -286,7 +286,7 @@ def averages(label=0, file='averages.tsv'):
     """
     global first_time
 
-    ave = qcm.averages(label)
+    ave = qcm.averages(ops, label)
     write_summary(file, first = first_time)
     first_time = False
 

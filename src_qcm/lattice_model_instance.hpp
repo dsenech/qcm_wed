@@ -62,7 +62,7 @@ struct lattice_model_instance{
 	vector<double> momentum_profile_per(const lattice_operator& op, const vector<vector3D<double>> &k);
 	vector<double> momentum_profile(const lattice_operator& op, const vector<vector3D<double>> &k);
 	vector<pair<double,string>> ground_state();
-	vector<pair<string,double>> averages();
+	vector<pair<string,double>> averages(const vector<string> &_ops);
 	vector<pair<vector<double>, vector<double>>> Lehmann_Green_function(vector<vector3D<double>> &k, int band, bool spin_down);
 	void average_integrand_per(Complex w, vector3D<double> &k, const int *nv, double *I);
 	void average_integrand(Complex w, vector3D<double> &k, const int *nv, double *I);

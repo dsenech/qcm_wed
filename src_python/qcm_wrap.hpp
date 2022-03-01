@@ -72,18 +72,21 @@ static PyObject* averages_python(PyObject *self, PyObject *args)
 {
   vector<pair<string,double>> ave;
   int label=0;
-  
+  PyObject *lst = nullptr;
+
   try{
-    if(!PyArg_ParseTuple(args, "|i", &label))
+    if(!PyArg_ParseTuple(args, "|Oi", &lst, &label))
       qcm_throw("failed to read parameters in call to averages (python)");
-    ave =  QCM::averages(label);
+    vector<string> ops = {};
+    if(lst != nullptr and PyList_Size(lst)>0) ops = strings_from_PyList(lst);
+    ave =  QCM::averages(ops,label);
   } catch(const string& s) {qcm_catch(s);}
   
-  PyObject *lst = PyDict_New();
+  PyObject *dic = PyDict_New();
   for(auto& x : ave){
-    PyDict_SetItem(lst, Py_BuildValue("s#", x.first.c_str(), x.first.length()), Py_BuildValue("d", x.second));
+    PyDict_SetItem(dic, Py_BuildValue("s#", x.first.c_str(), x.first.length()), Py_BuildValue("d", x.second));
   }
-  return lst;
+  return dic;
 }
 
 //==============================================================================

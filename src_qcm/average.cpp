@@ -6,21 +6,31 @@
 
 double tr_sigma_inf(0.0);
 
+vector<shared_ptr<lattice_operator>> ops = {};
 
 //==============================================================================
 /**
  Calculates the lattice expectation value of all operators in the model
+ @param ops list of names of operators to compute the averages of
  @returns an array of (string, double) giving the average for each lattice operator
  */
-vector<pair<string,double>> lattice_model_instance::averages()
+vector<pair<string,double>> lattice_model_instance::averages(const vector<string> &_ops)  
 {
   if(average_solved) return ave;
+  if(_ops.size() == 0) ops = model->one_body_ops;
+  else{
+    ops.clear();
+    ops.reserve(_ops.size());
+    for(int i=0; i<_ops.size(); i++){
+      if(model->term[_ops[i]]->is_interaction == false) ops.push_back(model->term[_ops[i]]);
+    }
+  }
   if(!gf_solved) Green_function_solve();
   double accur_OP = global_double("accur_OP");
   bool periodized_averages = global_bool("periodized_averages");
 
 	// frequency integral
-	vector<double> Iv(model->one_body_ops.size());
+	vector<double> Iv(ops.size());
   // lambda function
   if(periodized_averages){
     auto F = [this] (Complex w, vector3D<double> &k, const int *nv, double *I) mutable {average_integrand_per(w, k, nv, I);};
@@ -36,8 +46,8 @@ vector<pair<string,double>> lattice_model_instance::averages()
   if(global_bool("SEF_calc")) Potthoff_functional();
 
   size_t i = 0;
-  ave.resize(model->one_body_ops.size());
-	for(auto& op : model->one_body_ops){
+  ave.resize(ops.size());
+	for(auto& op : ops){
     if(periodized_averages) Iv[i] *= model->Lc;
     if(model->mixing == HS_mixing::full) {
       Iv[i] += op->nambu_correction_full;
@@ -52,7 +62,7 @@ vector<pair<string,double>> lattice_model_instance::averages()
   // computing the kinetic energy
   E_kin = 0.0;
   i = 0;
-  for(auto& op : model->one_body_ops){
+  for(auto& op : ops){
     if(op->name != "mu") E_kin += Iv[i]*params.at(op->name);
     i++;
   }
@@ -86,7 +96,7 @@ void lattice_model_instance::average_integrand(Complex w, vector3D<double> &k, c
 	K.Gcpt.add(-G_pole); // regulates the Green function at high frequency (subtracts G_pole times the identity matrix)
 	
 	size_t i = 0;
-	for(auto& op : model->one_body_ops){
+	for(auto& op : ops){
 		Complex z(0.0);
 		for(auto &x : op->GF_elem) z += K.Gcpt(x.c,x.r)*x.v;
 		for(auto &x : op->IGF_elem) z += K.Gcpt(x.c,x.r)*x.v*K.phase[x.n];
@@ -99,14 +109,14 @@ void lattice_model_instance::average_integrand(Complex w, vector3D<double> &k, c
     Green_function_k K(G,k);
     set_Gcpt(K);
     K.Gcpt.add(-G_pole); // regulates the Green function at high frequency (subtracts G_pole times the identity matrix)
-		for(auto& op : model->one_body_ops){
+		for(auto& op : ops){
 			Complex z(0.0);
 			for(auto &x : op->GF_elem_down) z += K.Gcpt(x.c,x.r)*x.v;
 			for(auto &x : op->IGF_elem_down) z += K.Gcpt(x.c,x.r)*x.v*K.phase[x.n];
 			I[i++] += real<double>(z);
 		}
 	}
-  if(model->mixing == HS_mixing::normal) for(size_t i=0; i<model->one_body_ops.size(); i++) I[i] *= 2;
+  if(model->mixing == HS_mixing::normal) for(size_t i=0; i<ops.size(); i++) I[i] *= 2;
 }
 
 
@@ -133,7 +143,7 @@ void lattice_model_instance::average_integrand_per(Complex w, vector3D<double> &
   K.g.add(-G_pole); // regulates the Green function at high frequency (subtracts G_pole times the identity matrix)
   
   size_t i = 0;
-  for(auto& op : model->one_body_ops){
+  for(auto& op : ops){
     matrix<Complex> S(G.G.r);
     // build the operator matrix
     for(auto &x : op->GF_elem) S(x.r, x.c) += x.v;
@@ -147,7 +157,7 @@ void lattice_model_instance::average_integrand_per(Complex w, vector3D<double> &
     Green_function_k K(G,k_red);
     periodized_Green_function(K);
     K.g.add(-G_pole); // regulates the Green function at high frequency (subtracts G_pole times the identity matrix)
-    for(auto& op : model->one_body_ops){
+    for(auto& op : ops){
       matrix<Complex> S(G.G.r);
       // build the operator matrix
       for(auto &x : op->GF_elem_down) S(x.r, x.c) += x.v;
@@ -156,7 +166,7 @@ void lattice_model_instance::average_integrand_per(Complex w, vector3D<double> &
       I[i++] += realpart(K.g.trace_product(S_per));
     }
   }
-  if(model->mixing == HS_mixing::normal) for(size_t i=0; i<model->one_body_ops.size(); i++) I[i] *= 2;
+  if(model->mixing == HS_mixing::normal) for(size_t i=0; i<ops.size(); i++) I[i] *= 2;
 }
 
 
