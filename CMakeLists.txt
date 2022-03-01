@@ -15,30 +15,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
 
-find_package(Python3 3.7 COMPONENTS Interpreter Development NumPy REQUIRED)
-message(STATUS "python executable: ${Python3_EXECUTABLE}")
-find_package(PythonLibs REQUIRED)
-message(STATUS "python include dir: ${PYTHON_INCLUDE_DIRS}")
-message(STATUS "python libs: ${PYTHON_LIBRARIES}")
-set(NUMPY_INCLUDE_DIR ${Python3_NumPy_INCLUDE_DIRS})
-
-if(SKBUILD)
-message(STATUS "this is built with SciKit-build")
-else()
-execute_process (COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
-
-message(STATUS "numpy dir : ${NUMPY_INCLUDE_DIR}")
-
-include(FindLAPACK)
-find_library(CUBA_LIBRARY
-    NAMES libcuba.a
-    HINTS "${CUBA_DIR}" "/usr/local/lib" "$ENV{HOME}/lib"
-)
-get_filename_component(CUBA_DIR ${CUBA_LIBRARY} DIRECTORY)
-message(STATUS "LAPACK lib: ${LAPACK_LIBRARIES}")
-message(STATUS "CUBA lib: ${CUBA_LIBRARY}")
-
+#------------------
+# Define target 
+#------------------
 add_library(qcm SHARED
 src_qcm/CPT.cpp
 src_qcm/Chern.cpp
@@ -77,14 +56,73 @@ src_util/vector_num.cpp
 
 set_target_properties(qcm PROPERTIES VERSION ${PROJECT_VERSION} PREFIX "" SUFFIX ".so")
 
+#------------------
+# Python components
+#------------------
+find_package(Python3 3.7 COMPONENTS Interpreter Development NumPy REQUIRED)
+message(STATUS "python executable: ${Python3_EXECUTABLE}")
+find_package(PythonLibs REQUIRED)
+message(STATUS "python include dir: ${PYTHON_INCLUDE_DIRS}")
+message(STATUS "python libs: ${PYTHON_LIBRARIES}")
+set(NUMPY_INCLUDE_DIR ${Python3_NumPy_INCLUDE_DIRS})
+message(STATUS "numpy dir : ${NUMPY_INCLUDE_DIR}")
+
+if(SKBUILD)
+message(STATUS "this is built with SciKit-build")
+else()
+execute_process (COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
+
+
+include(FindLAPACK)
+message(STATUS "LAPACK lib: ${LAPACK_LIBRARIES}")
+
+#------------------
+# Cuba library
+#------------------
+if (DOWNLOAD_CUBA)
+    include(ExternalProject)
+    ExternalProject_Add(Cuba
+        PREFIX ${CMAKE_SOURCE_DIR}/external
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/cuba
+        URL http://www.feynarts.de/cuba/Cuba-4.2.1.tar.gz
+        URL_HASH MD5=b9404645d735144ea29e090c086b99cf
+        CONFIGURE_COMMAND COMMAND ${CMAKE_SOURCE_DIR}/external/cuba/configure "CFLAGS=-O3 -fPIC -ffast-math -fomit-frame-pointer"
+        BUILD_COMMAND COMMAND make "lib"
+        BUILD_IN_SOURCE 1
+        INSTALL_COMMAND ""
+        STEP_TARGETS build
+        BUILD_BYPRODUCTS ${CMAKE_SOURCE_DIR}/external/cuba/libcuba.a
+    )
+    add_dependencies(qcm Cuba)
+    set(CUBA_LIBRARY ${CMAKE_SOURCE_DIR}/external/cuba/libcuba.a)
+else()
+    find_library(CUBA_LIBRARY
+        NAMES libcuba.a
+        HINTS "${CUBA_DIR}" "/usr/local/lib" "$ENV{HOME}/lib"
+    )
+endif()
+
+get_filename_component(CUBA_DIR ${CUBA_LIBRARY} DIRECTORY)
+message(STATUS "CUBA lib: ${CUBA_LIBRARY}")
+
+
+#------------------
+# Link dependencies
+#------------------
 target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
 
+target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy ${CUBA_DIR})
+
+
+#------------------
+# Parallelization using OpenMP
+#------------------
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
   target_link_libraries(qcm OpenMP::OpenMP_CXX)
 endif()
 
-target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy ${CUBA_DIR})
 
 # install(TARGETS qcm DESTINATION ${PYTHON_INCLUDE_DIRS}/site-packages)
 install(TARGETS qcm DESTINATION pyqcm)
