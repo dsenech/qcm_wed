@@ -2,7 +2,8 @@
 
 ## Defaut installation using pip
 
-This is the most basic installation of PyQCM, suitable for all user with default system compiler and library.
+This is the easiest installation of PyQCM suitable for all user.
+It build the PyQCM library and download dependencies automatically using default system compiler and library.
 
 1. Open a terminal and clone PyQCM Git repository:
 
@@ -19,6 +20,8 @@ pip install .
 
 ## Installation from source
 
+These instructions allow a finely tunned compilation of the qcm library and dependencies for better performance.
+Library and dependencies compilation and installation are no more handled automatically.
 
 1. Clone PyQCM and download CUBA source:
 
@@ -44,14 +47,18 @@ cd qcm_wed #enter extraction CUBA directory
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1
 make
+make install
 ```
 
-4. Install Python library:
+4. Run `setup.py` script to install the python library:
 
-#TODO
+```
+cd .. #exit build and go in source qcm dirs
+python setup.py --skip-cmake install --user
+```
 
 
-## Custom installation on Compute Canada server
+## Tips for compilation on Compute Canada server
 
 ### Compilation on Intel based cluster with ICC compiler
 
@@ -72,7 +79,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1 -DCMAKE_CXX_COMPILE
 QCM configure step (3) with CMake 3.21.4: 
 
 ```
-module load cmake/3.21.4
+module load cmake/3.21.4 flexiblas
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1 -DBLA_VENDOR=FlexiBLAS
 ```
 

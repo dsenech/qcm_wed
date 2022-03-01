@@ -125,4 +125,4 @@ endif()
 
 
 # install(TARGETS qcm DESTINATION ${PYTHON_INCLUDE_DIRS}/site-packages)
-install(TARGETS qcm DESTINATION pyqcm)
+install(TARGETS qcm DESTINATION ${CMAKE_SOURCE_DIR}/pyqcm)
