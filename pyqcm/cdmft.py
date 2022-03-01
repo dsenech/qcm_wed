@@ -320,6 +320,9 @@ def cdmft(
     """
     global w, wr, weight, var, mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
 
+    if type(hartree) is not list and hartree is not None:
+        hartree = [hartree] # quick fix to protect against hartree=`obj` behavior
+
     nvar_E = 0
     if type(varia) is tuple:
         nvar_E = len(varia[0])

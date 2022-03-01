@@ -597,7 +597,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
 
 
 ################################################################################
-def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', freq = 0.0, max=None, k_perp = 0, plane = 'xy', band_basis=False, file=None, plt_ax=None, **kwargs):
+def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='spin', freq = 0.0, max=None, k_perp = 0, plane = 'xy', band_basis=False, file=None, plt_ax=None, **kwargs):
     """Plots the spin spectral weight at zero frequency in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
@@ -642,7 +642,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
         A = S[:,3]
     elif opt=='spinp':
         A = np.sqrt(S[:,1]*S[:,1] + S[:,2]*S[:,2])
-    elif opt in 'spins':
+    elif opt == 'spins':
         Sx = S[:,1]
         Sy = S[:,2]
         if opt == 'spins':
@@ -679,7 +679,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
         title = r"$Z(k,0)$ : "+title
 
 #------------------------------------------------------------------
-    if opt in 'spins':
+    if opt == 'spins':
         X, Y = np.meshgrid(x, x)
         CS = ax.quiver(X, Y, Sx, Sy, pivot='mid', angles='xy', scale_units='xy', scale=10, width=0.003, headlength = 4.5, **kwargs)
     elif opt == 'sz':

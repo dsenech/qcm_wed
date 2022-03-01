@@ -409,7 +409,21 @@ def __newton_raphson_step(func=None, x=None, step=None):
 ################################################################################
 # performs the VCA
 
-def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, accur_grad=1e-6, max_iter=30, max_iter_diff=None, NR=False, hartree=None, hartree_self_consistent=False):
+def vca(
+    var2sef=None,
+    names=None, 
+    start=None, 
+    steps=None, 
+    accur=None, 
+    max=None,
+    file="vca.tsv",
+    accur_grad=1e-6, 
+    max_iter=30, 
+    max_iter_diff=None, 
+    NR=False, 
+    hartree=None, 
+    hartree_self_consistent=False
+):
     """Performs a VCA with the QN or NR method
     
     :param var2sef: function that converts variational parameters to model parameters
@@ -456,6 +470,9 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
             raise ValueError('arguments steps, accur and max of vca() must be lists of {:d} elements each'.format(nvar))
         if len(steps) != nvar or len(accur) != nvar or len(max) != nvar:
             raise ValueError('arguments steps, accur and max of vca() must be lists of {:d} elements each'.format(nvar))
+
+    if type(hartree) is not list and hartree is not None:
+        hartree = [hartree] # fixes possible type error
 
     global first_time
     pyqcm.new_model_instance()
@@ -552,7 +569,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
         if hartree != None:
             val += '{:.8g}\t'.format(omega)
             des += 'omegaH\t'
-        pyqcm.write_summary('vca.tsv', first = first_time, suppl_descr = des, suppl_values = val)
+        pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
         first_time = False
 
     if root:
@@ -561,7 +578,7 @@ def vca(var2sef=None, names=None, start=None, steps=None, accur=None, max=None, 
     return sol, 1.0/np.diag(iH)
 
 ################################################################################
-def plot_sef(param, prm, accur_SEF=1e-4, hartree=None, show=True):
+def plot_sef(param, prm, file="sef.tsv", accur_SEF=1e-4, hartree=None, show=True):
     """Draws a plot of the Potthoff functional as a function of a parameter param taken from the list prm. The results are going to be appended to 'sef.tsv'
     
     :param str param: name of the parameter (independent variable)
@@ -575,6 +592,9 @@ def plot_sef(param, prm, accur_SEF=1e-4, hartree=None, show=True):
     L = pyqcm.model_size()[0]
     pyqcm.first_SEF = True
 
+    if type(hartree) is not list and hartree is not None:
+        hartree = [hartree]
+
     pyqcm.set_global_parameter('accur_SEF', accur_SEF)
     omega = np.empty(len(prm))
     for i in range(len(prm)):
@@ -582,7 +602,7 @@ def plot_sef(param, prm, accur_SEF=1e-4, hartree=None, show=True):
         pyqcm.new_model_instance()
         # print(pyqcm.parameter_set(opt='report'))
         # print('.'*80, '\n', pyqcm.cluster_parameters())
-        omega[i] = pyqcm.Potthoff_functional(hartree)
+        omega[i] = pyqcm.Potthoff_functional(hartree, file=file)
 
         print("omega(", prm[i], ") = ", omega[i])
     
@@ -655,7 +675,7 @@ def plot_GS_energy(param, prm, clus=0, file=None, plt_ax=None, **kwargs):
 ################################################################################
 # performs the VCA by minimization
 
-def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='Nelder-Mead', hartree=None):
+def vca_min(names=None, start=None, steps=None, file="vca.tsv", accur=1e-4, ftol=1e-8, method='Nelder-Mead', hartree=None):
     """Performs the VCA assuming that the solution is a minimum of the Potthoff functional
     Uses minimization routines from scipy.optimize.
     
@@ -698,6 +718,9 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
             raise ValueError('arguments steps and accur of vca_min() must be lists of {:d} elements each'.format(nvar))
         if len(steps) != nvar or len(accur) != nvar:
             raise ValueError('arguments steps and accur of vca_min() must be lists of {:d} elements each'.format(nvar))
+
+    if type(hartree) is not list and hartree is not None:
+        hartree = [hartree]
 
     L = pyqcm.model_size()[0]
 
@@ -770,7 +793,7 @@ def vca_min(names=None, start=None, steps=None, accur=1e-4, ftol=1e-8, method='N
     val += time.strftime("%Y-%m-%d@%H:%M", time.localtime())
     # writes the solution in the standard file
     if root:
-        fout = open('vca.tsv', 'a')
+        fout = open(file, 'a')
         des += 'time'    
         fout.write(des + '\n')
         fout.write(val + '\n')

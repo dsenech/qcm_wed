@@ -3,7 +3,7 @@ import pyqcm
 import pyqcm.cdmft
 import os
 
-from __init__ import new_model_instance
+from pyqcm import new_model_instance
 
 first_time=True
 
@@ -402,6 +402,9 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 	"""
 
 	global first_time
+
+	if type(couplings) is not list:
+		couplings = [couplings]
 
 	pyqcm.banner('Hartree procedure', c='*', skip=1)
 	hartree_converged = False
