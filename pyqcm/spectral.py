@@ -110,6 +110,8 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
 
 
     A = np.zeros((len(w), len(k)))
+    A_down = np.zeros((len(w), len(k)))
+    plot_down = False
     for i in range(len(w)):
         if opt=='self':
             g = pyqcm.self_energy(w[i], k, False, label)
@@ -126,6 +128,14 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
             else:
                 A[i, j] += -g[j, band, band].imag
 
+            if mix&2:  
+                plot_down = True
+                if band is None:
+                    for l in range(nbands): 
+                        A_down[i, j] += -g[j, nbands+l, nbands+l].imag
+                else:
+                    A_down[i, j] += -g[j, nbands+band, nbands+band].imag
+
     if mix == 1:
         # add the contribution to the Nambu channel, but with opposite frequency
         if Nambu_redress:
@@ -140,13 +150,15 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
             else:
                 g = pyqcm.periodized_Green_function(W, k, False, label)
             for j in range(len(k)):
+                plot_down = True
                 if band is None:
                     for l in range(nbands): 
-                        A[i, j] += -g[j, nbands+l, nbands+l].imag
+                        A_down[i, j] += -g[j, nbands+l, nbands+l].imag
                 else:
-                    A[i, j] += -g[j, nbands+band, nbands+band].imag
+                    A_down[i, j] += -g[j, nbands+band, nbands+band].imag
 
     if mix == 4:
+        plot_down = True
         # add the contribution to the spin-down channel in that case
         for i in range(len(w)):
             if opt=='self':
@@ -156,14 +168,16 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
             for j in range(len(k)):
                 if band is None:
                     for l in range(nbands): 
-                        A[i, j] += -g[j, l, l].imag
+                        A_down[i, j] += -g[j, l, l].imag
                 else:
-                    A[i, j] += -g[j, band, band].imag
+                    A_down[i, j] += -g[j, band, band].imag
     
 
     ax.set_xlim(np.real(w[0]), np.real(w[-1]))
     ax.set_ylim(0, (1+len(k)) * offset + 1 / eta)
     for j in range(len(k)):
+        if plot_down:
+            ax.plot(np.real(w), A_down[:, j] + offset * j, 'r-', lw=0.5, **kwargs)
         ax.plot(np.real(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
     if title is None and plt_ax is None:
         ax.set_title(r'$A(\mathbf{k},\omega)$: '+pyqcm.parameter_string(), fontsize=9)

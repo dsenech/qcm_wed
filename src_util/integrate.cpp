@@ -98,8 +98,10 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 {
 	int ndim = dim+1;
 	int cuba_mineval, cuba_maxpoints;
-  cuba_threads=max_num_threads;
+  	cuba_threads=max_num_threads;
 	
+	if(verb) cout << "CUBA integration (" << cuba_threads << " threads)" << endl;
+
 	int ncomp = (int)Iv.size();
 	vector<double> value(ncomp,0);
 	vector<double> err(ncomp,0);

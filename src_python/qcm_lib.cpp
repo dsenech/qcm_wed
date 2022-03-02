@@ -161,6 +161,7 @@ void QCM::qcm_init()
     setenv("OMP_NUM_THREADS","1",0);
   }
   else max_num_threads = from_string<int>(string(omp_num_threads));
+  cout << "Number of openMP threads = " << max_num_threads << endl;
   omp_set_max_active_levels(2);
   #endif    
 }
