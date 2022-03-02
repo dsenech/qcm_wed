@@ -72,7 +72,7 @@ namespace ED{
     else if(_type == "X") M->term[_name] = make_shared<Heisenberg_operator>(_name, M, elements, 'X');
     else if(_type == "Y") M->term[_name] = make_shared<Heisenberg_operator>(_name, M, elements, 'Y');
     else if(_type == "Z") M->term[_name] = make_shared<Heisenberg_operator>(_name, M, elements, 'Z');
-    else cout << "ED_WARNING : type of operator " << _name << " is not yet implemented" << endl;
+    else qcm_throw("type of operator "+_name+" is not yet implemented");
   }
   
   
@@ -297,7 +297,7 @@ namespace ED{
     auto it = param1.begin();
     while(it != param1.end()){
       if(mod.term.find(it->first) == mod.term.end()){
-        cout << "ED WARNING : operator " << it->first << " does not exist in cluster model " << mod.name << endl;
+        if(global_bool("verb_warning")) cout << "ED WARNING : operator " << it->first << " does not exist in cluster model " << mod.name << endl;
         param1.erase(it++);
       }
       else ++it;
@@ -305,7 +305,7 @@ namespace ED{
     it = param2.begin();
     while(it != param2.end()){
       if(mod.term.find(it->first) == mod.term.end()){
-        cout << "ED WARNING : operator " << it->first << " does not exist in cluster model " << mod.name << endl;
+        if(global_bool("verb_warning")) cout << "ED WARNING : operator " << it->first << " does not exist in cluster model " << mod.name << endl;
         param2.erase(it++);
       }
       else ++it;

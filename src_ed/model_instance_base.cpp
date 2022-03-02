@@ -27,7 +27,7 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
   }
 
   for(auto& v : value){
-    if(the_model->term.find(v.first) == the_model->term.end()){
+    if(the_model->term.find(v.first) == the_model->term.end() and global_bool("verb_warning")){
       cout << "ED WARNING : operator " << v.first << " does not exist in cluster model " << the_model->name << endl;
     }
     Hermitian_operator& op = *the_model->term.at(v.first);
