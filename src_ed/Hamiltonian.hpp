@@ -280,7 +280,7 @@ vector<shared_ptr<state<HilbertField>>> Hamiltonian<HilbertField>::states(double
     if(Davidson_states > 1){
       Davidson(*this, dim, Davidson_states, evalues, evectors, global_double("accur_Davidson"),  global_bool("verb_ED"));
       if(evalues[0] < GS_energy) GS_energy = evalues[0];
-      if(evalues.back()-GS_energy < max_gap){
+      if(evalues.back()-GS_energy < max_gap and global_bool("verb_warning")){
         cout << "ED WARNING! : not enough Davidson states (" << Davidson_states << ") in sector " << sec.name() << endl;
       }
     }
