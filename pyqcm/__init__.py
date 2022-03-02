@@ -467,12 +467,18 @@ def Green_function_solve(label=0):
     return qcm.Green_function_solve(label)
 
 ################################################################################
-def ground_state():
+def ground_state(file=None):
     """
     :return: a list of pairs (float, str) of the ground state energy and sector string, for each cluster of the system
 
     """
-    return qcm.ground_state()
+
+    GS = qcm.ground_state()
+
+    if file is not None:
+        write_summary(file, first=True) 
+
+    return GS
 
 ################################################################################
 def cluster_averages(label=0):
@@ -1432,15 +1438,21 @@ def update_bath(label=0):
     qcm.update_bath(label)
 
 ################################################################################
-def print_wavefunction(label=0):
-    """
-    prints the ground state wavefunction(s) on the screen
+def print_wavefunction(label=0, pr=True):
+    """prints the ground state wavefunction(s) on the screen
 
-    :param int label:  label of the model instance
-    :return: None
+    :param int label: label of the model instance
+    :param bool pr: prints wavefucntion to screen if pr=True
+
+    :return: the wavefunction
 
     """
-    return qcm.print_wavefunction(label)
+    wavefunction = qcm.print_wavefunction(label)
+
+    if pr:
+        print(wavefunction)
+
+    return wavefunction
 
 ################################################################################
 def matrix_elements(model, op):

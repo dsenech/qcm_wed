@@ -224,4 +224,4 @@ class counterterm:
 
 
     def print(self):
-        print(__str__(self))
+        print(self.__str__())

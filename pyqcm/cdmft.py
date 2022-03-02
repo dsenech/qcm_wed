@@ -6,7 +6,6 @@
 from multiprocessing.sharedctypes import Value
 import numpy as np
 import pyqcm
-import time
 import qcm
 import timeit
 
