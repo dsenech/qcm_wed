@@ -1056,6 +1056,11 @@ def set_parameter(name, value, pr=False):
     """
     if pr:
         print('-----> ', name, ' = ', value)
+    if value == 0:
+        warn(
+            "***WARNING*** : `0` carries a specific meaning for QCM (does not create operator). If a trivial operator value is desired, using a small value such as `1e-9` is preferable."
+        )
+
     qcm.set_parameter(name, value)
 
 ################################################################################
@@ -1103,18 +1108,18 @@ def set_basis(B):
     qcm.set_basis(B)
 
 ################################################################################
-def interaction_operator(name, **kwargs):
+def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
     """
     Defines an interaction operator of type Hubbard, Hund, Heisenberg or X, Y, Z
 
     :param str name: name of the operator
+    :param int band1: number of the first band (None by default)
+    :param int band2: number of the second band (None by default)
+    :param list link: link of the operator (None by default)
 
-   :Keyword Arguments:
+    :Keyword Arguments:
 
-        * link (*[int]*): 3-component integer vector, (0,0,0) by default
         * amplitude (*float*): amplitude multiplier
-        * band1 (*int*): Band label of first index (1 by default)
-        * band2 (*int*): Band label of second index (1 by default)
         * type (*str*): one of 'Hubbard', 'Heisenberg', 'Hund', 'X', 'Y', 'Z'
 
     :return: None
@@ -1122,22 +1127,44 @@ def interaction_operator(name, **kwargs):
     """
 
     global the_model
-    if type(the_model.sites) is list: the_model._finalize()
+    if type(the_model.sites) is list:
+        the_model._finalize()
 
-    # dim, nbands = reduced_Green_function_dimension()############################################### - To be continued - #####################################################
+    if band1 is None and band2 is None: # this applies an interaction operator on all bands if none are specified
+        nbands = model_size()[1]
+        bands = [i for i in range(1, 1+nbands)]
+        for band_no in bands:
+            the_model.record += "interaction_operator('"+name+"'"
+            the_model.record += ', band1='+str(band_no)
+            the_model.record += ', band2='+str(band_no)
+            if link is not None:
+                the_model.record += ', link='+str(link)
 
-    # if "band1" in kwargs or "band2" in kwargs:
-    #     if "band1" is None
+            for x in kwargs:
+                if type(kwargs[x]) is str:
+                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                else:	
+                    the_model.record += ', '+x+'='+str(kwargs[x])
+            the_model.record += ')\n'	
 
-    the_model.record += "interaction_operator('"+name+"'"
-    for x in kwargs:
-        if type(kwargs[x]) is str:
-            the_model.record += ', '+x+"='"+kwargs[x]+"'"
-        else:	
-            the_model.record += ', '+x+'='+str(kwargs[x])
-    the_model.record += ')\n'	
+            qcm.interaction_operator(name, band1=band_no, band2=band_no, link=link, **kwargs)
+    elif band1 is None or band2 is None: # protects against undefined situation (one out of two bands are defined)
+        raise ValueError("Both bands must be given or both bands must be None to define operator across all bands.")
+    else: # does the usual routine if both bands are given
+        the_model.record += "interaction_operator('"+name+"'"
+        the_model.record += ', band1='+str(band1)
+        the_model.record += ', band2='+str(band2)
+        if link is not None:
+            the_model.record += ', link='+str(link)
 
-    qcm.interaction_operator(name, **kwargs)
+        for x in kwargs:
+            if type(kwargs[x]) is str:
+                the_model.record += ', '+x+"='"+kwargs[x]+"'"
+            else:	
+                the_model.record += ', '+x+'='+str(kwargs[x])
+        the_model.record += ')\n'	
+
+        qcm.interaction_operator(name, band1=band1, band2=band2, link=link, **kwargs)
 
 ################################################################################
 def hopping_operator(name, link, amplitude, **kwargs):
@@ -1183,9 +1210,9 @@ def hopping_operator(name, link, amplitude, **kwargs):
 def anomalous_operator(name, link, amplitude, **kwargs):
     """Defines an anomalous operator
 
-      :param str name: name of operator
-      :param [int] link: bond vector (3-component integer array)
-      :param complex amplitude: pairing multiplier
+    :param str name: name of operator
+    :param [int] link: bond vector (3-component integer array)
+    :param complex amplitude: pairing multiplier
 
     :Keyword Arguments:
 
@@ -1256,7 +1283,7 @@ def density_wave(name, t, Q, **kwargs):
     :Keyword Arguments:
 
         * link (*[int]*) -- bond vector, for bond density waves
-        * amplitude (*complex*) -- amplitude multiplier
+        * amplitude (*complex*) -- amplitude multiplier. **Caution**: A factor of 2 must be used in some situations (see :ref:`density wave theory`)
         * band (*int*) -- Band label (0 by default = all bands)
         * phase (*float*) -- real phase (as a multiple of :math:`pi`)
 

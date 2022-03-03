@@ -77,14 +77,14 @@
 \indexentry{set\_parameter() (in module pyqcm)@\spxentry{set\_parameter()}\spxextra{in module pyqcm}|hyperpage}{33}
 \indexentry{set\_parameters() (in module pyqcm)@\spxentry{set\_parameters()}\spxextra{in module pyqcm}|hyperpage}{33}
 \indexentry{set\_params\_from\_file() (in module pyqcm)@\spxentry{set\_params\_from\_file()}\spxextra{in module pyqcm}|hyperpage}{33}
-\indexentry{set\_target\_sectors() (in module pyqcm)@\spxentry{set\_target\_sectors()}\spxextra{in module pyqcm}|hyperpage}{33}
+\indexentry{set\_target\_sectors() (in module pyqcm)@\spxentry{set\_target\_sectors()}\spxextra{in module pyqcm}|hyperpage}{34}
 \indexentry{site\_and\_bond\_profile() (in module pyqcm)@\spxentry{site\_and\_bond\_profile()}\spxextra{in module pyqcm}|hyperpage}{34}
 \indexentry{spatial\_dimension() (in module pyqcm)@\spxentry{spatial\_dimension()}\spxextra{in module pyqcm}|hyperpage}{34}
 \indexentry{spectral\_average() (in module pyqcm)@\spxentry{spectral\_average()}\spxextra{in module pyqcm}|hyperpage}{34}
 \indexentry{spin\_spectral\_function() (in module pyqcm)@\spxentry{spin\_spectral\_function()}\spxextra{in module pyqcm}|hyperpage}{34}
 \indexentry{susceptibility() (in module pyqcm)@\spxentry{susceptibility()}\spxextra{in module pyqcm}|hyperpage}{34}
 \indexentry{susceptibility\_poles() (in module pyqcm)@\spxentry{susceptibility\_poles()}\spxextra{in module pyqcm}|hyperpage}{34}
-\indexentry{switch\_cluster\_model() (in module pyqcm)@\spxentry{switch\_cluster\_model()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{switch\_cluster\_model() (in module pyqcm)@\spxentry{switch\_cluster\_model()}\spxextra{in module pyqcm}|hyperpage}{35}
 \indexentry{tk() (in module pyqcm)@\spxentry{tk()}\spxextra{in module pyqcm}|hyperpage}{35}
 \indexentry{update\_bath() (in module pyqcm)@\spxentry{update\_bath()}\spxextra{in module pyqcm}|hyperpage}{35}
 \indexentry{variational\_parameters() (in module pyqcm)@\spxentry{variational\_parameters()}\spxextra{in module pyqcm}|hyperpage}{35}

@@ -61,7 +61,7 @@
 
 
 \title{pyqcm Documentation}
-\date{Feb 28, 2022}
+\date{Mar 03, 2022}
 \release{1.0}
 \author{David Sénéchal}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -176,7 +176,7 @@ where again the indices \(\alpha\) and \(\beta\) are composite indices. The pair
 
 
 \subsection{Density waves}
-\label{\detokenize{models:density-waves}}\begin{quote}
+\label{\detokenize{models:density-waves}}\label{\detokenize{models:density-wave-theory}}\begin{quote}
 
 \sphinxAtStartPar
 If the operator is a site density wave, its expression is
@@ -816,6 +816,7 @@ This may be the most important function of the library. It takes a single, long 
 
 \sphinxAtStartPar
 The values of the parameters are set by the equal sign. Dependent parameters are specified by a multiple of another parameter and the multiplication (*) sign. Note that a prefactor is always required, even when it is unity. Thus, you should write \sphinxcode{\sphinxupquote{M\_2 = 1*M\_1}} and not \sphinxcode{\sphinxupquote{M\_2=M\_1}}.
+Notice that setting a parameter to \sphinxcode{\sphinxupquote{0}} causes qcm to \sphinxstyleemphasis{not create the operator} in the model.
 
 
 \section{Hilbert space sectors}
@@ -1178,23 +1179,22 @@ None
 \phantomsection\label{\detokenize{functions:pyqcm.anomalous_operator}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.}}\sphinxbfcode{\sphinxupquote{anomalous\_operator}}}{\emph{\DUrole{n}{name}}, \emph{\DUrole{n}{link}}, \emph{\DUrole{n}{amplitude}}, \emph{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
 \sphinxAtStartPar
 Defines an anomalous operator
-\begin{quote}
 \begin{quote}\begin{description}
-\item[{param str name}] \leavevmode
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
 \sphinxAtStartPar
-name of operator
+\sphinxstyleliteralstrong{\sphinxupquote{name}} (\sphinxhref{https://docs.python.org/3/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} name of operator
 
-\item[{param {[}int{]} link}] \leavevmode
+\item {} 
 \sphinxAtStartPar
-bond vector (3\sphinxhyphen{}component integer array)
+\sphinxstyleliteralstrong{\sphinxupquote{link}} (\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxhref{https://docs.python.org/3/library/functions.html\#int}{\sphinxstyleliteralemphasis{\sphinxupquote{int}}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} bond vector (3\sphinxhyphen{}component integer array)
 
-\item[{param complex amplitude}] \leavevmode
+\item {} 
 \sphinxAtStartPar
-pairing multiplier
+\sphinxstyleliteralstrong{\sphinxupquote{amplitude}} (\sphinxhref{https://docs.python.org/3/library/functions.html\#complex}{\sphinxstyleliteralemphasis{\sphinxupquote{complex}}}) \textendash{} pairing multiplier
 
-\end{description}\end{quote}
-\end{quote}
-\begin{quote}\begin{description}
+\end{itemize}
+
 \item[{Keyword Arguments}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
@@ -1539,7 +1539,7 @@ link (\sphinxstyleemphasis{{[}int{]}}) \textendash{} bond vector, for bond densi
 
 \item {} 
 \sphinxAtStartPar
-amplitude (\sphinxstyleemphasis{complex}) \textendash{} amplitude multiplier
+amplitude (\sphinxstyleemphasis{complex}) \textendash{} amplitude multiplier. \sphinxstylestrong{Caution}: A factor of 2 must be used in some situations (see {\hyperref[\detokenize{models:density-wave-theory}]{\sphinxcrossref{\DUrole{std,std-ref}{Density waves}}}})
 
 \item {} 
 \sphinxAtStartPar
@@ -1685,7 +1685,7 @@ None
 \index{ground\_state() (in module pyqcm)@\spxentry{ground\_state()}\spxextra{in module pyqcm}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{functions:pyqcm.ground_state}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.}}\sphinxbfcode{\sphinxupquote{ground\_state}}}{}{}\begin{quote}\begin{description}
+\phantomsection\label{\detokenize{functions:pyqcm.ground_state}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.}}\sphinxbfcode{\sphinxupquote{ground\_state}}}{\emph{\DUrole{n}{file}\DUrole{o}{=}\DUrole{default_value}{None}}}{}\begin{quote}\begin{description}
 \item[{Returns}] \leavevmode
 \sphinxAtStartPar
 a list of pairs (float, str) of the ground state energy and sector string, for each cluster of the system
@@ -1813,46 +1813,43 @@ a complex\sphinxhyphen{}valued matrix
 \index{interaction\_operator() (in module pyqcm)@\spxentry{interaction\_operator()}\spxextra{in module pyqcm}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{functions:pyqcm.interaction_operator}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.}}\sphinxbfcode{\sphinxupquote{interaction\_operator}}}{\emph{\DUrole{n}{name}}, \emph{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}\begin{quote}
-
+\phantomsection\label{\detokenize{functions:pyqcm.interaction_operator}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.}}\sphinxbfcode{\sphinxupquote{interaction\_operator}}}{\emph{\DUrole{n}{name}}, \emph{\DUrole{n}{band1}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{band2}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{link}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
 \sphinxAtStartPar
 Defines an interaction operator of type Hubbard, Hund, Heisenberg or X, Y, Z
 \begin{quote}\begin{description}
-\item[{param str name}] \leavevmode
-\sphinxAtStartPar
-name of the operator
-
-\end{description}\end{quote}
-\end{quote}
-\begin{quote}\begin{description}
-\item[{Keyword Arguments}] \leavevmode\begin{itemize}
+\item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-link (\sphinxstyleemphasis{{[}int{]}}): 3\sphinxhyphen{}component integer vector, (0,0,0) by default
+\sphinxstyleliteralstrong{\sphinxupquote{name}} (\sphinxhref{https://docs.python.org/3/library/stdtypes.html\#str}{\sphinxstyleliteralemphasis{\sphinxupquote{str}}}) \textendash{} name of the operator
 
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{band1}} (\sphinxhref{https://docs.python.org/3/library/functions.html\#int}{\sphinxstyleliteralemphasis{\sphinxupquote{int}}}) \textendash{} number of the first band (None by default)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{band2}} (\sphinxhref{https://docs.python.org/3/library/functions.html\#int}{\sphinxstyleliteralemphasis{\sphinxupquote{int}}}) \textendash{} number of the second band (None by default)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{link}} (\sphinxhref{https://docs.python.org/3/library/stdtypes.html\#list}{\sphinxstyleliteralemphasis{\sphinxupquote{list}}}) \textendash{} link of the operator (None by default)
+
+\end{itemize}
+
+\item[{Keyword Arguments}] \leavevmode\begin{itemize}
 \item {} 
 \sphinxAtStartPar
 amplitude (\sphinxstyleemphasis{float}): amplitude multiplier
 
 \item {} 
 \sphinxAtStartPar
-band1 (\sphinxstyleemphasis{int}): Band label of first index (1 by default)
-
-\item {} 
-\sphinxAtStartPar
-band2 (\sphinxstyleemphasis{int}): Band label of second index (1 by default)
-
-\item {} 
-\sphinxAtStartPar
 type (\sphinxstyleemphasis{str}): one of ‘Hubbard’, ‘Heisenberg’, ‘Hund’, ‘X’, ‘Y’, ‘Z’
 
 \end{itemize}
-\begin{quote}\begin{description}
-\item[{return}] \leavevmode
+
+\item[{Returns}] \leavevmode
 \sphinxAtStartPar
 None
-
-\end{description}\end{quote}
 
 \end{description}\end{quote}
 
@@ -2491,17 +2488,24 @@ Prints the parameters nicely on the screen
 \index{print\_wavefunction() (in module pyqcm)@\spxentry{print\_wavefunction()}\spxextra{in module pyqcm}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{functions:pyqcm.print_wavefunction}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.}}\sphinxbfcode{\sphinxupquote{print\_wavefunction}}}{\emph{\DUrole{n}{label}\DUrole{o}{=}\DUrole{default_value}{0}}}{}
+\phantomsection\label{\detokenize{functions:pyqcm.print_wavefunction}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.}}\sphinxbfcode{\sphinxupquote{print\_wavefunction}}}{\emph{\DUrole{n}{label}\DUrole{o}{=}\DUrole{default_value}{0}}, \emph{\DUrole{n}{pr}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
 \sphinxAtStartPar
 prints the ground state wavefunction(s) on the screen
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
 \sphinxAtStartPar
 \sphinxstyleliteralstrong{\sphinxupquote{label}} (\sphinxhref{https://docs.python.org/3/library/functions.html\#int}{\sphinxstyleliteralemphasis{\sphinxupquote{int}}}) \textendash{} label of the model instance
 
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{pr}} (\sphinxhref{https://docs.python.org/3/library/functions.html\#bool}{\sphinxstyleliteralemphasis{\sphinxupquote{bool}}}) \textendash{} prints wavefucntion to screen if pr=True
+
+\end{itemize}
+
 \item[{Returns}] \leavevmode
 \sphinxAtStartPar
-None
+the wavefunction
 
 \end{description}\end{quote}
 
@@ -4011,7 +4015,7 @@ None
 \index{spin\_mdc() (in module pyqcm.spectral)@\spxentry{spin\_mdc()}\spxextra{in module pyqcm.spectral}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{spectral:pyqcm.spectral.spin_mdc}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.spectral.}}\sphinxbfcode{\sphinxupquote{spin\_mdc}}}{\emph{\DUrole{n}{nk}\DUrole{o}{=}\DUrole{default_value}{200}}, \emph{\DUrole{n}{eta}\DUrole{o}{=}\DUrole{default_value}{0.1}}, \emph{\DUrole{n}{label}\DUrole{o}{=}\DUrole{default_value}{0}}, \emph{\DUrole{n}{band}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{quadrant}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{opt}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}plain\textquotesingle{}}}, \emph{\DUrole{n}{freq}\DUrole{o}{=}\DUrole{default_value}{0.0}}, \emph{\DUrole{n}{max}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{k\_perp}\DUrole{o}{=}\DUrole{default_value}{0}}, \emph{\DUrole{n}{plane}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}xy\textquotesingle{}}}, \emph{\DUrole{n}{band\_basis}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{file}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{plt\_ax}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
+\phantomsection\label{\detokenize{spectral:pyqcm.spectral.spin_mdc}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyqcm.spectral.}}\sphinxbfcode{\sphinxupquote{spin\_mdc}}}{\emph{\DUrole{n}{nk}\DUrole{o}{=}\DUrole{default_value}{200}}, \emph{\DUrole{n}{eta}\DUrole{o}{=}\DUrole{default_value}{0.1}}, \emph{\DUrole{n}{label}\DUrole{o}{=}\DUrole{default_value}{0}}, \emph{\DUrole{n}{band}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{quadrant}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{opt}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}spin\textquotesingle{}}}, \emph{\DUrole{n}{freq}\DUrole{o}{=}\DUrole{default_value}{0.0}}, \emph{\DUrole{n}{max}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{k\_perp}\DUrole{o}{=}\DUrole{default_value}{0}}, \emph{\DUrole{n}{plane}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}xy\textquotesingle{}}}, \emph{\DUrole{n}{band\_basis}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{file}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{plt\_ax}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
 \sphinxAtStartPar
 Plots the spin spectral weight at zero frequency in the Brillouin zone (2D)
 \begin{quote}\begin{description}

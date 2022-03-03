@@ -202,7 +202,7 @@
   \item \spxentry{set\_parameter()}\spxextra{in module pyqcm}, \hyperpage{33}
   \item \spxentry{set\_parameters()}\spxextra{in module pyqcm}, \hyperpage{33}
   \item \spxentry{set\_params\_from\_file()}\spxextra{in module pyqcm}, \hyperpage{33}
-  \item \spxentry{set\_target\_sectors()}\spxextra{in module pyqcm}, \hyperpage{33}
+  \item \spxentry{set\_target\_sectors()}\spxextra{in module pyqcm}, \hyperpage{34}
   \item \spxentry{site\_and\_bond\_profile()}\spxextra{in module pyqcm}, \hyperpage{34}
   \item \spxentry{slab}\spxextra{class in pyqcm.slab}, \hyperpage{63}
   \item \spxentry{spatial\_dimension()}\spxextra{in module pyqcm}, \hyperpage{34}
@@ -216,7 +216,7 @@
 		\hyperpage{52}
   \item \spxentry{susceptibility()}\spxextra{in module pyqcm}, \hyperpage{34}
   \item \spxentry{susceptibility\_poles()}\spxextra{in module pyqcm}, \hyperpage{34}
-  \item \spxentry{switch\_cluster\_model()}\spxextra{in module pyqcm}, \hyperpage{34}
+  \item \spxentry{switch\_cluster\_model()}\spxextra{in module pyqcm}, \hyperpage{35}
 
   \indexspace
   \bigletter T

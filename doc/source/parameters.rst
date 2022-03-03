@@ -22,6 +22,7 @@ This may be the most important function of the library. It takes a single, long 
     """)
 
 The values of the parameters are set by the equal sign. Dependent parameters are specified by a multiple of another parameter and the multiplication (*) sign. Note that a prefactor is always required, even when it is unity. Thus, you should write ``M_2 = 1*M_1`` and not ``M_2=M_1``.
+Notice that setting a parameter to ``0`` causes qcm to *not create the operator* in the model.
 
 
 Hilbert space sectors
