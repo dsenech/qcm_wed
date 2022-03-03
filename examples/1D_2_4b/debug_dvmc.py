@@ -8,6 +8,7 @@ np.set_printoptions(precision=4, linewidth=512, suppress=True)
 sec = 'R0:N6:S0'
 set_global_parameter('verbose',0)
 set_target_sectors([sec])
+
 set_parameters("""
     U=4
     mu=1

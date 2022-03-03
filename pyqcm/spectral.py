@@ -66,7 +66,7 @@ def __kgrid(ax, nk, quadrant=False, k_perp=0.0, plane='xy', size=1.0):
 ################################################################################
 def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=None, offset=2, opt='A', Nambu_redress=True, inverse_path=False, title=None, file=None, plt_ax=None, **kwargs):
     """Plots the spectral function :math:`A(\mathbf{k},\omega)` along a wavevector path in the Brillouin zone.
-    This version plots the spin-down part with the correct sign of the frequency in the Nambu formalism
+    This version plots the spin-down part with the correct sign of the frequency in the Nambu formalism.
 
     :param float wmax: the frequency range is from -wmax to wmax if w is a float. Otherwise wmax is a tuple and the range is (wmax[0], wmax[1])
     :param float eta: Lorentzian broadening
@@ -259,15 +259,15 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
 
 
 ################################################################################
-def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, self=False, spin_down=False, blocks=False, file=None, plt_ax=None, **kwargs):
+def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, opt=None, spin_down=False, blocks=False, file=None, plt_ax=None, realpart=False, **kwargs):
     """Plots the spectral function of the cluster in the site basis
     
     :param float  wmax: the frequency range is from -wmax to wmax
     :param float eta: Lorentzian broadening
     :param int clus: label of the cluster within the super unit cell (starts at 0)
-    :param int label: label of the instance of the model
+    :param int label: label of the model instance
     :param float offset: vertical offset in the plot between the curves associated to successive wavevectors
-    :param boolean full: if True, plots off diagonal components as well
+    :param boolean full: if True, plots off-diagonal components as well
     :param boolean self: if True, plots the self-energy instead of the spectral function
     :param boolean spin_down: if True, plots the spin down part, if different
     :param boolean blocks: if True, gives the GF in the symmetry basis (block diagonal)
@@ -300,10 +300,14 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
 
     A = np.zeros((len(w), dd))
     for i in range(len(w)):
-        if self:
-            g = pyqcm.cluster_self_energy(clus, w[i], spin_down, label)
+        if opt is None:
+            g = pyqcm.cluster_Green_function(clus, w[i], spin_down, label, blocks) # run of the mill cluster green function
+        elif opt == "self":
+            g = pyqcm.cluster_self_energy(clus, w[i], spin_down, label) # self-energy functionnal
+        elif opt == "hyb":
+            g = pyqcm.hybridization_function(clus, w[i], realpart, label) # hybridization function
         else:
-            g = pyqcm.cluster_Green_function(clus, w[i], spin_down, label, blocks)
+            raise ValueError(f"'{opt}' is not a valid option, must be one of 'self', 'hyb' or None.")
         if full:
             l = 0
             for j in range(d):
@@ -334,7 +338,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
 
 ################################################################################
 def spectral_function_Lehmann(path='triangle', nk=32, label=0, band=1, offset=0.1, lims=None, file=None, plt_ax=None, **kwargs):
-    """Plots a Lehmann representation of the spectral function along a wavevector path in the Brillouin zone
+    """Plots a Lehmann representation of the spectral function along a wavevector path in the Brillouin zone. Singularities are plotted as impulses with heights proportionnal to the residue.
     
     :param path: if a string, keyword passed to `pyqcm.wavevector_path()` to produce a set of wavevectors; else, explicit list of wavevectors (N x 3 numpy array).
     :param int nk: the number of wavevectors along each segment of the path (passed to pyqcm.wavevector_path())
@@ -607,7 +611,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
 
 
 ################################################################################
-def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', freq = 0.0, max=None, k_perp = 0, plane = 'xy', band_basis=False, file=None, plt_ax=None, **kwargs):
+def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='spin', freq = 0.0, max=None, k_perp = 0, plane = 'xy', band_basis=False, file=None, plt_ax=None, **kwargs):
     """Plots the spin spectral weight at zero frequency in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
@@ -638,8 +642,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
 
     mix = pyqcm.mixing()
     if mix != 2 and mix != 3:
-        print('spin_mdc() makes sense only if spin-flip terms are present')
-        exit()
+        raise RuntimeError('spin_mdc() makes sense only if spin-flip terms are present')
     
     k, x = __kgrid(ax, nk, quadrant=quadrant, k_perp=k_perp, plane=plane)
 
@@ -653,7 +656,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
         A = S[:,3]
     elif opt=='spinp':
         A = np.sqrt(S[:,1]*S[:,1] + S[:,2]*S[:,2])
-    elif opt in 'spins':
+    elif opt == 'spins':
         Sx = S[:,1]
         Sy = S[:,2]
         if opt == 'spins':
@@ -690,7 +693,7 @@ def spin_mdc(nk=200, eta=0.1, label=0, band=None, quadrant=False, opt='plain', f
         title = r"$Z(k,0)$ : "+title
 
 #------------------------------------------------------------------
-    if opt in 'spins':
+    if opt == 'spins':
         X, Y = np.meshgrid(x, x)
         CS = ax.quiver(X, Y, Sx, Sy, pivot='mid', angles='xy', scale_units='xy', scale=10, width=0.003, headlength = 4.5, **kwargs)
     elif opt == 'sz':
@@ -807,7 +810,7 @@ def mdc_anomalous(nk=200, w=0.1j, label=0, bands=(1,1), self=False, im_part=Fals
         plt.show()
 
 ################################################################################
-def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, **kwargs):
+def plot_dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafile=None, quadrant=False, k_perp = 0, plane = 'xy', file=None, plt_ax=None, view_angle=None, **kwargs):
     """Plots the dispersion relation in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
@@ -821,7 +824,8 @@ def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafi
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
-    :param kwargs: keyword arguments passed to the matplotlib 'plot' function
+    :param tuple view_angle: optional projection angle to pass to view_init() in the format of (elevation, azimuth) in degrees
+    :param kwargs: keyword arguments passed to the matplotlib 'plot_surface' function
     :returns: None
 
     """
@@ -837,6 +841,9 @@ def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafi
     else:
         ax = plt_ax
     
+    if view_angle is not None:
+        ax.view_init(*view_angle) # adjusts viewing angle if specified
+
     k, x = __kgrid(ax, nk, quadrant=quadrant, k_perp=k_perp, plane=plane)
 
     d, nbands = pyqcm.reduced_Green_function_dimension()
@@ -861,9 +868,9 @@ def dispersion(nk=64, label=0, spin_down=False, band=None, contour=False, datafi
         x, y = np.meshgrid(x, x)
         if band is None:
             for j in range(d):
-                ax.plot_surface(x, y, e[:, :, j], rstride=1,cstride=1, linewidth=0.2, antialiased=False)
+                ax.plot_surface(x, y, e[:, :, j], rstride=1,cstride=1, linewidth=0.2, antialiased=False, **kwargs)
         else:
-            ax.plot_surface(x, y, e[:, :, band-1], rstride=1,cstride=1, linewidth=0.2, antialiased=False)
+            ax.plot_surface(x, y, e[:, :, band-1], rstride=1,cstride=1, linewidth=0.2, antialiased=False, **kwargs)
             
     if plt_ax is None:
         axis = set_legend_mdc(plane, k_perp)
@@ -933,7 +940,7 @@ def Fermi_surface(nk=64, label=0, band=None, quadrant=False, plane='xy', k_perp=
     :param int band: if None, plots all the bands. Otherwise just plots the FS for that band (starts at 1)
     :param boolean quadrant: if True, plots the first quadrant of a square Brillouin zone only
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
-    :param float k_perp: momentum component in the third direction (in multiple of pi)
+    :param float k_perp: momentum component in the third direction (in multiple of :math:`\pi`)
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
     :param kwargs: keyword arguments passed to the matplotlib 'plot' function
@@ -986,7 +993,7 @@ def G_dispersion(nk=64, label=0, band=None, period = 'G', contour=False, inv=Fal
     :param boolean quadrant: if True, plots the first quadrant of a square Brillouin zone only
     :param str datafile: if different from None, just writes the data in a file and does not plot
     :param float max: energy range (from -max to max) 
-    :param float k_perp: momentum component in the third direction (in multiple of pi)
+    :param float k_perp: momentum component in the third direction (in multiple of :math:`pi`)
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set

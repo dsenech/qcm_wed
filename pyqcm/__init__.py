@@ -2,6 +2,7 @@ import numpy as np
 import re
 import time
 from . import qcm
+from warnings import warn
 
 parameter_set_str = ''
 first_time = True
@@ -142,8 +143,7 @@ def new_cluster_operator(name, op_name, op_type, elem):
     if op_type == 'anomalous':
         for x in elem:  
             if x[0] >= x[1] :
-                print('anomalous matrix elements of ',op_name, ' must be such that row index < column index')
-                exit()
+                raise ValueError(f'anomalous matrix elements of {op_name} must be such that row index < column index')
 
     qcm.new_operator(name, op_name, op_type, elem)
 
@@ -189,7 +189,7 @@ def susceptibility(op_name, freqs, label=0):
 
         :param str op_name: name of the operator
         :param [complex] freqs: array of complex frequencies
-        :para int label: label of cluster model instance
+        :param int label: label of cluster model instance
         :return: array of complex susceptibilities
 
     """
@@ -374,7 +374,7 @@ def CPT_Green_function(z, k, spin_down=False, label=0):
     computes the CPT Green function at a given frequency
 
     :param z: complex frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices
@@ -387,11 +387,14 @@ def CPT_Green_function_inverse(z, k, spin_down=False, label=0):
     computes the inverse CPT Green function at a given frequency
 
     :param z: complex frequency
-    :param k: array of wavevectors (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices
     """
+    if np.shape(k) == (3,):
+        k = np.array([k]) # this protects the case where k is an ndarray(3)
+
     return qcm.CPT_Green_function_inverse(z, k, spin_down, label)
 
 
@@ -400,7 +403,7 @@ def dispersion(k, spin_down=False, label=0):
     """
     computes the dispersion relation for a single or an array of wavevectors
 
-    :param wavevector k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param wavevector k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (ndarray(d)) or an array (ndarray(N,d)) of real values (energies). d is the reduced GF dimension.
@@ -453,12 +456,18 @@ def Green_function_solve(label=0):
     return qcm.Green_function_solve(label)
 
 ################################################################################
-def ground_state():
+def ground_state(file=None):
     """
     :return: a list of pairs (float, str) of the ground state energy and sector string, for each cluster of the system
 
     """
-    return qcm.ground_state()
+
+    GS = qcm.ground_state()
+
+    if file is not None:
+        write_summary(file, first=True) 
+
+    return GS
 
 ################################################################################
 def cluster_averages(label=0):
@@ -476,7 +485,7 @@ def Lehmann_Green_function(k, band = 1, spin_down=False, label=0):
     """
     computes the Lehmann representation of the periodized Green function for a set of wavevectors
 
-    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param int band: band index (starts at 1)
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
@@ -564,7 +573,7 @@ def momentum_profile(name, k, label=0):
     computes the momentum-resolved average of an operator
 
     :param str name: name of the lattice operator
-    :param k: array of wavevectors (ndarray(N,	:param)
+    :param k: array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param int label:  label of the model instance
     :return: an array of values
 
@@ -657,7 +666,7 @@ def set_parameters(params, dump=True):
     global parameter_set_str
     if set_parameters.called:
         print('WARNING : The function set_parameters() can only be called once')
-        return
+        return None
 
     set_parameters.called = True
 
@@ -686,9 +695,11 @@ def set_parameters(params, dump=True):
         if dump:
             parameter_set_str = 'set_parameters("""\n'+str(params)+'""")\n'
         qcm.set_parameters(elems)
+        new_model_instance() # Prevents user error by instantiating model
         return elems
     else:	
         qcm.set_parameters(params)
+        new_model_instance() # Prevents user error by instantiating model
         return params
 
 set_parameters.called = False        
@@ -704,7 +715,7 @@ def set_target_sectors(sec):
     """
     if set_target_sectors.called:
         print('WARNING : set_target_sectors() can only be called once.')
-        return
+        return # prevents a deep c++ error from calling twice
     set_target_sectors.called = True    
     global the_model
     the_model.record += """
@@ -719,6 +730,74 @@ except:
 
 set_target_sectors.called = False
 
+################################################################################
+# def __sector_string_builder(R, N, S):
+#     """Takes non-None values of R, N and S and inserts them in the correct string format for set_target_sectors()
+    
+#     :param int R: Symmetry sector
+#     :param int N: Particle number sector
+#     :param int S: Spin sector
+
+#     :return string: A string formatted for use with set_target_sectors
+
+#     """
+#     R_string = ""
+#     N_string = ""
+#     S_string = ""
+
+#     if R is not None:
+#         R_string = f"R{R}"
+#     if N is not None:
+#         R_string = f"R{N}"
+#     if S is not None:
+#         R_string = f"R{S}"
+
+#     return f"{R_string}:{N_string}:{S_string}"
+
+
+# def __convert_to_None(R, N, S):
+#     len_list = []
+
+#     for var in [("R", R), ("N", N), ("S", S)]:
+#         try:
+#             exec(f"len_{var[0]} = len({var[1]})")
+#         except:
+#             exec(exec(f"len_{var[0]} = 0"))
+        
+#         exec(f"len_list.append(len_{var[0]})")
+
+#     max_length = max(len_list)
+
+#     for var in [R, N, S]:
+#         if var is None:
+            
+
+# def sectors(R=None, N=None, S=None):
+#     sector_string_list = []
+
+
+
+#     # if len(R) != len(N) or len(N) != len(S):
+#     #     raise ValueError(f"The length of all the lists must the same; here len(R)={len(R)}, len(N)={len(N)} and len(S)={len(S)}")
+    
+#     if type(R) is not list and type(N) is not list and type(S) is not list:
+#         sector_string_list.append(__sector_string_builder(R, N, S)) 
+#     elif type(R) is list or type(N) is list or type(S) is list:
+
+#         if type(R[0]) is int or type(N[0]) is int or type(S[0]) is int:
+#             None ######################### Set different cluster target sectors
+#         elif type(R[0]) is list:
+#             None ############################ Do the other thing 
+#     else:
+#         raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
+
+
+#     for i in range(len(R)):
+#         if type(R[i]) is list:
+#             None
+
+#     set_target_sectors(sector_string_list)            
+    
 ################################################################################
 def parameters(label=0):
     """
@@ -784,7 +863,7 @@ def periodized_Green_function(z, k, spin_down=False, label=0):
     computes the periodized Green function at a given frequency and wavevectors
 
     :param complex z: frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -799,7 +878,7 @@ def band_Green_function(z, k, spin_down=False, label=0):
     in the noninteracting model). It only differs from the periodized Green function in multi-band models.
 
     :param complex z: frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -815,7 +894,7 @@ def periodized_Green_function_element(r, c, z, k, spin_down=False, label=0):
     :param int r: a row index (starts at 0)
     :param int c: a column index (starts at 0)
     :param complex z: frequency
-    :param k: array of wavevectors (ndarray(N,3))
+    :param k: array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a vector of complex numbers
@@ -930,7 +1009,7 @@ def self_energy(z, k, spin_down=False, label=0):
     computes the self-energy associated with the periodized Green function at a given frequency and wavevectors
 
     :param complex z: frequency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance 
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -966,6 +1045,11 @@ def set_parameter(name, value, pr=False):
     """
     if pr:
         print('-----> ', name, ' = ', value)
+    if value == 0:
+        warn(
+            "***WARNING*** : `0` carries a specific meaning for QCM (does not create operator). If a trivial operator value is desired, using a small value such as `1e-9` is preferable."
+        )
+
     qcm.set_parameter(name, value)
 
 ################################################################################
@@ -1013,18 +1097,18 @@ def set_basis(B):
     qcm.set_basis(B)
 
 ################################################################################
-def interaction_operator(name, **kwargs):
+def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
     """
     Defines an interaction operator of type Hubbard, Hund, Heisenberg or X, Y, Z
 
     :param str name: name of the operator
+    :param int band1: number of the first band (None by default)
+    :param int band2: number of the second band (None by default)
+    :param list link: link of the operator (None by default)
 
-   :Keyword Arguments:
+    :Keyword Arguments:
 
-        * link (*[int]*): 3-component integer vector, (0,0,0) by default
         * amplitude (*float*): amplitude multiplier
-        * band1 (*int*): Band label of first index (1 by default)
-        * band2 (*int*): Band label of second index (1 by default)
         * type (*str*): one of 'Hubbard', 'Heisenberg', 'Hund', 'X', 'Y', 'Z'
 
     :return: None
@@ -1032,17 +1116,44 @@ def interaction_operator(name, **kwargs):
     """
 
     global the_model
-    if type(the_model.sites) is list: the_model._finalize()
-    the_model.record += "interaction_operator('"+name+"'"
-    for x in kwargs:
-        if type(kwargs[x]) is str:
-            the_model.record += ', '+x+"='"+kwargs[x]+"'"
-        else:	
-            the_model.record += ', '+x+'='+str(kwargs[x])
-    the_model.record += ')\n'	
+    if type(the_model.sites) is list:
+        the_model._finalize()
 
-    qcm.interaction_operator(name, **kwargs)
+    if band1 is None and band2 is None: # this applies an interaction operator on all bands if none are specified
+        nbands = model_size()[1]
+        bands = [i for i in range(1, 1+nbands)]
+        for band_no in bands:
+            the_model.record += "interaction_operator('"+name+"'"
+            the_model.record += ', band1='+str(band_no)
+            the_model.record += ', band2='+str(band_no)
+            if link is not None:
+                the_model.record += ', link='+str(link)
 
+            for x in kwargs:
+                if type(kwargs[x]) is str:
+                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                else:	
+                    the_model.record += ', '+x+'='+str(kwargs[x])
+            the_model.record += ')\n'	
+
+            qcm.interaction_operator(name, band1=band_no, band2=band_no, link=link, **kwargs)
+    elif band1 is None or band2 is None: # protects against undefined situation (one out of two bands are defined)
+        raise ValueError("Both bands must be given or both bands must be None to define operator across all bands.")
+    else: # does the usual routine if both bands are given
+        the_model.record += "interaction_operator('"+name+"'"
+        the_model.record += ', band1='+str(band1)
+        the_model.record += ', band2='+str(band2)
+        if link is not None:
+            the_model.record += ', link='+str(link)
+
+        for x in kwargs:
+            if type(kwargs[x]) is str:
+                the_model.record += ', '+x+"='"+kwargs[x]+"'"
+            else:	
+                the_model.record += ', '+x+'='+str(kwargs[x])
+        the_model.record += ')\n'	
+
+        qcm.interaction_operator(name, band1=band1, band2=band2, link=link, **kwargs)
 
 ################################################################################
 def hopping_operator(name, link, amplitude, **kwargs):
@@ -1064,6 +1175,15 @@ def hopping_operator(name, link, amplitude, **kwargs):
     """
 
     global the_model
+
+    if link == [0,0,0]:
+        if "tau" in kwargs:
+            if kwargs["tau"] != 0:
+                warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
+                kwargs["tau"] = 0
+        else:
+            kwargs["tau"] = 0
+
     if type(the_model.sites) is list: the_model._finalize()
     the_model.record += "hopping_operator('"+name+"', "+str(link)+', '+str(amplitude)
     for x in kwargs:
@@ -1079,9 +1199,9 @@ def hopping_operator(name, link, amplitude, **kwargs):
 def anomalous_operator(name, link, amplitude, **kwargs):
     """Defines an anomalous operator
 
-      :param str name: name of operator
-      :param [int] link: bond vector (3-component integer array)
-      :param complex amplitude: pairing multiplier
+    :param str name: name of operator
+    :param [int] link: bond vector (3-component integer array)
+    :param complex amplitude: pairing multiplier
 
     :Keyword Arguments:
 
@@ -1110,7 +1230,7 @@ def explicit_operator(name, elem, **kwargs):
     Defines an explicit operator
 
     :param str name: name of operator
-    :param [(int,int,complex)] elem: matrix elements
+    :param [(list, list, complex)] elem: List of tuples. Each tuple contains three elements (in order): a list representing position, a list representing link and a complex amplitude.
 
     :Keyword Arguments:
 
@@ -1122,6 +1242,14 @@ def explicit_operator(name, elem, **kwargs):
 
     """
     global the_model
+
+    # if "tau" in kwargs:
+    #         if kwargs["tau"] != 0:
+    #             warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
+    #             kwargs["tau"] = 0
+    #     else:
+    #         kwargs["tau"] = 0
+
     the_model.record += "explicit_operator('"+name+"', "+str(elem)
     for x in kwargs:
         if type(kwargs[x]) is str:
@@ -1144,7 +1272,7 @@ def density_wave(name, t, Q, **kwargs):
     :Keyword Arguments:
 
         * link (*[int]*) -- bond vector, for bond density waves
-        * amplitude (*complex*) -- amplitude multiplier
+        * amplitude (*complex*) -- amplitude multiplier. **Caution**: A factor of 2 must be used in some situations (see :ref:`density wave theory`)
         * band (*int*) -- Band label (0 by default = all bands)
         * phase (*float*) -- real phase (as a multiple of :math:`pi`)
 
@@ -1185,7 +1313,7 @@ def V_matrix(z, k, spin_down=False, label=0):
     Computes the matrix :math:`V=G_0^{-1}-G^{c-1}_0` at a given frequency and wavevectors, where :math:`G_0` is the noninteracting Green function on the infinite lattice and :math:`G^c_0` is the noninteracting Green function on the cluster.
 
     :param complex z: frequency
-    :param wavevector k: wavevector (ndarray(3))
+    :param wavevector k: wavevector (ndarray(3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single (d,d) or an array (N,d,d) of complex-valued matrices. d is the reduced GF dimension.
@@ -1198,7 +1326,7 @@ def tk(k, spin_down=False, label=0):
     """
     computes the k-dependent one-body matrix of the lattice model
 
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
     :param int label:  label of the model instance
     :return: a single or an array of complex-valued matrices
@@ -1210,7 +1338,7 @@ def QP_weight(k, eta=0.01, band=1, spin_down=False, label=0):
     """
     computes the k-dependent quasi-particle weight from the self-energy derived from the periodized Green function
 
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param float eta: increment in the imaginary axis direction used to computed the derivative of the self-energy
     :param int band: band index (starts at 1)
     :param boolean spin_down: True is the spin down sector is to be computed (applies if mixing = 4)
@@ -1218,6 +1346,10 @@ def QP_weight(k, eta=0.01, band=1, spin_down=False, label=0):
     :return: a single float or an array of floats, depending on the shape of k
 
     """
+
+    if np.shape(k) == (3,):
+        k = np.array([k]) # this protects the case where k is an ndarray(3)
+
     sigma1 = qcm.self_energy(-eta*1j, k, spin_down, label)
     sigma2 = qcm.self_energy(eta*1j, k, spin_down, label)
     if len(sigma1.shape) == 3:
@@ -1253,7 +1385,7 @@ def spin_spectral_function(freq, k, band=1, label=0):
     computes the k-dependent spin-resolved spectral function
 
     :param freq: complex freqency
-    :param k: single wavevector (ndarray(3) or array of wavevectors (ndarray(N,3))
+    :param k: single wavevector (ndarray(3)) or array of wavevectors (ndarray(N,3)) in units of :math:`\pi`
     :param int band: band index (starts at 1)
     :param int label:  label of the model instance
     :return: depending on the shape of k, a nd.array(3) of nd.array(N,3)
@@ -1262,8 +1394,7 @@ def spin_spectral_function(freq, k, band=1, label=0):
     mix = mixing()
     ds, nbands = reduced_Green_function_dimension()
     if mix != 2 and mix != 3:
-        print('The function "spin_spectral_function()" makes sense only if spin-flip terms are present')
-        exit()
+        raise RuntimeError('The function "spin_spectral_function()" makes sense only if spin-flip terms are present')
     if mix == 2:
         ds //= 2
     elif mix == 3:
@@ -1323,15 +1454,21 @@ def update_bath(label=0):
     qcm.update_bath(label)
 
 ################################################################################
-def print_wavefunction(label=0):
-    """
-    prints the ground state wavefunction(s) on the screen
+def print_wavefunction(label=0, pr=True):
+    """prints the ground state wavefunction(s) on the screen
 
-    :param int label:  label of the model instance
-    :return: None
+    :param int label: label of the model instance
+    :param bool pr: prints wavefucntion to screen if pr=True
+
+    :return: the wavefunction
 
     """
-    return qcm.print_wavefunction(label)
+    wavefunction = qcm.print_wavefunction(label)
+
+    if pr:
+        print(wavefunction)
+
+    return wavefunction
 
 ################################################################################
 def matrix_elements(model, op):
@@ -1610,7 +1747,7 @@ def wavevector_path(n=32, shape='triangle'):
         ticks = np.array([0, n, 2 * n, 3 * n, 4 * n, 5 * n, 6 * n + 1])
         tick_labels = [r'$(0,0,0)$', r'$(0,\pi,0)$', r'$(\pi,\pi,0)$', r'$(0,0,0)$', r'$(\pi,\pi,\pi)$' , r'$(0,\pi,0)$', r'$(0,0,0)$']
     else:
-        print('-------> shape ', shape, ' unknown')
+        print(f'-------> shape {shape} unknown')
     return 0.5 * k, ticks, tick_labels
 
 
@@ -1628,8 +1765,7 @@ def wavevector_grid(n=100, orig=[-1.0, -1.0], side=2, k_perp = 0, plane='z'):
     
     """
     if spatial_dimension() < 2:
-        print('"calling wavevector_grid()" makes no sense for a spatial dimension < 2 "')
-        exit()
+        raise RuntimeError('calling "wavevector_grid()" makes no sense for a spatial dimension < 2')
 
     c = np.array([0,1,2])
     if plane in ['y', 'xz', 'zx']:
@@ -1660,7 +1796,7 @@ def read_from_file(out_file, n=0):
 
     :param str out_file: name of output file from which parameters are read
     :param int n: line number of data in output file (excluding titles)
-    :return: string to be added to an enventual input file
+    :return: string to be added to an eventual input file
 
     """
 
@@ -1796,8 +1932,7 @@ def read_from_file_legacy(filename):
     try:
         i1 = F.find('parameters')
     except:
-        print('"parameters" not found in "'+filename+' exiting')
-        exit()
+        raise RuntimeError(f'"parameters" not found in {filename}; exiting')
 
     data = F[i1:].splitlines()
     data = data[1:]
@@ -1820,8 +1955,7 @@ def read_from_file_legacy(filename):
     try:
         i1 = F.find('target_sectors')
     except:
-        print('"target_sectors" not found in "'+filename+' exiting')
-        exit()
+        raise RuntimeError('"target_sectors" not found in {filename}; exiting')
 
     i2 = F[i1:].find('\n\n')	
     data = F[i1:i2].splitlines()

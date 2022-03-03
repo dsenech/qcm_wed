@@ -45,6 +45,8 @@ Anomalous operators
 
 where again the indices :math:`\alpha` and :math:`\beta` are composite indices. The pairing amplitude :math:`\Delta^{(a)}_{\alpha\beta}` is antisymmetric.
 
+.. _density wave theory:
+
 Density waves
 -------------
 

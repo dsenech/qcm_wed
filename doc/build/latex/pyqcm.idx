@@ -1,0 +1,170 @@
+\indexentry{module@\spxentry{module}!pyqcm@\spxentry{pyqcm}|hyperpage}{21}
+\indexentry{pyqcm@\spxentry{pyqcm}!module@\spxentry{module}|hyperpage}{21}
+\indexentry{CPT\_Green\_function() (in module pyqcm)@\spxentry{CPT\_Green\_function()}\spxextra{in module pyqcm}|hyperpage}{21}
+\indexentry{CPT\_Green\_function\_inverse() (in module pyqcm)@\spxentry{CPT\_Green\_function\_inverse()}\spxextra{in module pyqcm}|hyperpage}{21}
+\indexentry{Green\_function\_dimension() (in module pyqcm)@\spxentry{Green\_function\_dimension()}\spxextra{in module pyqcm}|hyperpage}{21}
+\indexentry{Green\_function\_solve() (in module pyqcm)@\spxentry{Green\_function\_solve()}\spxextra{in module pyqcm}|hyperpage}{21}
+\indexentry{Lehmann\_Green\_function() (in module pyqcm)@\spxentry{Lehmann\_Green\_function()}\spxextra{in module pyqcm}|hyperpage}{21}
+\indexentry{MinimizationError@\spxentry{MinimizationError}|hyperpage}{22}
+\indexentry{MissingArgError@\spxentry{MissingArgError}|hyperpage}{22}
+\indexentry{OutOfBoundsError@\spxentry{OutOfBoundsError}|hyperpage}{22}
+\indexentry{ParseError@\spxentry{ParseError}|hyperpage}{22}
+\indexentry{Potthoff\_functional() (in module pyqcm)@\spxentry{Potthoff\_functional()}\spxextra{in module pyqcm}|hyperpage}{22}
+\indexentry{QP\_weight() (in module pyqcm)@\spxentry{QP\_weight()}\spxextra{in module pyqcm}|hyperpage}{22}
+\indexentry{TooManyIterationsError@\spxentry{TooManyIterationsError}|hyperpage}{22}
+\indexentry{V\_matrix() (in module pyqcm)@\spxentry{V\_matrix()}\spxextra{in module pyqcm}|hyperpage}{22}
+\indexentry{VarParamMismatchError@\spxentry{VarParamMismatchError}|hyperpage}{22}
+\indexentry{WrongArgumentError@\spxentry{WrongArgumentError}|hyperpage}{22}
+\indexentry{add\_cluster() (in module pyqcm)@\spxentry{add\_cluster()}\spxextra{in module pyqcm}|hyperpage}{23}
+\indexentry{anomalous\_operator() (in module pyqcm)@\spxentry{anomalous\_operator()}\spxextra{in module pyqcm}|hyperpage}{23}
+\indexentry{averages() (in module pyqcm)@\spxentry{averages()}\spxextra{in module pyqcm}|hyperpage}{23}
+\indexentry{band\_Green\_function() (in module pyqcm)@\spxentry{band\_Green\_function()}\spxextra{in module pyqcm}|hyperpage}{23}
+\indexentry{cluster\_Green\_function() (in module pyqcm)@\spxentry{cluster\_Green\_function()}\spxextra{in module pyqcm}|hyperpage}{23}
+\indexentry{cluster\_Green\_function\_average() (in module pyqcm)@\spxentry{cluster\_Green\_function\_average()}\spxextra{in module pyqcm}|hyperpage}{24}
+\indexentry{cluster\_Green\_function\_dimension() (in module pyqcm)@\spxentry{cluster\_Green\_function\_dimension()}\spxextra{in module pyqcm}|hyperpage}{24}
+\indexentry{cluster\_QP\_weight() (in module pyqcm)@\spxentry{cluster\_QP\_weight()}\spxextra{in module pyqcm}|hyperpage}{24}
+\indexentry{cluster\_averages() (in module pyqcm)@\spxentry{cluster\_averages()}\spxextra{in module pyqcm}|hyperpage}{24}
+\indexentry{cluster\_hopping\_matrix() (in module pyqcm)@\spxentry{cluster\_hopping\_matrix()}\spxextra{in module pyqcm}|hyperpage}{24}
+\indexentry{cluster\_info() (in module pyqcm)@\spxentry{cluster\_info()}\spxextra{in module pyqcm}|hyperpage}{25}
+\indexentry{cluster\_parameters() (in module pyqcm)@\spxentry{cluster\_parameters()}\spxextra{in module pyqcm}|hyperpage}{25}
+\indexentry{cluster\_self\_energy() (in module pyqcm)@\spxentry{cluster\_self\_energy()}\spxextra{in module pyqcm}|hyperpage}{25}
+\indexentry{density\_wave() (in module pyqcm)@\spxentry{density\_wave()}\spxextra{in module pyqcm}|hyperpage}{25}
+\indexentry{dispersion() (in module pyqcm)@\spxentry{dispersion()}\spxextra{in module pyqcm}|hyperpage}{25}
+\indexentry{dos() (in module pyqcm)@\spxentry{dos()}\spxextra{in module pyqcm}|hyperpage}{26}
+\indexentry{epsilon() (in module pyqcm)@\spxentry{epsilon()}\spxextra{in module pyqcm}|hyperpage}{26}
+\indexentry{explicit\_operator() (in module pyqcm)@\spxentry{explicit\_operator()}\spxextra{in module pyqcm}|hyperpage}{26}
+\indexentry{ground\_state() (in module pyqcm)@\spxentry{ground\_state()}\spxextra{in module pyqcm}|hyperpage}{26}
+\indexentry{hopping\_operator() (in module pyqcm)@\spxentry{hopping\_operator()}\spxextra{in module pyqcm}|hyperpage}{26}
+\indexentry{hybridization\_Lehmann() (in module pyqcm)@\spxentry{hybridization\_Lehmann()}\spxextra{in module pyqcm}|hyperpage}{27}
+\indexentry{hybridization\_function() (in module pyqcm)@\spxentry{hybridization\_function()}\spxextra{in module pyqcm}|hyperpage}{27}
+\indexentry{interaction\_operator() (in module pyqcm)@\spxentry{interaction\_operator()}\spxextra{in module pyqcm}|hyperpage}{27}
+\indexentry{interactions() (in module pyqcm)@\spxentry{interactions()}\spxextra{in module pyqcm}|hyperpage}{27}
+\indexentry{lattice\_model() (in module pyqcm)@\spxentry{lattice\_model()}\spxextra{in module pyqcm}|hyperpage}{27}
+\indexentry{matrix\_elements() (in module pyqcm)@\spxentry{matrix\_elements()}\spxextra{in module pyqcm}|hyperpage}{28}
+\indexentry{mixing() (in module pyqcm)@\spxentry{mixing()}\spxextra{in module pyqcm}|hyperpage}{28}
+\indexentry{model\_is\_closed() (in module pyqcm)@\spxentry{model\_is\_closed()}\spxextra{in module pyqcm}|hyperpage}{28}
+\indexentry{model\_size() (in module pyqcm)@\spxentry{model\_size()}\spxextra{in module pyqcm}|hyperpage}{28}
+\indexentry{momentum\_profile() (in module pyqcm)@\spxentry{momentum\_profile()}\spxextra{in module pyqcm}|hyperpage}{28}
+\indexentry{new\_cluster\_model() (in module pyqcm)@\spxentry{new\_cluster\_model()}\spxextra{in module pyqcm}|hyperpage}{29}
+\indexentry{new\_cluster\_model\_instance() (in module pyqcm)@\spxentry{new\_cluster\_model\_instance()}\spxextra{in module pyqcm}|hyperpage}{29}
+\indexentry{new\_cluster\_operator() (in module pyqcm)@\spxentry{new\_cluster\_operator()}\spxextra{in module pyqcm}|hyperpage}{29}
+\indexentry{new\_cluster\_operator\_complex() (in module pyqcm)@\spxentry{new\_cluster\_operator\_complex()}\spxextra{in module pyqcm}|hyperpage}{29}
+\indexentry{new\_model\_instance() (in module pyqcm)@\spxentry{new\_model\_instance()}\spxextra{in module pyqcm}|hyperpage}{29}
+\indexentry{parameter\_set() (in module pyqcm)@\spxentry{parameter\_set()}\spxextra{in module pyqcm}|hyperpage}{30}
+\indexentry{parameter\_string() (in module pyqcm)@\spxentry{parameter\_string()}\spxextra{in module pyqcm}|hyperpage}{30}
+\indexentry{parameters() (in module pyqcm)@\spxentry{parameters()}\spxextra{in module pyqcm}|hyperpage}{30}
+\indexentry{params\_from\_file() (in module pyqcm)@\spxentry{params\_from\_file()}\spxextra{in module pyqcm}|hyperpage}{30}
+\indexentry{periodized\_Green\_function() (in module pyqcm)@\spxentry{periodized\_Green\_function()}\spxextra{in module pyqcm}|hyperpage}{30}
+\indexentry{periodized\_Green\_function\_element() (in module pyqcm)@\spxentry{periodized\_Green\_function\_element()}\spxextra{in module pyqcm}|hyperpage}{30}
+\indexentry{print\_averages() (in module pyqcm)@\spxentry{print\_averages()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{print\_cluster\_averages() (in module pyqcm)@\spxentry{print\_cluster\_averages()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{print\_graph() (in module pyqcm)@\spxentry{print\_graph()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{print\_model() (in module pyqcm)@\spxentry{print\_model()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{print\_options() (in module pyqcm)@\spxentry{print\_options()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{print\_parameters() (in module pyqcm)@\spxentry{print\_parameters()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{print\_wavefunction() (in module pyqcm)@\spxentry{print\_wavefunction()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{projected\_Green\_function() (in module pyqcm)@\spxentry{projected\_Green\_function()}\spxextra{in module pyqcm}|hyperpage}{31}
+\indexentry{properties() (in module pyqcm)@\spxentry{properties()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{qmatrix() (in module pyqcm)@\spxentry{qmatrix()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{read\_cluster\_model\_instance() (in module pyqcm)@\spxentry{read\_cluster\_model\_instance()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{read\_from\_file() (in module pyqcm)@\spxentry{read\_from\_file()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{read\_from\_file\_legacy() (in module pyqcm)@\spxentry{read\_from\_file\_legacy()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{read\_model() (in module pyqcm)@\spxentry{read\_model()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{reduced\_Green\_function\_dimension() (in module pyqcm)@\spxentry{reduced\_Green\_function\_dimension()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{self\_energy() (in module pyqcm)@\spxentry{self\_energy()}\spxextra{in module pyqcm}|hyperpage}{32}
+\indexentry{set\_basis() (in module pyqcm)@\spxentry{set\_basis()}\spxextra{in module pyqcm}|hyperpage}{33}
+\indexentry{set\_global\_parameter() (in module pyqcm)@\spxentry{set\_global\_parameter()}\spxextra{in module pyqcm}|hyperpage}{33}
+\indexentry{set\_parameter() (in module pyqcm)@\spxentry{set\_parameter()}\spxextra{in module pyqcm}|hyperpage}{33}
+\indexentry{set\_parameters() (in module pyqcm)@\spxentry{set\_parameters()}\spxextra{in module pyqcm}|hyperpage}{33}
+\indexentry{set\_params\_from\_file() (in module pyqcm)@\spxentry{set\_params\_from\_file()}\spxextra{in module pyqcm}|hyperpage}{33}
+\indexentry{set\_target\_sectors() (in module pyqcm)@\spxentry{set\_target\_sectors()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{site\_and\_bond\_profile() (in module pyqcm)@\spxentry{site\_and\_bond\_profile()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{spatial\_dimension() (in module pyqcm)@\spxentry{spatial\_dimension()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{spectral\_average() (in module pyqcm)@\spxentry{spectral\_average()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{spin\_spectral\_function() (in module pyqcm)@\spxentry{spin\_spectral\_function()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{susceptibility() (in module pyqcm)@\spxentry{susceptibility()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{susceptibility\_poles() (in module pyqcm)@\spxentry{susceptibility\_poles()}\spxextra{in module pyqcm}|hyperpage}{34}
+\indexentry{switch\_cluster\_model() (in module pyqcm)@\spxentry{switch\_cluster\_model()}\spxextra{in module pyqcm}|hyperpage}{35}
+\indexentry{tk() (in module pyqcm)@\spxentry{tk()}\spxextra{in module pyqcm}|hyperpage}{35}
+\indexentry{update\_bath() (in module pyqcm)@\spxentry{update\_bath()}\spxextra{in module pyqcm}|hyperpage}{35}
+\indexentry{variational\_parameters() (in module pyqcm)@\spxentry{variational\_parameters()}\spxextra{in module pyqcm}|hyperpage}{35}
+\indexentry{wavevector\_grid() (in module pyqcm)@\spxentry{wavevector\_grid()}\spxextra{in module pyqcm}|hyperpage}{35}
+\indexentry{wavevector\_path() (in module pyqcm)@\spxentry{wavevector\_path()}\spxextra{in module pyqcm}|hyperpage}{35}
+\indexentry{write\_cluster\_instance\_to\_file() (in module pyqcm)@\spxentry{write\_cluster\_instance\_to\_file()}\spxextra{in module pyqcm}|hyperpage}{35}
+\indexentry{model (class in pyqcm)@\spxentry{model}\spxextra{class in pyqcm}|hyperpage}{36}
+\indexentry{\_\_init\_\_() (pyqcm.model method)@\spxentry{\_\_init\_\_()}\spxextra{pyqcm.model method}|hyperpage}{36}
+\indexentry{model\_instance (class in pyqcm)@\spxentry{model\_instance}\spxextra{class in pyqcm}|hyperpage}{36}
+\indexentry{\_\_init\_\_() (pyqcm.model\_instance method)@\spxentry{\_\_init\_\_()}\spxextra{pyqcm.model\_instance method}|hyperpage}{36}
+\indexentry{module@\spxentry{module}!pyqcm.spectral@\spxentry{pyqcm.spectral}|hyperpage}{37}
+\indexentry{pyqcm.spectral@\spxentry{pyqcm.spectral}!module@\spxentry{module}|hyperpage}{37}
+\indexentry{DoS() (in module pyqcm.spectral)@\spxentry{DoS()}\spxextra{in module pyqcm.spectral}|hyperpage}{37}
+\indexentry{Fermi\_surface() (in module pyqcm.spectral)@\spxentry{Fermi\_surface()}\spxextra{in module pyqcm.spectral}|hyperpage}{37}
+\indexentry{G\_dispersion() (in module pyqcm.spectral)@\spxentry{G\_dispersion()}\spxextra{in module pyqcm.spectral}|hyperpage}{38}
+\indexentry{Luttinger\_surface() (in module pyqcm.spectral)@\spxentry{Luttinger\_surface()}\spxextra{in module pyqcm.spectral}|hyperpage}{38}
+\indexentry{cluster\_spectral\_function() (in module pyqcm.spectral)@\spxentry{cluster\_spectral\_function()}\spxextra{in module pyqcm.spectral}|hyperpage}{39}
+\indexentry{gap() (in module pyqcm.spectral)@\spxentry{gap()}\spxextra{in module pyqcm.spectral}|hyperpage}{39}
+\indexentry{hybridization\_function() (in module pyqcm.spectral)@\spxentry{hybridization\_function()}\spxextra{in module pyqcm.spectral}|hyperpage}{39}
+\indexentry{mdc() (in module pyqcm.spectral)@\spxentry{mdc()}\spxextra{in module pyqcm.spectral}|hyperpage}{40}
+\indexentry{mdc\_anomalous() (in module pyqcm.spectral)@\spxentry{mdc\_anomalous()}\spxextra{in module pyqcm.spectral}|hyperpage}{40}
+\indexentry{momentum\_profile() (in module pyqcm.spectral)@\spxentry{momentum\_profile()}\spxextra{in module pyqcm.spectral}|hyperpage}{41}
+\indexentry{plot\_dispersion() (in module pyqcm.spectral)@\spxentry{plot\_dispersion()}\spxextra{in module pyqcm.spectral}|hyperpage}{41}
+\indexentry{segment\_dispersion() (in module pyqcm.spectral)@\spxentry{segment\_dispersion()}\spxextra{in module pyqcm.spectral}|hyperpage}{42}
+\indexentry{spectral\_function() (in module pyqcm.spectral)@\spxentry{spectral\_function()}\spxextra{in module pyqcm.spectral}|hyperpage}{42}
+\indexentry{spectral\_function\_Lehmann() (in module pyqcm.spectral)@\spxentry{spectral\_function\_Lehmann()}\spxextra{in module pyqcm.spectral}|hyperpage}{43}
+\indexentry{spin\_mdc() (in module pyqcm.spectral)@\spxentry{spin\_mdc()}\spxextra{in module pyqcm.spectral}|hyperpage}{43}
+\indexentry{module@\spxentry{module}!pyqcm.berry@\spxentry{pyqcm.berry}|hyperpage}{45}
+\indexentry{pyqcm.berry@\spxentry{pyqcm.berry}!module@\spxentry{module}|hyperpage}{45}
+\indexentry{Berry\_curvature() (in module pyqcm.berry)@\spxentry{Berry\_curvature()}\spxextra{in module pyqcm.berry}|hyperpage}{45}
+\indexentry{Berry\_field\_map() (in module pyqcm.berry)@\spxentry{Berry\_field\_map()}\spxextra{in module pyqcm.berry}|hyperpage}{45}
+\indexentry{Berry\_flux() (in module pyqcm.berry)@\spxentry{Berry\_flux()}\spxextra{in module pyqcm.berry}|hyperpage}{46}
+\indexentry{Berry\_flux\_map() (in module pyqcm.berry)@\spxentry{Berry\_flux\_map()}\spxextra{in module pyqcm.berry}|hyperpage}{46}
+\indexentry{Chern\_number() (in module pyqcm.berry)@\spxentry{Chern\_number()}\spxextra{in module pyqcm.berry}|hyperpage}{46}
+\indexentry{monopole() (in module pyqcm.berry)@\spxentry{monopole()}\spxextra{in module pyqcm.berry}|hyperpage}{47}
+\indexentry{monopole\_map() (in module pyqcm.berry)@\spxentry{monopole\_map()}\spxextra{in module pyqcm.berry}|hyperpage}{47}
+\indexentry{module@\spxentry{module}!pyqcm.cdmft@\spxentry{pyqcm.cdmft}|hyperpage}{49}
+\indexentry{pyqcm.cdmft@\spxentry{pyqcm.cdmft}!module@\spxentry{module}|hyperpage}{49}
+\indexentry{cdmft() (in module pyqcm.cdmft)@\spxentry{cdmft()}\spxextra{in module pyqcm.cdmft}|hyperpage}{49}
+\indexentry{cdmft\_distance\_debug() (in module pyqcm.cdmft)@\spxentry{cdmft\_distance\_debug()}\spxextra{in module pyqcm.cdmft}|hyperpage}{50}
+\indexentry{cdmft\_forcing() (in module pyqcm.cdmft)@\spxentry{cdmft\_forcing()}\spxextra{in module pyqcm.cdmft}|hyperpage}{50}
+\indexentry{cdmft\_variational\_sequence() (in module pyqcm.cdmft)@\spxentry{cdmft\_variational\_sequence()}\spxextra{in module pyqcm.cdmft}|hyperpage}{50}
+\indexentry{forcing\_sequence() (in module pyqcm.cdmft)@\spxentry{forcing\_sequence()}\spxextra{in module pyqcm.cdmft}|hyperpage}{51}
+\indexentry{moving\_std() (in module pyqcm.cdmft)@\spxentry{moving\_std()}\spxextra{in module pyqcm.cdmft}|hyperpage}{51}
+\indexentry{general\_bath (class in pyqcm.cdmft)@\spxentry{general\_bath}\spxextra{class in pyqcm.cdmft}|hyperpage}{51}
+\indexentry{\_\_init\_\_() (pyqcm.cdmft.general\_bath method)@\spxentry{\_\_init\_\_()}\spxextra{pyqcm.cdmft.general\_bath method}|hyperpage}{51}
+\indexentry{starting\_values() (pyqcm.cdmft.general\_bath method)@\spxentry{starting\_values()}\spxextra{pyqcm.cdmft.general\_bath method}|hyperpage}{51}
+\indexentry{starting\_values\_PH() (pyqcm.cdmft.general\_bath method)@\spxentry{starting\_values\_PH()}\spxextra{pyqcm.cdmft.general\_bath method}|hyperpage}{52}
+\indexentry{varia() (pyqcm.cdmft.general\_bath method)@\spxentry{varia()}\spxextra{pyqcm.cdmft.general\_bath method}|hyperpage}{52}
+\indexentry{varia\_E() (pyqcm.cdmft.general\_bath method)@\spxentry{varia\_E()}\spxextra{pyqcm.cdmft.general\_bath method}|hyperpage}{52}
+\indexentry{varia\_H() (pyqcm.cdmft.general\_bath method)@\spxentry{varia\_H()}\spxextra{pyqcm.cdmft.general\_bath method}|hyperpage}{52}
+\indexentry{module@\spxentry{module}!pyqcm.vca@\spxentry{pyqcm.vca}|hyperpage}{53}
+\indexentry{pyqcm.vca@\spxentry{pyqcm.vca}!module@\spxentry{module}|hyperpage}{53}
+\indexentry{plot\_GS\_energy() (in module pyqcm.vca)@\spxentry{plot\_GS\_energy()}\spxextra{in module pyqcm.vca}|hyperpage}{53}
+\indexentry{plot\_sef() (in module pyqcm.vca)@\spxentry{plot\_sef()}\spxextra{in module pyqcm.vca}|hyperpage}{53}
+\indexentry{transition\_line() (in module pyqcm.vca)@\spxentry{transition\_line()}\spxextra{in module pyqcm.vca}|hyperpage}{53}
+\indexentry{vca() (in module pyqcm.vca)@\spxentry{vca()}\spxextra{in module pyqcm.vca}|hyperpage}{54}
+\indexentry{vca\_min() (in module pyqcm.vca)@\spxentry{vca\_min()}\spxextra{in module pyqcm.vca}|hyperpage}{54}
+\indexentry{hartree (class in pyqcm.hartree)@\spxentry{hartree}\spxextra{class in pyqcm.hartree}|hyperpage}{58}
+\indexentry{\_\_init\_\_() (pyqcm.hartree.hartree method)@\spxentry{\_\_init\_\_()}\spxextra{pyqcm.hartree.hartree method}|hyperpage}{58}
+\indexentry{converged() (pyqcm.hartree.hartree method)@\spxentry{converged()}\spxextra{pyqcm.hartree.hartree method}|hyperpage}{58}
+\indexentry{omega() (pyqcm.hartree.hartree method)@\spxentry{omega()}\spxextra{pyqcm.hartree.hartree method}|hyperpage}{58}
+\indexentry{omega\_var() (pyqcm.hartree.hartree method)@\spxentry{omega\_var()}\spxextra{pyqcm.hartree.hartree method}|hyperpage}{58}
+\indexentry{update() (pyqcm.hartree.hartree method)@\spxentry{update()}\spxextra{pyqcm.hartree.hartree method}|hyperpage}{58}
+\indexentry{counterterm (class in pyqcm.hartree)@\spxentry{counterterm}\spxextra{class in pyqcm.hartree}|hyperpage}{59}
+\indexentry{\_\_init\_\_() (pyqcm.hartree.counterterm method)@\spxentry{\_\_init\_\_()}\spxextra{pyqcm.hartree.counterterm method}|hyperpage}{59}
+\indexentry{converged() (pyqcm.hartree.counterterm method)@\spxentry{converged()}\spxextra{pyqcm.hartree.counterterm method}|hyperpage}{59}
+\indexentry{update() (pyqcm.hartree.counterterm method)@\spxentry{update()}\spxextra{pyqcm.hartree.counterterm method}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!pyqcm.loop@\spxentry{pyqcm.loop}|hyperpage}{61}
+\indexentry{pyqcm.loop@\spxentry{pyqcm.loop}!module@\spxentry{module}|hyperpage}{61}
+\indexentry{Hartree() (in module pyqcm.loop)@\spxentry{Hartree()}\spxextra{in module pyqcm.loop}|hyperpage}{61}
+\indexentry{controlled\_loop() (in module pyqcm.loop)@\spxentry{controlled\_loop()}\spxextra{in module pyqcm.loop}|hyperpage}{61}
+\indexentry{fade() (in module pyqcm.loop)@\spxentry{fade()}\spxextra{in module pyqcm.loop}|hyperpage}{61}
+\indexentry{fixed\_density\_loop() (in module pyqcm.loop)@\spxentry{fixed\_density\_loop()}\spxextra{in module pyqcm.loop}|hyperpage}{61}
+\indexentry{linear\_loop() (in module pyqcm.loop)@\spxentry{linear\_loop()}\spxextra{in module pyqcm.loop}|hyperpage}{62}
+\indexentry{loop\_from\_file() (in module pyqcm.loop)@\spxentry{loop\_from\_file()}\spxextra{in module pyqcm.loop}|hyperpage}{62}
+\indexentry{module@\spxentry{module}!pyqcm.profile@\spxentry{pyqcm.profile}|hyperpage}{63}
+\indexentry{pyqcm.profile@\spxentry{pyqcm.profile}!module@\spxentry{module}|hyperpage}{63}
+\indexentry{plot\_profile() (in module pyqcm.profile)@\spxentry{plot\_profile()}\spxextra{in module pyqcm.profile}|hyperpage}{63}
+\indexentry{slab (class in pyqcm.slab)@\spxentry{slab}\spxextra{class in pyqcm.slab}|hyperpage}{63}
+\indexentry{\_\_init\_\_() (pyqcm.slab.slab method)@\spxentry{\_\_init\_\_()}\spxextra{pyqcm.slab.slab method}|hyperpage}{63}
+\indexentry{hopping\_operator() (pyqcm.slab.slab method)@\spxentry{hopping\_operator()}\spxextra{pyqcm.slab.slab method}|hyperpage}{64}
+\indexentry{interaction\_operator() (pyqcm.slab.slab method)@\spxentry{interaction\_operator()}\spxextra{pyqcm.slab.slab method}|hyperpage}{64}

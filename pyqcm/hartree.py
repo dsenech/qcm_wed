@@ -184,7 +184,8 @@ class counterterm:
 
         par = pyqcm.parameters()
         if self.fullname not in par:
-            print('Counterterm ', self.fullname, ' is not a parameter in the model!'); exit(1)    
+            raise ValueError(f'Counterterm {self.fullname} is not a parameter in the model!')
+
         self.v = par[self.fullname]
         self.v0 = 1e-9
 
@@ -222,4 +223,4 @@ class counterterm:
 
 
     def print(self):
-        print(__str__(self))
+        print(self.__str__())
