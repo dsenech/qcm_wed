@@ -587,9 +587,9 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
   {
     auto tmp = ED::model_size(name);
     try{
-      if(tmp.first != pos.size()) qcm_throw("The number of sites of cluster "+name+" is inconsistent with the cluster model");
+      if(get<0>(tmp) != pos.size()) qcm_throw("The number of sites of cluster "+name+" is inconsistent with the cluster model");
     } catch(const string& s) {qcm_catch(s);}
-    if(tmp.second > 0) qcm_model->bath_exists = true;
+    if(get<1>(tmp) > 0) qcm_model->bath_exists = true;
     for(size_t i=0; i<pos.size(); i++){
       qcm_model->sites.push_back({qcm_model->clusters.size(), i, 0, pos[i]+cpos});
     }
@@ -597,7 +597,9 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
       ref = qcm_model->clusters.size()+1;
       qcm_model->inequiv.push_back(qcm_model->clusters.size());
     }
-    qcm_model->clusters.push_back({tmp.first, tmp.second, qcm_model->sites.size(), name, cpos, ref-1});
+    qcm_model->clusters.push_back({get<0>(tmp), get<1>(tmp), qcm_model->sites.size(), name, cpos, ref-1, 0, get<2>(tmp)});
+    // n_sites, n_bath, offset, name, position, ref, mixing, n_sym
+
   }
   
   
@@ -725,14 +727,15 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    * returns some information about the clusters in an array of 4-tuples
    * for each cluster of the repeated unit: 1. the name of the cluster model, 2. the number of sites, 3. the number of bath sites, 4. the dimension of the Green function
    */
-  vector<tuple<string, int, int, int>> cluster_info()
+  vector<tuple<string, int, int, int, int>> cluster_info()
   {
-    vector<tuple<string, int, int, int>> info(qcm_model->clusters.size());
+    vector<tuple<string, int, int, int, int>> info(qcm_model->clusters.size());
     for(int i=0; i<info.size(); i++){
       get<0>(info[i]) = qcm_model->clusters[i].name;
       get<1>(info[i]) = (int)qcm_model->clusters[i].n_sites;
       get<2>(info[i]) = (int)qcm_model->clusters[i].n_bath;
       get<3>(info[i]) = (int)qcm_model->clusters[i].n_sites*qcm_model->n_mixed;
+      get<4>(info[i]) = (int)qcm_model->clusters[i].n_sym;
     }
     return info;
   }

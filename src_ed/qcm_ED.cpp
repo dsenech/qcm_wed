@@ -99,10 +99,10 @@ namespace ED{
   
   
   
-  pair<size_t,size_t>  model_size(const string &name)
+  tuple<size_t,size_t,size_t>  model_size(const string &name)
   {
     if(models.find(name) == models.end()) qcm_ED_throw("model "+name+" does not exist!");
-    return {models.at(name)->n_sites, models.at(name)->n_bath};
+    return {models.at(name)->n_sites, models.at(name)->n_bath, models.at(name)->group->e.size()};
   }
   
   
