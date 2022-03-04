@@ -2,9 +2,9 @@
 #define lapack_blas_h
 
 extern "C"{
-#include "f2c.h"
-#include "cblas.h"
-#include "clapack.h"
+#include <f2c.h>
+#include <cblas.h>
+#include <clapack.h>
 }
 
 #endif

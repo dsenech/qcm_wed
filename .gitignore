@@ -8,3 +8,4 @@ _skbuild
 **/__pycache__
 build
 qcm_git_hash.py
+external
