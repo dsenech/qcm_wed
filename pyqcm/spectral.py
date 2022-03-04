@@ -498,7 +498,7 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
 
 
 ################################################################################
-def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, opt='GF', k_perp = 0, freq = 0.0, max=None, plane = 'xy', size=1.0, band_basis=False, file=None, plt_ax=None, **kwargs):
+def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, opt='GF', k_perp = 0, freq = 0.0, max=None, plane = 'xy', size=1.0, band_basis=False, sym=None, file=None, plt_ax=None, **kwargs):
     """Plots the spectral weight at zero frequency in the Brillouin zone (2D)
 
     :param int nk: number of wavevectors on each side of the grid
@@ -513,6 +513,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
     :param float max: maximum value of the plotting range (if None, maximum of the data)
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param band_basis: uses the band basis instead of the orbital basis (for multiband models)
+    :param str sym: symmetrization option for the mdc
     :param float size: size of the plot, in multiple of the default (2 pi on the side)
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
@@ -557,6 +558,16 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
             A = -pyqcm.band_Green_function(freq + eta * 1j, k, spin_down=spin_down, label=label)[:, band-1, band-1].imag
 
     A = np.reshape(A, (nk, nk))
+
+    # acting with symmetries
+    if sym != None:
+        if 'R' in sym:
+            A = 0.5*(A + A.T)
+        if 'X' in sym:
+            A = 0.5*(A + np.flip(A,0))
+        if 'Y' in sym:
+            A = 0.5*(A + np.flip(A,1))
+
     axis = ''
     ax1 = 'x'
     ax2 = 'y'

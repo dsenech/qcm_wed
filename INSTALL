@@ -1,48 +1,86 @@
-This files explains how to compile and install QCM.
+# PyQCM installation
 
-1) The distribution can be obtained from bitbucket:
+## Defaut installation using pip
 
-git clone https://dsenech@bitbucket.org/dsenechQCM/qcm_wed.git 
+This is the easiest installation of PyQCM suitable for all user.
+It build the PyQCM library and download dependencies automatically using default system compiler and library.
 
-2) It is advised to create a python virtual environment and to work within such an environment. To create such an environment called q_env in your root directory, execute
+1. Open a terminal and clone PyQCM Git repository:
 
-python3 -m venv q_env/
+```
+git clone https://bitbucket.org/dsenechQCM/qcm_wed.git
+cd qcm_wed #enter cloned repository
+```
 
-Then to launch this environment, execute
+2. Perform automatic installation with `pip`:
 
-source q_env/bin/activate
-
-If you want this to be activated every time a new terminal is launched, just add the above command at the end of your .bashrc or .zshrc, depending on which shell you use.
-
-Within this environment, you shoud install numpy, scipy, matplotlib, cmake and ninja using pip, e.g.:
-
-pip install numpy
-pip install cmake
-
-etc.
-
-Make sure you have the latest version of pip, by executing
-
-pip install --upgrade pip
-
-
-3) CUBA
-fetch CUBA at http://www.feynarts.de/cuba/ (take the latest version) and decompress locally.
-the run ./configure and then edit the makefile it produces by adding the option -fPIC 
-in two places, i.e. at the end of the lines that start with CFLAGS and LIBS, respectively, like so:
-
-CFLAGS = -O3 -fomit-frame-pointer -ffast-math -Wall -DHAVE_CONFIG_H -DREALSIZE=8 -I$(common) -I. -I$(srcdir) -fPIC
-LIBS = -lm -fPIC -Wl,-z,muldefs
-
-Note that the option "-Wl,-z,muldefs" has to be added too at the link step (LIBS) in order to use the latest versions of some operating systems (e.g. centOS8).
-
-This change is necessary if CUBA is to be loaded as part of a dynamic library.
-Then run 'make lib' and move the resulting static library 'libcuba.a' to $HOME/lib/
-
-Also: define the environment variable
-export CUBACORES=0
-in your shell initialization (e.g. .bash_profile, .bashrc, .zsh_profile, .zshrc, .zprofile, etc.)
-   
-4) Go to the qcm_wed folder and execute
-
+```
 pip install .
+```
+
+## Installation from source
+
+These instructions allow a finely tunned compilation of the qcm library and dependencies for better performance.
+Library and dependencies compilation and installation are no more handled automatically.
+
+1. Clone PyQCM and download CUBA source:
+
+```
+git clone https://bitbucket.org/dsenechQCM/qcm_wed.git
+wget http://www.feynarts.de/cuba/Cuba-4.2.1.tar.gz
+tar -xf Cuba-4.2.1.tar.gz
+```
+
+2. Configure and compile CUBA:
+
+```
+cd Cuba-4.2.1 #enter extraction CUBA directory
+./configure CFLAGS="-O3 -fPIC -ffast-math -fomit-frame-pointer"
+make lib
+cd .. #return common directory
+```
+
+3. Configure and compile QCM library:
+
+```
+cd qcm_wed #enter extraction CUBA directory
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1
+make
+make install
+```
+
+4. Run `setup.py` script to install the python library:
+
+```
+cd .. #exit build and go in source qcm dirs
+python setup.py --skip-cmake install --user
+```
+
+
+## Tips for compilation on Compute Canada server
+
+### Compilation on Intel based cluster with ICC compiler
+
+CUBA configure step (2): 
+
+```
+./configure FC=`which ifort` CC=`which icc` CFLAGS="-O3 -fPIC"
+```
+
+QCM configure step (3) with CMake:
+
+```
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1 -DCMAKE_CXX_COMPILER=`which icc` -DBLA_VENDOR=Intel10_64lp_seq -DCMAKE_INCLUDE_PATH=${MKLLROOT}/lib/intel64_lin/
+```
+
+### Compilation with FlexiBLAS
+
+QCM configure step (3) with CMake 3.21.4: 
+
+```
+module load cmake/3.21.4 flexiblas
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1 -DBLA_VENDOR=FlexiBLAS
+```
+
+
