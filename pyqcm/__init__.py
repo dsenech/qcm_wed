@@ -336,7 +336,7 @@ def cluster_self_energy(cluster, z, spin_down=False, label=0):
 ################################################################################
 def cluster_info():
     """
-    :return:A list of 4-tuples: (str, int, int, int): name of the cluster model, number of physical sites, number of bath sites, dimension of the Green function
+    :return:A list of 4-tuples: (str, int, int, int, int): name of the cluster model, number of physical sites, number of bath sites, dimension of the Green function, number of point-group symmetry operations
     """
     return qcm.cluster_info()
 
@@ -590,6 +590,7 @@ def new_model_instance(label=0, record=False):
         pyqcm.dvmc.dvmc_solver()
 
     if record:
+        cinfo = cluster_info()
         params = parameter_set(True)
         for x in params:
             if params[x][1] is None:
@@ -600,6 +601,8 @@ def new_model_instance(label=0, record=False):
         nclus = len(mod[2])
         the_instance.record += '\nsolution=[None]*'+str(nclus)+'\n'
         for i in range(nclus):
+            if cinfo[i][4] > 1:
+                raise ValueError('symmetries must be off when recording the model instance!')
             if mod[4][i] != i:
                 continue
             clabel = label*nclus+i

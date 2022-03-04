@@ -403,11 +403,11 @@ static PyObject* model_sizeC_python(PyObject *self, PyObject *args)
     if(!PyArg_ParseTuple(args, "s", &S1))
       qcm_ED_throw("failed to read parameters in call to model_size (python)");
   } catch(const string& s) {qcm_ED_catch(s);}
-  pair<int, int> d ;
+  tuple<int, int, int> d ;
   try{
     d = ED::model_size(string(S1));
   } catch(const string& s) {qcm_ED_catch(s);}
-  return Py_BuildValue("ii", d.first, d.second);
+  return Py_BuildValue("ii", get<0>(d), get<1>(d));
 }
 //==============================================================================
 const char* new_model_help =

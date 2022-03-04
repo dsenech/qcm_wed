@@ -29,6 +29,7 @@ struct cluster{
 	vector3D<int64_t> position; //!< base position of cluster
 	int ref; //!< label of reference (or equivalent) cluster, from 0 to N_clus - 1
 	int mixing; //!< mixing state of the cluster
+	size_t n_sym; //!< number of point group symmetry operations in the cluster model
 };
 
 
@@ -110,7 +111,7 @@ void lattice_model::build_cluster_operators(lattice_operator& op)
 
 		// selecting the matrix elements
 		auto data = ED::model_size(clusters[c].name);
-		size_t n_orb = data.first + data.second;
+		size_t n_orb = get<0>(data) + get<1>(data);
 		vector<matrix_element<T>> elem;
 		for(auto& e : op.elements){
 			if(sites[e.site2].cluster == c and sites[e.site1].cluster == c and e.neighbor == 0){
@@ -125,7 +126,7 @@ void lattice_model::build_cluster_operators(lattice_operator& op)
 			}
 		}
 		
-		if(elem.size() == 0){
+		if(elem.size() == 0 and global_bool("verb_warning")){
 			cout << "WARNING : operator " << op.name << " has no element in cluster " << c+1 << endl;
 			continue;
 		}
@@ -174,7 +175,7 @@ void lattice_model::build_cluster_operators(lattice_operator& op)
 	if(!op.is_density_wave) return;
 	for(int c=0; c<clusters.size(); c++){
 		auto data = ED::model_size(clusters[c].name);
-		size_t n_orb = data.first + data.second;
+		size_t n_orb = get<0>(data) + get<1>(data);
 		int cref = clusters[c].ref;
 		if(c == cref) continue;
 		vector<matrix_element<T>> elem_ref;

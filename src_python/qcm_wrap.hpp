@@ -308,19 +308,20 @@ R"(
 arguments:
 None
 returns:
-  A list of 3-tuples : (str, int, int) : name of the cluster model, number of sites, dimension of the Green function
+  A list of 5-tuples : (str, int, int) : name of the cluster model, number of sites, number of bath sites, dimension of the Green function, number of symmetry  operations
 )";
 //------------------------------------------------------------------------------
 static PyObject* cluster_info_python(PyObject *self, PyObject *args)
 {
-  vector<tuple<string, int, int, int>> info = QCM::cluster_info();
+  vector<tuple<string, int, int, int, int>> info = QCM::cluster_info();
   PyObject *lst = PyList_New(info.size());
   for(size_t i=0; i< info.size(); i++){
-    PyObject* elem = PyTuple_New(4);
+    PyObject* elem = PyTuple_New(5);
     PyTuple_SetItem(elem, 0, Py_BuildValue("s", get<0>(info[i]).c_str()));
     PyTuple_SetItem(elem, 1, Py_BuildValue("i", get<1>(info[i])));
     PyTuple_SetItem(elem, 2, Py_BuildValue("i", get<2>(info[i])));
     PyTuple_SetItem(elem, 3, Py_BuildValue("i", get<3>(info[i])));
+    PyTuple_SetItem(elem, 4, Py_BuildValue("i", get<4>(info[i])));
     PyList_SET_ITEM(lst, i, elem);
   }
   return lst;
@@ -833,8 +834,8 @@ static PyObject* model_size_python(PyObject *self, PyObject *args)
   PyObject* ref = PyTuple_New(qcm_model->clusters.size());
   for(int i=0; i<qcm_model->clusters.size(); i++){
     auto s = ED::model_size(qcm_model->clusters[i].name);
-    PyTuple_SetItem(elem, i, Py_BuildValue("i", s.first));
-    PyTuple_SetItem(bath, i, Py_BuildValue("i", s.second));
+    PyTuple_SetItem(elem, i, Py_BuildValue("i", get<0>(s)));
+    PyTuple_SetItem(bath, i, Py_BuildValue("i", get<1>(s)));
     PyTuple_SetItem(ref, i, Py_BuildValue("i", qcm_model->clusters[i].ref));
   }
   return Py_BuildValue("iiOOO", qcm_model->sites.size(), qcm_model->n_band, elem, bath, ref);

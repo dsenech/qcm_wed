@@ -40,7 +40,7 @@ namespace ED{
    retrieves basic data for model from its name
    returns: n_sites, n_bath
    */
-  pair<size_t,size_t> model_size(const string &name);
+  tuple<size_t,size_t,size_t> model_size(const string &name);
   
   
   
