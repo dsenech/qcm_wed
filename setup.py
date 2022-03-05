@@ -21,12 +21,11 @@ skbuild.setup(
     author="David Sénéchal",
     license="GPL",
     packages=find_packages(),
-    cmake_args=["-DDOWNLOAD_CUBA=1"],
+    cmake_args=["-DDOWNLOAD_CUBA=1", '-DCMAKE_BUILD_TYPE="Release"'],
     # package_dir={"": "."},
     # cmake_install_dir=".",
     include_package_data=True,
     install_requires=["numpy", "matplotlib", "scipy"],
     python_requires=">=3.7",
-    cmake_args=['-DCMAKE_BUILD_TYPE="Release"'],
 )
 

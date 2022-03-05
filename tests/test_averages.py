@@ -9,9 +9,18 @@ U = 4
 mu = 0.5*U
 """)
 
+print("\ntesting lattice averages (all operators):\n")
 pyqcm.new_model_instance()
+pyqcm.print_averages(pyqcm.averages())
+
+print("\ntesting lattice averages (selected operators):\n")
+pyqcm.new_model_instance()
+pyqcm.print_averages(pyqcm.averages(['mu']))
+
+print("\ntesting cluster averages from the wavefunction:\n")
 pyqcm.print_cluster_averages(pyqcm.cluster_averages())
 
+print("\ntesting cluster Green function averages:\n")
 ave = pyqcm.Green_function_average()
 print('\naverages of c^\dagger_i c_j :\n\n', ave)
 
