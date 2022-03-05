@@ -161,8 +161,7 @@ def Berry_flux(k0, R, nk=40, plane='xy', label=0, band=0):
         d2 = 2
         d3 = 0
     else:
-        print('forbidden value of "plane" in function Berry_flux')
-        exit(1)
+        raise ValueError('forbidden value of "plane" in function Berry_flux')
 
     for i, phi in enumerate(phi_list):
         k[i, d1] = 0.5*(k0[d1] + R*np.cos(phi))

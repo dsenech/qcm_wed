@@ -3,6 +3,8 @@ import pyqcm
 import pyqcm.cdmft
 import os
 
+from pyqcm import new_model_instance
+
 first_time=True
 
 ################################################################################
@@ -31,6 +33,7 @@ def loop_from_file(func, file):
 			print(x, ' --> ', data[x][i])
 			pyqcm.set_parameter(x, data[x][i])
 		func()
+		new_model_instance()
 
 
 ################################################################################
@@ -62,7 +65,7 @@ def controlled_loop(
 ):
 	"""Performs a controlled loop for VCA or CDMFT with a predictor
 	
-	:param func: function called at each step of the loop
+	:param func: a function called at each step of the loop
 	:param [str] varia: names of the variational parameters
 	:param str loop_param: name of the parameter looped over
 	:param (float, float, float) loop_range: range of the loop (min, max, step)
@@ -141,6 +144,7 @@ def controlled_loop(
 		try:
 			pyqcm.banner('loop index = {:d}, {:s} = {:1.4f}'.format(loop_counter + 1, loop_param, prm[0]), '=', skip=1)
 			func()
+			new_model_instance()
 			P = pyqcm.parameters()
 			for i in range(len(varia)):
 				sol[0, i] = P[varia[i]]
@@ -287,6 +291,7 @@ def fixed_density_loop(
 			pyqcm.set_parameter('mu', mu)
 			pyqcm.banner('mu = {:1.4f}'.format(mu), '+')
 			func()
+			new_model_instance()
 			if cluster_density:
 				dens = pyqcm.cluster_averages()['mu'][0]
 			else:
@@ -328,7 +333,7 @@ def fixed_density_loop(
 						pyqcm.set_parameter(v, poly_predictor(n, var2[v], j+1, 2))
 
 		if not mu_converged:
-			raise ValueError('failed to find the value of chemical potential. Aborting')
+			raise RuntimeError('failed to find the value of chemical potential. Aborting')
 		mu_list[i] = mu
 
 		des, val = pyqcm.properties()
@@ -398,6 +403,9 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 
 	global first_time
 
+	if type(couplings) is not list:
+		couplings = [couplings]
+
 	pyqcm.banner('Hartree procedure', c='*', skip=1)
 	hartree_converged = False
 	diff_tot = 1e6
@@ -410,6 +418,7 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 	iter = 0
 	while True:
 		F()
+		new_model_instance()
 		iter += 1
 		pyqcm.banner('Hartree iteration {:d}'.format(iter), '-')
 		diff_tot = 0
@@ -430,7 +439,7 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 			break
 
 		if iter > maxiter :
-			raise ValueError('Maximum number of Hartree iterations exceeded! Aborting...')
+			raise RuntimeError('Maximum number of Hartree iterations exceeded! Aborting...')
 
 	pyqcm.banner('Hartree procedure has converged', c='*')
 	
@@ -500,6 +509,7 @@ def linear_loop(
 			print('predictor: ', start, fit_type)
 		try:
 			func()
+			new_model_instance()
 			P = pyqcm.parameters()
 			for i in range(len(varia)):
 				sol[0, i] = P[varia[i]]

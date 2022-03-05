@@ -70,7 +70,7 @@ def test_spectral():
     banner('testing spectral_function_Lehmann()', c='#', skip=1); spectral_function_Lehmann(lims=(-5,5), label = Lab, file = F, plt_ax=ax)
     
     F = 'test_spin_mdc.pdf'
-    banner('testing spin_mdc()', c='#', skip=1); spin_mdc(opt='spins', label = Lab, file = F, plt_ax=ax)
+    banner('testing spin_mdc()', c='#', skip=1); spin_mdc(nk=40, opt='spins', label = Lab, file = F, plt_ax=ax)
 
     F = 'test_hybridization_function.pdf'
     banner('testing hybridization_function()', c='#', skip=1); hybridization_function(label = Lab, file = F, plt_ax=ax)
@@ -82,10 +82,10 @@ def test_spectral():
     banner('testing Fermi_surface()', c='#', skip=1); Fermi_surface(label = Lab, file = F, plt_ax=ax)
     
     F = 'test_dispersion.pdf'
-    banner('testing dispersion()', c='#', skip=1); dispersion(label = Lab, file = F, plt_ax=ax)
+    banner('testing dispersion()', c='#', skip=1); plot_dispersion(label = Lab, file = F, plt_ax=ax)
     
     F = 'test_dispersionC.pdf'
-    banner('testing dispersion() with contours', c='#', skip=1); dispersion(label = Lab, contour=True, file = F, plt_ax=ax)
+    banner('testing dispersion() with contours', c='#', skip=1); plot_dispersion(label = Lab, contour=True, file = F, plt_ax=ax)
 
     F = 'test_segment_dispersion.pdf'
     banner('testing segment_dispersion()', c='#', skip=1); segment_dispersion(label = Lab, file = F, plt_ax=ax)
