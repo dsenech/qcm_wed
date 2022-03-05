@@ -7,7 +7,6 @@ from multiprocessing.sharedctypes import Value
 import numpy as np
 import pyqcm
 from pyqcm import qcm
-import qcm
 import timeit
 
 #-------------------------------------------------------------------------------
@@ -1076,29 +1075,29 @@ class general_bath:
             for i in range(NE):
                 S += 'eb{:d}u_{:d} = -1.0*eb{:d}d_{:d}\n'.format(2*i+2, c, 2*i+1, c)
                 S += 'eb{:d}d_{:d} = -1.0*eb{:d}u_{:d}\n'.format(2*i+2, c, 2*i+1, c)
-                for s in self.sites[i]:
+                for s in self.sites[2*i]:
                     S += 'tb{:d}u{:d}u_{:d} = {:2.1f}*tb{:d}d{:d}d_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
                     S += 'tb{:d}d{:d}d_{:d} = {:2.1f}*tb{:d}u{:d}u_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
                 if self.complex:
-                    for s in self.sites[i]:
+                    for s in self.sites[2*i]:
                         S += 'tb{:d}u{:d}ui_{:d} = {:2.1f}*tb{:d}d{:d}di_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
                         S += 'tb{:d}d{:d}di_{:d} = {:2.1f}*tb{:d}u{:d}ui_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
                 if self.spin_flip:
-                    for s in self.sites[i]:
+                    for s in self.sites[2*i]:
                         S += 'tb{:d}u{:d}d_{:d} = {:2.1f}*tb{:d}u{:d}d_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
                         S += 'tb{:d}d{:d}u_{:d} = {:2.1f}*tb{:d}d{:d}u_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
                     if self.complex:
-                        for s in self.sites[i]:
+                        for s in self.sites[2*i]:
                             S += 'tb{:d}u{:d}di_{:d} = {:2.1f}*tb{:d}u{:d}di_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
                             S += 'tb{:d}d{:d}ui_{:d} = {:2.1f}*tb{:d}d{:d}ui_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
 
         else:
             for i in range(NE):
                 S += 'eb{:d}_{:d} = -1.0*eb{:d}_{:d}\n'.format(2*i+2, c, 2*i+1, c)
-                for s in self.sites[i]:
+                for s in self.sites[2*i]:
                     S += 'tb{:d}{:d}_{:d} = {:2.1f}*tb{:d}{:d}_{:d}\n'.format(2*i+2, s, c,  phi[s-1], 2*i+1, s, c)
                 if self.complex:
-                    for s in self.sites[i]:
+                    for s in self.sites[2*i]:
                         S += 'tb{:d}{:d}i_{:d} = {:2.1f}*tb{:d}{:d}i_{:d}\n'.format(2*i+2, s, c, -phi[s-1], 2*i+1, s, c)
 
         var_E = self.var_E

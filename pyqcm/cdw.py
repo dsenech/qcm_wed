@@ -312,16 +312,20 @@ def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3)):
     print('intra-cluster V matrix:\n',Vc)
     print('inter-cluster V matrix:\n',Vic)
 
+    fig, ax = plt.subplots((C.N+3)//4, 4, sharex=True, sharey=True)
+    fig.set_size_inches(6, 1.5*ax.shape[0])
+    ax = np.reshape(ax, (C.N))
+
     w, v = np.linalg.eigh(Vic)
     w = np.round(w,10)
     for i in range(C.N):
-        # y = v[:,i]
-        # for j in range(C.N):
-        #     if np.abs(y[j] > 1e-2):
-        #         break
-        # y /= y[j]
-        # v[:,i] = y
         print('\neigenvalue ', w[i], ' :\n', v[:, i])
+        C.draw_cdw(v[:, i], basis=basis, plt_ax = ax[i])
+        ax[i].set_title('$\\lambda = {:f}$'.format(w[i]))
+        ax[i].tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
+
+    # plt.tight_layout()
+    plt.show()
     return w, v, Vic, Vc
 
 
