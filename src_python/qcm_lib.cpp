@@ -19,6 +19,7 @@ static PyMethodDef methods[] = {
   { "cluster_averages", cluster_averages_python, METH_VARARGS, cluster_averages_help },
   { "complex_HS", complex_HS_python, METH_VARARGS, complex_HS_help },
   { "fidelity", fidelity_python, METH_VARARGS, fidelity_help },
+  { "Green_function_average", Green_function_average_python, METH_VARARGS, Green_function_average_help },
   { "Green_function_dimensionC", Green_function_dimensionC_python, METH_VARARGS, Green_function_dimensionC_help },
   { "Green_function_solveC", Green_function_solveC_python, METH_VARARGS, Green_function_solveC_help },
   { "Green_function", Green_function_python, METH_VARARGS, Green_function_help },

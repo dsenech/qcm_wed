@@ -112,7 +112,7 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
 template<>
 void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
 {
-  qcm_throw("the use of continued fractions with complex-values Hamiltonian is not yet ready");
+  qcm_throw("the use of continued fractions with complex-valued Hamiltonians is not yet ready");
   auto& sym_orb = the_model->sym_orb[mixing];
 
   auto cf = make_shared<continued_fraction_set>(Omega.sec, the_model->group, mixing, true);

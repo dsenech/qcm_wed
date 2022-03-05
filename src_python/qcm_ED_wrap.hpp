@@ -81,6 +81,36 @@ static PyObject* fidelity_python(PyObject *self, PyObject *args)
   return Py_BuildValue("d", f);
 }
 //==============================================================================
+const char* Green_function_average_help =
+R"(
+arguments:
+1. label of model_instance (optional, default=0)
+returns:
+the average of c^\dagger_i c_j (matrix)
+)";
+//------------------------------------------------------------------------------
+static PyObject* Green_function_average_python(PyObject *self, PyObject *args)
+{
+  int label=0;
+  int spin_down=0;
+  try{
+    if(!PyArg_ParseTuple(args, "|ii", &label, &spin_down))
+      qcm_ED_throw("failed to read parameters in call to Green_function_average (python)");
+  } catch(const string& s) {qcm_ED_catch(s);}
+  matrix<complex<double>> g;
+  try{
+    g = ED::Green_function_average((bool)spin_down, (size_t)label);
+  } catch(const string& s) {qcm_ED_catch(s);}
+
+  npy_intp dims[2];
+  dims[0] = dims[1] = g.r;
+  
+  PyObject *out = PyArray_SimpleNew(2, dims, NPY_COMPLEX128);
+  memcpy(PyArray_DATA((PyArrayObject*) out), g.data(), g.size()*sizeof(complex<double>));
+  PyArray_ENABLEFLAGS((PyArrayObject*) out, NPY_ARRAY_OWNDATA);
+  return out;
+}
+//==============================================================================
 const char* Green_function_dimensionC_help =
 R"(
 arguments:

@@ -473,7 +473,7 @@ matrix<Complex> model_instance<HilbertField>::Green_function_average(bool spin_d
   if(spin_down and !(mixing&HS_mixing::up_down)) qcm_ED_throw("spin_down=True impossible with Hilbert space mixing "+to_string(mixing));
   if(!gf_solved and !gf_read) Green_function_solve();
 
-  matrix<Complex> Gint(n_mixed*(the_model->n_orb));
+  matrix<Complex> Gint(n_mixed*(the_model->n_sites));
   block_matrix<Complex> G(the_model->group->site_irrep_dim*n_mixed);
   if(spin_down and mixing&HS_mixing::up_down){
     for(auto& x : states) x->gf_down->integrated_Green_function(G);

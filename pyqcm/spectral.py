@@ -259,7 +259,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
 
 
 ################################################################################
-def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, self=False, spin_down=False, blocks=False, file=None, plt_ax=None, **kwargs):
+def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, self=False, spin_down=False, blocks=False, file=None, plt_ax=None, color='b', **kwargs):
     """Plots the spectral function of the cluster in the site basis
     
     :param float  wmax: the frequency range is from -wmax to wmax
@@ -273,6 +273,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     :param boolean blocks: if True, gives the GF in the symmetry basis (block diagonal)
     :param str file: if not None, saves the plot in a file with that name
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
+    :param color: matplotlib color of the curves
     :param kwargs: keyword arguments passed to the matplotlib 'plot' function
     :returns: the array of frequencies, the spectral weight
 
@@ -318,7 +319,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     max = np.max(A)
     plt.ylim(0, dd * offset + max)
     for j in range(dd):
-        plt.plot(np.real(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
+        plt.plot(np.real(w), A[:, j] + offset * j, '-', lw=0.5, color=color, **kwargs)
     plt.xlabel(r'$\omega$')
     plt.axvline(0, ls='solid', lw=0.5)
     plt.title(pyqcm.parameter_string(), fontsize=9)

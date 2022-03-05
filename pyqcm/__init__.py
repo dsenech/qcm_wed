@@ -13,6 +13,8 @@ except:
     print('submodule qcm_git_hash not found. Will not be able to record git version in output files')
     git_hash = 'NA'
 
+np.set_printoptions(precision=6, linewidth=200, suppress=True, sign=' ')
+
 ################################################################################
 # GLOBAL MODULE VARIABLES
 solver = 'ED'
@@ -309,7 +311,7 @@ def cluster_Green_function(cluster, z, spin_down=False, label=0, blocks=False):
     return qcm.cluster_Green_function(cluster, z, spin_down, label, blocks)
 
 ################################################################################
-def cluster_Green_function_average(cluster=0, spin_down=False):
+def Green_function_average(cluster=0, spin_down=False):
     """Computes the cluster Green function average (integral over frequencies)
 
     :param int cluster: label of the cluster (0 to the number of clusters-1)
@@ -317,7 +319,7 @@ def cluster_Green_function_average(cluster=0, spin_down=False):
     :return: a complex-valued matrix
 
     """
-    return qcm.Green_function_average(spin_down, cluster)
+    return qcm.Green_function_average(cluster, spin_down)
 
 ################################################################################
 def cluster_self_energy(cluster, z, spin_down=False, label=0):

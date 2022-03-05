@@ -170,6 +170,40 @@ class cluster:
         if plt_ax is None:
             plt.show()
 
+    def draw_cdw(self, cdw, basis=None, plt_ax=None):
+        """
+        Plots the amplitudes of a cdw
+        :param [float] cdw: the cdw amplitudes (same order as the sites)
+        :param [[float]] basis: the real space, geometric basis
+
+        """
+        assert self.dim == 2, 'the draw() function only works in two dimensions'
+
+        if plt_ax is None:
+            ax = plt.gca()
+        else:
+            ax = plt_ax
+
+        if basis is None:
+            basis = np.eye(3)
+        
+        e = self.e
+        e = e@basis
+        ax.set_aspect(1)
+        ax.plot([0, e[0,0]], [0, e[0,1]], 'r-', lw=0.5)
+        ax.plot([0, e[1,0]], [0, e[1,1]], 'r-', lw=0.5)
+        S = self.sites
+        S = S@basis
+        fac = 12/np.max(np.abs(cdw))
+        for j1 in range(-1,2,1):
+            for j2 in range(-1,2,1):
+                es = j1*e[0,:] + j2*e[1,:]
+                for i in range(S.shape[0]):
+                    ss = es + S[i,:]
+                    if cdw[i] > 0: ax.plot(ss[0], ss[1], 'bo', ms=fac*cdw[i])
+                    else: ax.plot(ss[0], ss[1], 'ro', ms=-fac*cdw[i])
+        if plt_ax is None:
+            plt.show()
 
 ################################################################################
 
