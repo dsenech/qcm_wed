@@ -1,7 +1,7 @@
 import pyqcm
 import model_1D_2_4b
 
-sec = 'R0:N4:S0'
+sec = 'R0:N6:S0'
 pyqcm.set_target_sectors([sec])
 pyqcm.set_parameters("""
 t=1

@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <array>
+#include<unordered_map>
 
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
@@ -26,6 +27,7 @@ vector<string> strings_from_PyList(PyObject* lst);
 extern shared_ptr<parameter_set> param_set;
 extern shared_ptr<lattice_model> qcm_model;
 extern vector<string> target_sectors;
+extern unordered_map<string, global_parameter<bool>> GP_bool;
 void qcm_catch(const string& s);
 
 static PyObject *qcm_Error;
@@ -1461,8 +1463,20 @@ static PyObject* set_global_parameter_python(PyObject *self, PyObject *args)
     else{
       if(PyLong_Check(obj)){
         size_t I = (int)PyLong_AsLong(obj);
-        set_global_int(name, I);
-        cout << "global parameter " << name << " set to " << I << endl;
+        if(GP_bool.find(name) != GP_bool.end()){
+          if(I==0){
+            set_global_bool(name, false);
+            cout << "global parameter " << name << " set to false" << endl;
+          }
+          else{
+            set_global_bool(name, true);
+            cout << "global parameter " << name << " set to true" << endl;
+          }
+        }
+        else{
+          set_global_int(name, I);
+          cout << "global parameter " << name << " set to " << I << endl;
+        }
       }
       else if(PyFloat_Check(obj)){
         double I = (double)PyFloat_AsDouble(obj);
