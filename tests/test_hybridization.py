@@ -1,5 +1,9 @@
 import pyqcm
+import pyqcm.spectral as SP
 import model_1D_2_4b
+
+import pyqcm.qcm as qcm
+
 
 sec = 'R0:N4:S0'
 pyqcm.set_target_sectors([sec])
@@ -14,13 +18,9 @@ tb2_1 = 0.5
 """)
 
 pyqcm.new_model_instance()
-pyqcm.print_cluster_averages(pyqcm.cluster_averages())
-
-ave = pyqcm.Green_function_average()
-print('\naverages of c^\dagger_i c_j :\n\n', ave)
-
-print('\naverage of t from GF= ', -(ave[0,1]+ave[1,2]+ave[2,3]))
-print('average of mu from GF = ', 2*(ave[0,0]))
 
 
+SP.cluster_spectral_function(wmax=6, opt='hyb')
+
+# print(pyqcm.hybridization_Lehmann())
 

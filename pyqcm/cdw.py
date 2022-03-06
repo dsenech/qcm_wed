@@ -369,7 +369,7 @@ def draw_Vic(C, _V, plt_ax, basis=None):
     draws the links associated with extended interactions
 
     :param (class cluster) C: periodic cluster
-    :param [([int], float)] V: density-density interactions
+    :param [([int], float)] _V: density-density interactions
     :param plt_ax: matplotlib axis set; triggers plotting
     :param [[float]] basis: the real space, geometric basis
     :return: None
@@ -389,6 +389,7 @@ def draw_Vic(C, _V, plt_ax, basis=None):
     color=['r', 'g', 'b', 'y', 'k']
     ic = 0
     for v in V:
+        DX = v[0]@basis
         for i,x in enumerate(C.sitesF):
             j, S, R = C.fold_shifted(x + v[0])
             

@@ -259,7 +259,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
 
 
 ################################################################################
-def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, self=False, spin_down=False, blocks=False, file=None, plt_ax=None, color='b', **kwargs):
+def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, opt=None, spin_down=False, blocks=False, file=None, plt_ax=None, realpart=False, color = 'b', **kwargs):
     """Plots the spectral function of the cluster in the site basis
     
     :param float  wmax: the frequency range is from -wmax to wmax

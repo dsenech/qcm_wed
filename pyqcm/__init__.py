@@ -212,20 +212,6 @@ def qmatrix(label=0):
     return qcm.qmatrix(label)
 
 ################################################################################
-def hybridization_Lehmann(label=0):
-    """Returns the Lehmann representation of the hybridization function
-
-    :param int label: label of the cluster model instance
-    :return: 2-tuple made of
-
-        1. the array of M real eigenvalues, M being the number of poles in the representation
-        2. a rectangular (L x M) matrix (real of complex), L being the dimension of the Green function
-
-    """	
-
-    return qcm.hybridization(label)
-
-################################################################################
 def write_cluster_instance_to_file(filename, clus=0):
     """Writes the solved cluster model instance to a text file
     
