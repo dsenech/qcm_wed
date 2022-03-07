@@ -1250,16 +1250,6 @@ def anomalous_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
 
             qcm.anomalous_operator(name, link, amplitude, band1=band_no1, band2=band_no2, **kwargs)
 
-    # the_model.record += "anomalous_operator('"+name+"', "+str(link)+', '+str(amplitude)
-    # for x in kwargs:
-    #     if type(kwargs[x]) is str:
-    #         the_model.record += ', '+x+"='"+kwargs[x]+"'"
-    #     else:	
-    #         the_model.record += ', '+x+'='+str(kwargs[x])
-    # the_model.record += ')\n'	
-
-    # qcm.anomalous_operator(name, link, amplitude, **kwargs)
-
 ################################################################################
 def explicit_operator(name, elem, **kwargs):
     """
