@@ -1036,10 +1036,10 @@ def set_parameter(name, value, pr=False):
     """
     if pr:
         print('-----> ', name, ' = ', value)
-    if value == 0:
-        warn(
-            "***WARNING*** : `0` carries a specific meaning for QCM (does not create operator). If a trivial operator value is desired, using a small value such as `1e-9` is preferable."
-        )
+    # if value == 0:
+    #     warn(
+    #         "`0` carries a specific meaning for QCM (does not create operator). If a trivial operator value is desired, using a small value such as `1e-9` is preferable."
+    #     )
 
     qcm.set_parameter(name, value)
 

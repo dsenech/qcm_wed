@@ -32,6 +32,7 @@ struct model
   string name; //!< name of the system (i.e. cluster name)
   vector<bool> in_bath; //! indicates whether an orbital (from 0 to 2*n_orb) is in bath or not
   vector<vector<vector<symmetric_orbital>>> sym_orb;
+  int mixing; //!< mixing state of the cluster itself (stored copy from model_instance)
 
   model(const string &_name, const size_t _n_orb, const size_t _n_bath, const vector<vector<int>> &gen, bool bath_irrep);
   void add_chemical_potential();

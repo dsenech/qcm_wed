@@ -38,6 +38,14 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
   }
   if(mixing>5) mixing = mixing&HS_mixing::full;
   if(mixing==5) mixing = mixing&HS_mixing::anomalous;
+
+  // makes sure the mixing stays the same as the first instance
+  if(the_model->mixing == -1) the_model->mixing = mixing;
+  else if((mixing | the_model->mixing) != the_model->mixing){
+    qcm_ED_throw("The new instance mixing state of model "+the_model->name+" ("+to_string(mixing)+") is not compatible with the first instance mixing ("+to_string(the_model->mixing)+")");
+  }
+  else mixing = the_model->mixing;
+
   spin_down = false;
   n_mixed = 1;
   if(mixing & HS_mixing::anomalous) n_mixed *= 2;

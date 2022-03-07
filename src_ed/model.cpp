@@ -19,7 +19,8 @@ n_orb(_n_orb),
 n_bath(_n_bath),
 n_sites(_n_orb-_n_bath),
 is_closed(false),
-is_factorized(false)
+is_factorized(false),
+mixing(-1)
 {
   group = make_shared<symmetry_group>(n_orb, n_sites, gen, bath_irrep);
   in_bath.assign(2*n_orb, false);
