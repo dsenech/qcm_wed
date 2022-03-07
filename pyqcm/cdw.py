@@ -146,7 +146,9 @@ class cluster:
         :param [[float]] basis: the real space, geometric basis
 
         """
-        assert self.dim == 2, 'the draw() function only works in two dimensions'
+        if self.dim != 2:
+            print('the draw() function only works in two dimensions. Skipping draw()')
+            return
 
         if plt_ax is None:
             ax = plt.gca()
@@ -177,7 +179,9 @@ class cluster:
         :param [[float]] basis: the real space, geometric basis
 
         """
-        assert self.dim == 2, 'the draw() function only works in two dimensions'
+        if self.dim != 2:
+            print('the draw() function only works in two dimensions. Skipping draw()')
+            return
 
         if plt_ax is None:
             ax = plt.gca()
@@ -314,7 +318,8 @@ def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3)):
 
     fig, ax = plt.subplots((C.N+3)//4, 4, sharex=True, sharey=True)
     fig.set_size_inches(6, 1.5*ax.shape[0])
-    ax = np.reshape(ax, (C.N))
+    if C.N > 4:
+        ax = np.reshape(ax, (C.N))
 
     w, v = np.linalg.eigh(Vic)
     w = np.round(w,10)

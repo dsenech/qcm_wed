@@ -1,11 +1,13 @@
 import numpy as np
 import re
 import time
+import copy
 from . import qcm
 from warnings import warn
 
 parameter_set_str = ''
-first_time = True
+des_dict = {}  # use to store description lines in output files. filename->current description line
+
 
 try:
     from . import qcm_git_hash
@@ -19,7 +21,6 @@ np.set_printoptions(precision=6, linewidth=200, suppress=True, sign=' ')
 ################################################################################
 # GLOBAL MODULE VARIABLES
 solver = 'ED'
-first_SEF = True
 ################################################################################
 # EXCEPTIONS
 
@@ -272,12 +273,8 @@ def averages(ops=[], label=0, file='averages.tsv'):
     :return {str,float}: a dict giving the values of the averages for each parameter
 
     """
-    global first_time
-
     ave = qcm.averages(ops, label)
-    write_summary(file, first = first_time)
-    first_time = False
-
+    write_summary(file)
     return ave
 
 
@@ -453,7 +450,7 @@ def ground_state(file=None):
     GS = qcm.ground_state()
 
     if file is not None:
-        write_summary(file, first=True) 
+        write_summary(file) 
 
     return GS
 
@@ -905,16 +902,13 @@ def Potthoff_functional(hartree=None, file='sef.tsv', label=0):
     :return: the value of the self-energy functional
 
     """
-    global first_SEF
-
     OM = qcm.Potthoff_functional(label)
     if hartree != None:
         L = model_size()[0]
         for C in hartree:
             OM += C.omega_var()/L
 
-    write_summary(file, first=first_SEF, suppl_descr='omegaH\t', suppl_values='{:.8g}\t'.format(OM))
-    first_SEF = False
+    write_summary(file, suppl_descr='omegaH\t', suppl_values='{:.8g}\t'.format(OM))
 
     return OM
 
@@ -1530,17 +1524,31 @@ def print_parameters(P):
         print(x, ' = ', P[x])
 
 
-def write_summary(f, first=False, suppl_descr=None, suppl_values=None):
+def write_summary(f, suppl_descr=None, suppl_values=None):
+    global description_line
     fout = open(f, 'a')
+    first_in_file =False
     des, val = properties()
+    try:
+        des_prev = des_dict[f]
+    except:
+        des_dict[f] = ''
+        des_prev = ''
+        first_in_file =True
+    if des == des_prev: 
+        first = False
+    else: 
+        first = True
+        des_dict[f] = copy.copy(des)
     if suppl_values != None:
         val += suppl_values
     val += time.strftime("%Y-%m-%d@%H:%M", time.localtime())
     if first:
         if suppl_descr != None:
             des += suppl_descr
-        des += 'time'    
-        fout.write('\n\n' + des + '\n')
+        des += 'time'
+        if first_in_file is False: fout.write('\n')
+        fout.write(des + '\n')
     fout.write(val + '\n')
     fout.close()
 
