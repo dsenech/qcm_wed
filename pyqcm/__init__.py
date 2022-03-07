@@ -1088,6 +1088,33 @@ def set_basis(B):
     qcm.set_basis(B)
 
 ################################################################################
+def __band_manager(band1, band2):
+    """If a band is none, makes it take all possible band value
+    """
+
+    if type(band1) is not int and band1 is not None:
+        raise ValueError("`band1` must be of type `int` or None (default)")
+    if type(band2) is not int and band2 is not None:
+        raise ValueError("`band2` must be of type `int` or None (default)")
+
+    nbands = model_size()[1]
+    complete_band_list = [i for i in range(1, nbands+1)]
+
+    if band1 is None:
+        band1 = complete_band_list
+    else:
+        band1 = [band1]
+
+    if band2 is None:
+        band2 = complete_band_list
+    else:
+        band2 = [band2]
+
+    return band1, band2
+    
+    
+
+################################################################################
 def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
     """
     Defines an interaction operator of type Hubbard, Hund, Heisenberg or X, Y, Z
