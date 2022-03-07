@@ -746,6 +746,13 @@ def __sector_string_builder(R, N, S):
     return f"{R_string}:{N_string}:{S_string}"
 
 
+def __cluster_sector_string_builder(R, N, S):
+    sector_string = ""
+    for i in range(len(R)):
+        sector_string += f"{__sector_string_builder(R[i], N[i], S[i])}/"
+    return sector_string[:-1] # removes the last caracter (/) from string
+
+
 def sectors(R=None, N=None, S=None):
     sector_string_list = []
     
@@ -760,7 +767,7 @@ def sectors(R=None, N=None, S=None):
             for i in range(len(R)):
                 sector_string = ""
                 for j in range(len(R[i])):
-                    sector_string += f"{__sector_string_builder(R[i], N[i], S[i])}/"
+                    sector_string += f"{__sector_string_builder(R[i][j], N[i][j], S[i][j])}/"
                 sector_string = sector_string[:-1] # removes the last caracter (/) from string
                 sector_string_list.append(sector_string)
         else:
