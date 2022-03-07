@@ -722,72 +722,61 @@ except:
 set_target_sectors.called = False
 
 ################################################################################
-# def __sector_string_builder(R, N, S):
-#     """Takes non-None values of R, N and S and inserts them in the correct string format for set_target_sectors()
+def __sector_string_builder(R, N, S):
+    """Takes non-None values of R, N and S and inserts them in the correct string format for set_target_sectors()
     
-#     :param int R: Symmetry sector
-#     :param int N: Particle number sector
-#     :param int S: Spin sector
+    :param int R: Symmetry sector
+    :param int N: Particle number sector
+    :param int S: Spin sector
 
-#     :return string: A string formatted for use with set_target_sectors
+    :return string: A string formatted for use with set_target_sectors
 
-#     """
-#     R_string = ""
-#     N_string = ""
-#     S_string = ""
+    """
+    R_string = ""
+    N_string = ""
+    S_string = ""
 
-#     if R is not None:
-#         R_string = f"R{R}"
-#     if N is not None:
-#         R_string = f"R{N}"
-#     if S is not None:
-#         R_string = f"R{S}"
+    if R is not None:
+        R_string = f"R{R}"
+    if N is not None:
+        N_string = f"N{N}"
+    if S is not None:
+        S_string = f"S{S}"
 
-#     return f"{R_string}:{N_string}:{S_string}"
-
-
-# def __convert_to_None(R, N, S):
-#     len_list = []
-
-#     for var in [("R", R), ("N", N), ("S", S)]:
-#         try:
-#             exec(f"len_{var[0]} = len({var[1]})")
-#         except:
-#             exec(exec(f"len_{var[0]} = 0"))
-        
-#         exec(f"len_list.append(len_{var[0]})")
-
-#     max_length = max(len_list)
-
-#     for var in [R, N, S]:
-#         if var is None:
-            
-
-# def sectors(R=None, N=None, S=None):
-#     sector_string_list = []
+    return f"{R_string}:{N_string}:{S_string}"
 
 
-
-#     # if len(R) != len(N) or len(N) != len(S):
-#     #     raise ValueError(f"The length of all the lists must the same; here len(R)={len(R)}, len(N)={len(N)} and len(S)={len(S)}")
+def sectors(R=None, N=None, S=None):
+    sector_string_list = []
     
-#     if type(R) is not list and type(N) is not list and type(S) is not list:
-#         sector_string_list.append(__sector_string_builder(R, N, S)) 
-#     elif type(R) is list or type(N) is list or type(S) is list:
+    if type(R) is not list and type(N) is not list and type(S) is not list:
+        sector_string_list.append(__sector_string_builder(R, N, S))
 
-#         if type(R[0]) is int or type(N[0]) is int or type(S[0]) is int:
-#             None ######################### Set different cluster target sectors
-#         elif type(R[0]) is list:
-#             None ############################ Do the other thing 
-#     else:
-#         raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
+    elif type(R) is list and type(N) is list and type(S) is list:
+        if len(R) != len(N) or len(N) != len(S):
+            raise ValueError("The lengths of R, N and S must be the same!")
 
+        if type(R[0]) is list:
+            for i in range(len(R)):
+                sector_string = ""
+                for j in range(len(R[i])):
+                    sector_string += f"{__sector_string_builder(R[i], N[i], S[i])}/"
+                sector_string = sector_string[:-1] # removes the last caracter (/) from string
+                sector_string_list.append(sector_string)
+        else:
+            sector_string = ""
+            for i in range(len(R)):
+                sector_string += f"{__sector_string_builder(R[i], N[i], S[i])}/"
+            sector_string = sector_string[:-1] # removes the last caracter (/) from string
+            sector_string_list.append(sector_string)
+         
+    else:
+        raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
+###################DEBUG##################
+    print(sector_string_list)
 
-#     for i in range(len(R)):
-#         if type(R[i]) is list:
-#             None
-
-#     set_target_sectors(sector_string_list)            
+    # set_target_sectors([sector_string])
+####################DEBUG#################
     
 ################################################################################
 def parameters(label=0):
