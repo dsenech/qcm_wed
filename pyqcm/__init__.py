@@ -1183,7 +1183,7 @@ def hopping_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
             kwargs["tau"] = 0
 
     if type(the_model.sites) is list:
-         the_model._finalize()
+        the_model._finalize()
 
     band1, band2 = __band_manager(band1, band2) 
 
@@ -1203,17 +1203,17 @@ def hopping_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
             qcm.hopping_operator(name, link, amplitude, band1=band_no1, band2=band_no2, **kwargs)
 
 ################################################################################
-def anomalous_operator(name, link, amplitude, **kwargs):
+def anomalous_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
     """Defines an anomalous operator
 
     :param str name: name of operator
     :param [int] link: bond vector (3-component integer array)
     :param complex amplitude: pairing multiplier
+    :param int band1: number of the first band (None by default)
+    :param int band2: number of the second band (None by default)
 
     :Keyword Arguments:
-
-        * band1 (*int*) -- Band label of first index (1 by default)
-        * band2 (*int*) -- Band label of second index (1 by default)
+    
         * type (*str*) -- one of 'singlet' (default), 'dz', 'dy', 'dx'
   
     :return: None
@@ -1221,15 +1221,44 @@ def anomalous_operator(name, link, amplitude, **kwargs):
     """
 
     global the_model
-    the_model.record += "anomalous_operator('"+name+"', "+str(link)+', '+str(amplitude)
-    for x in kwargs:
-        if type(kwargs[x]) is str:
-            the_model.record += ', '+x+"='"+kwargs[x]+"'"
-        else:	
-            the_model.record += ', '+x+'='+str(kwargs[x])
-    the_model.record += ')\n'	
 
-    qcm.anomalous_operator(name, link, amplitude, **kwargs)
+    if link == [0,0,0]:
+        if "tau" in kwargs:
+            if kwargs["tau"] != 0:
+                warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
+                kwargs["tau"] = 0
+        else:
+            kwargs["tau"] = 0
+    
+    if type(the_model.sites) is list:
+        the_model._finalize()
+
+    band1, band2 = __band_manager(band1, band2) 
+
+    for band_no1 in band1:
+        for band_no2 in band2:
+            the_model.record += "anomalous_operator('"+name+"', "+str(link)+', '+str(amplitude)
+            the_model.record += ', band1='+str(band_no1)
+            the_model.record += ', band2='+str(band_no2)
+
+            for x in kwargs:
+                if type(kwargs[x]) is str:
+                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                else:	
+                    the_model.record += ', '+x+'='+str(kwargs[x])
+            the_model.record += ')\n'
+
+            qcm.anomalous_operator(name, link, amplitude, band1=band_no1, band2=band_no2, **kwargs)
+
+    # the_model.record += "anomalous_operator('"+name+"', "+str(link)+', '+str(amplitude)
+    # for x in kwargs:
+    #     if type(kwargs[x]) is str:
+    #         the_model.record += ', '+x+"='"+kwargs[x]+"'"
+    #     else:	
+    #         the_model.record += ', '+x+'='+str(kwargs[x])
+    # the_model.record += ')\n'	
+
+    # qcm.anomalous_operator(name, link, amplitude, **kwargs)
 
 ################################################################################
 def explicit_operator(name, elem, **kwargs):
