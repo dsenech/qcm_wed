@@ -1113,21 +1113,22 @@ def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
     if band1 is None and band2 is None: # this applies an interaction operator on all bands if none are specified
         nbands = model_size()[1]
         bands = [i for i in range(1, 1+nbands)]
-        for band_no in bands:
-            the_model.record += "interaction_operator('"+name+"'"
-            the_model.record += ', band1='+str(band_no)
-            the_model.record += ', band2='+str(band_no)
-            if link is not None:
-                the_model.record += ', link='+str(link)
+        for band_no1 in bands:
+            for band_no2 in bands:
+                the_model.record += "interaction_operator('"+name+"'"
+                the_model.record += ', band1='+str(band_no1)
+                the_model.record += ', band2='+str(band_no2)
+                if link is not None:
+                    the_model.record += ', link='+str(link)
 
-            for x in kwargs:
-                if type(kwargs[x]) is str:
-                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
-                else:	
-                    the_model.record += ', '+x+'='+str(kwargs[x])
-            the_model.record += ')\n'	
+                for x in kwargs:
+                    if type(kwargs[x]) is str:
+                        the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                    else:	
+                        the_model.record += ', '+x+'='+str(kwargs[x])
+                the_model.record += ')\n'	
+                qcm.interaction_operator(name, band1=band_no1, band2=band_no2, link=link, **kwargs)
 
-            qcm.interaction_operator(name, band1=band_no, band2=band_no, link=link, **kwargs)
     elif band1 is None or band2 is None: # protects against undefined situation (one out of two bands are defined)
         raise ValueError("Both bands must be given or both bands must be None to define operator across all bands.")
     else: # does the usual routine if both bands are given
