@@ -1089,7 +1089,7 @@ def set_basis(B):
 
 ################################################################################
 def __band_manager(band1, band2):
-    """If a band is none, makes it take all possible band value
+    """If a band is none, it is set to a list of all bands. If band is specified --> [band]
     """
 
     if type(band1) is not int and band1 is not None:
@@ -1113,7 +1113,7 @@ def __band_manager(band1, band2):
     return band1, band2
     
 ################################################################################
-def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
+def interaction_operator(name, link=None, band1=None, band2=None, **kwargs):
     """
     Defines an interaction operator of type Hubbard, Hund, Heisenberg or X, Y, Z
 
@@ -1135,7 +1135,7 @@ def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
     if type(the_model.sites) is list:
         the_model._finalize()
 
-    band1, band2 = __band_manager(band1, band2)
+    band1, band2 = __band_manager(band1, band2) 
 
     for band_no1 in band1:
         for band_no2 in band2:
@@ -1154,17 +1154,17 @@ def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
             qcm.interaction_operator(name, band1=band_no1, band2=band_no2, link=link, **kwargs)
 
 ################################################################################
-def hopping_operator(name, link, amplitude, **kwargs):
+def hopping_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
     """Defines a hopping term or, more generally, a one-body operator
 
     :param str name: name of operator
     :param [int] link: bond vector (3-component integer array)
     :param float amplitude: hopping amplitude multiplier
+    :param int band1: number of the first band (None by default)
+    :param int band2: number of the second band (None by default)
     
     :Keyword Arguments:
 
-        * band1 (*int*) -- Band label of first index (1 by default)
-        * band2 (*int*) -- Band label of second index (1 by default)
         * tau (*int*) -- specifies the tau Pauli matrix  (0,1,2,3)
         * sigma (*int*) -- specifies the sigma Pauli matrix  (0,1,2,3)
   
@@ -1182,16 +1182,25 @@ def hopping_operator(name, link, amplitude, **kwargs):
         else:
             kwargs["tau"] = 0
 
-    if type(the_model.sites) is list: the_model._finalize()
-    the_model.record += "hopping_operator('"+name+"', "+str(link)+', '+str(amplitude)
-    for x in kwargs:
-        if type(kwargs[x]) is str:
-            the_model.record += ', '+x+"='"+kwargs[x]+"'"
-        else:	
-            the_model.record += ', '+x+'='+str(kwargs[x])
-    the_model.record += ')\n'	
+    if type(the_model.sites) is list:
+         the_model._finalize()
 
-    qcm.hopping_operator(name, link, amplitude, **kwargs)
+    band1, band2 = __band_manager(band1, band2) 
+
+    for band_no1 in band1:
+        for band_no2 in band2:
+            the_model.record += "hopping_operator('"+name+"', "+str(link)+', '+str(amplitude)
+            the_model.record += ', band1='+str(band_no1)
+            the_model.record += ', band2='+str(band_no2)
+
+            for x in kwargs:
+                if type(kwargs[x]) is str:
+                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                else:	
+                    the_model.record += ', '+x+'='+str(kwargs[x])
+            the_model.record += ')\n'
+
+            qcm.hopping_operator(name, link, amplitude, band1=band_no1, band2=band_no2, **kwargs)
 
 ################################################################################
 def anomalous_operator(name, link, amplitude, **kwargs):
