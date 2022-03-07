@@ -719,72 +719,68 @@ except:
 set_target_sectors.called = False
 
 ################################################################################
-# def __sector_string_builder(R, N, S):
-#     """Takes non-None values of R, N and S and inserts them in the correct string format for set_target_sectors()
+def __sector_string_builder(R, N, S):
+    """Takes non-None values of R, N and S and inserts them in the correct string format for set_target_sectors()
     
-#     :param int R: Symmetry sector
-#     :param int N: Particle number sector
-#     :param int S: Spin sector
+    :param int R: Symmetry sector
+    :param int N: Particle number sector
+    :param int S: Spin sector
 
-#     :return string: A string formatted for use with set_target_sectors
+    :return string: A string formatted for use with set_target_sectors
 
-#     """
-#     R_string = ""
-#     N_string = ""
-#     S_string = ""
+    """
+    R_string = ""
+    N_string = ""
+    S_string = ""
 
-#     if R is not None:
-#         R_string = f"R{R}"
-#     if N is not None:
-#         R_string = f"R{N}"
-#     if S is not None:
-#         R_string = f"R{S}"
+    if R is not None:
+        R_string = f"R{R}"
+    if N is not None:
+        N_string = f"N{N}"
+    if S is not None:
+        S_string = f"S{S}"
 
-#     return f"{R_string}:{N_string}:{S_string}"
-
-
-# def __convert_to_None(R, N, S):
-#     len_list = []
-
-#     for var in [("R", R), ("N", N), ("S", S)]:
-#         try:
-#             exec(f"len_{var[0]} = len({var[1]})")
-#         except:
-#             exec(exec(f"len_{var[0]} = 0"))
-        
-#         exec(f"len_list.append(len_{var[0]})")
-
-#     max_length = max(len_list)
-
-#     for var in [R, N, S]:
-#         if var is None:
-            
-
-# def sectors(R=None, N=None, S=None):
-#     sector_string_list = []
+    return f"{R_string}:{N_string}:{S_string}"
 
 
+def __cluster_sector_string_builder(R, N, S):
+    sector_string = ""
+    for i in range(len(R)):
+        sector_string += f"{__sector_string_builder(R[i], N[i], S[i])}/"
+    return sector_string[:-1] # removes the last caracter (/) from string
 
-#     # if len(R) != len(N) or len(N) != len(S):
-#     #     raise ValueError(f"The length of all the lists must the same; here len(R)={len(R)}, len(N)={len(N)} and len(S)={len(S)}")
+
+def sectors(R=None, N=None, S=None):
+    """Alternative method of setting target sectors (see `set_target_sectors(...)`). An example of usage is, R = [[1,2], [3,4]] --> ["R1.../R2...", "R3.../R4..."].
     
-#     if type(R) is not list and type(N) is not list and type(S) is not list:
-#         sector_string_list.append(__sector_string_builder(R, N, S)) 
-#     elif type(R) is list or type(N) is list or type(S) is list:
+    :param int or [int] or [[int]] R: Symmetry sector.
+    :param int or [int] or [[int]] N: Particle number.
+    :param int or [int] or [[int]] S: Total spin.
 
-#         if type(R[0]) is int or type(N[0]) is int or type(S[0]) is int:
-#             None ######################### Set different cluster target sectors
-#         elif type(R[0]) is list:
-#             None ############################ Do the other thing 
-#     else:
-#         raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
+    :return: None
 
+    """
+    sector_string_list = []
+    
+    if type(R) is not list and type(N) is not list and type(S) is not list:
+        sector_string_list.append(__sector_string_builder(R, N, S)) # if all arguments are int
 
-#     for i in range(len(R)):
-#         if type(R[i]) is list:
-#             None
+    elif type(R) is list and type(N) is list and type(S) is list:
+        if len(R) != len(N) or len(N) != len(S):
+            raise ValueError("The lengths of R, N and S must be the same!")
 
-#     set_target_sectors(sector_string_list)            
+        if type(R[0]) is list:
+            for i in range(len(R)):
+                if len(R[i]) != len(N[i]) or len(N[i]) != len(S[i]):
+                    raise ValueError("Sublists at same indices must have same length!")
+                sector_string_list.append(__cluster_sector_string_builder(R[i], N[i], S[i])) # if all arguments are nested lists
+        else:
+            sector_string_list.append(__cluster_sector_string_builder(R, N, S)) # if all arguments are lists
+         
+    else:
+        raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
+
+    set_target_sectors(sector_string_list)
     
 ################################################################################
 def parameters(label=0):
@@ -1082,7 +1078,32 @@ def set_basis(B):
     qcm.set_basis(B)
 
 ################################################################################
-def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
+def __band_manager(band1, band2):
+    """If a band is none, it is set to a list of all bands. If band is specified --> [band]
+    """
+
+    if type(band1) is not int and band1 is not None:
+        raise ValueError("`band1` must be of type `int` or None (default)")
+    if type(band2) is not int and band2 is not None:
+        raise ValueError("`band2` must be of type `int` or None (default)")
+
+    nbands = model_size()[1]
+    complete_band_list = [i for i in range(1, nbands+1)]
+
+    if band1 is None:
+        band1 = complete_band_list
+    else:
+        band1 = [band1]
+
+    if band2 is None:
+        band2 = complete_band_list
+    else:
+        band2 = [band2]
+
+    return band1, band2
+    
+################################################################################
+def interaction_operator(name, link=None, band1=None, band2=None, **kwargs):
     """
     Defines an interaction operator of type Hubbard, Hund, Heisenberg or X, Y, Z
 
@@ -1104,55 +1125,36 @@ def interaction_operator(name, band1=None, band2=None, link=None, **kwargs):
     if type(the_model.sites) is list:
         the_model._finalize()
 
-    if band1 is None and band2 is None: # this applies an interaction operator on all bands if none are specified
-        nbands = model_size()[1]
-        bands = [i for i in range(1, 1+nbands)]
-        for band_no1 in bands:
-            for band_no2 in bands:
-                the_model.record += "interaction_operator('"+name+"'"
-                the_model.record += ', band1='+str(band_no1)
-                the_model.record += ', band2='+str(band_no2)
-                if link is not None:
-                    the_model.record += ', link='+str(link)
+    band1, band2 = __band_manager(band1, band2) 
 
-                for x in kwargs:
-                    if type(kwargs[x]) is str:
-                        the_model.record += ', '+x+"='"+kwargs[x]+"'"
-                    else:	
-                        the_model.record += ', '+x+'='+str(kwargs[x])
-                the_model.record += ')\n'	
-                qcm.interaction_operator(name, band1=band_no1, band2=band_no2, link=link, **kwargs)
+    for band_no1 in band1:
+        for band_no2 in band2:
+            the_model.record += "interaction_operator('"+name+"'"
+            the_model.record += ', band1='+str(band_no1)
+            the_model.record += ', band2='+str(band_no2)
+            if link is not None:
+                the_model.record += ', link='+str(link)
 
-    elif band1 is None or band2 is None: # protects against undefined situation (one out of two bands are defined)
-        raise ValueError("Both bands must be given or both bands must be None to define operator across all bands.")
-    else: # does the usual routine if both bands are given
-        the_model.record += "interaction_operator('"+name+"'"
-        the_model.record += ', band1='+str(band1)
-        the_model.record += ', band2='+str(band2)
-        if link is not None:
-            the_model.record += ', link='+str(link)
-
-        for x in kwargs:
-            if type(kwargs[x]) is str:
-                the_model.record += ', '+x+"='"+kwargs[x]+"'"
-            else:	
-                the_model.record += ', '+x+'='+str(kwargs[x])
-        the_model.record += ')\n'	
-
-        qcm.interaction_operator(name, band1=band1, band2=band2, link=link, **kwargs)
+            for x in kwargs:
+                if type(kwargs[x]) is str:
+                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                else:	
+                    the_model.record += ', '+x+'='+str(kwargs[x])
+            the_model.record += ')\n'	
+            qcm.interaction_operator(name, band1=band_no1, band2=band_no2, link=link, **kwargs)
 
 ################################################################################
-def hopping_operator(name, link, amplitude, **kwargs):
+def hopping_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
     """Defines a hopping term or, more generally, a one-body operator
 
     :param str name: name of operator
     :param [int] link: bond vector (3-component integer array)
     :param float amplitude: hopping amplitude multiplier
+    :param int band1: number of the first band (None by default)
+    :param int band2: number of the second band (None by default)
     
     :Keyword Arguments:
 
-        * band1 (*int*) -- Band label of first index (1 by default)
-        * band2 (*int*) -- Band label of second index (1 by default)
         * tau (*int*) -- specifies the tau Pauli matrix  (0,1,2,3)
         * sigma (*int*) -- specifies the sigma Pauli matrix  (0,1,2,3)
   
@@ -1170,29 +1172,38 @@ def hopping_operator(name, link, amplitude, **kwargs):
         else:
             kwargs["tau"] = 0
 
-    if type(the_model.sites) is list: the_model._finalize()
-    the_model.record += "hopping_operator('"+name+"', "+str(link)+', '+str(amplitude)
-    for x in kwargs:
-        if type(kwargs[x]) is str:
-            the_model.record += ', '+x+"='"+kwargs[x]+"'"
-        else:	
-            the_model.record += ', '+x+'='+str(kwargs[x])
-    the_model.record += ')\n'	
+    if type(the_model.sites) is list:
+        the_model._finalize()
 
-    qcm.hopping_operator(name, link, amplitude, **kwargs)
+    band1, band2 = __band_manager(band1, band2) 
+
+    for band_no1 in band1:
+        for band_no2 in band2:
+            the_model.record += "hopping_operator('"+name+"', "+str(link)+', '+str(amplitude)
+            the_model.record += ', band1='+str(band_no1)
+            the_model.record += ', band2='+str(band_no2)
+
+            for x in kwargs:
+                if type(kwargs[x]) is str:
+                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                else:	
+                    the_model.record += ', '+x+'='+str(kwargs[x])
+            the_model.record += ')\n'
+
+            qcm.hopping_operator(name, link, amplitude, band1=band_no1, band2=band_no2, **kwargs)
 
 ################################################################################
-def anomalous_operator(name, link, amplitude, **kwargs):
+def anomalous_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
     """Defines an anomalous operator
 
     :param str name: name of operator
     :param [int] link: bond vector (3-component integer array)
     :param complex amplitude: pairing multiplier
+    :param int band1: number of the first band (None by default)
+    :param int band2: number of the second band (None by default)
 
     :Keyword Arguments:
-
-        * band1 (*int*) -- Band label of first index (1 by default)
-        * band2 (*int*) -- Band label of second index (1 by default)
+    
         * type (*str*) -- one of 'singlet' (default), 'dz', 'dy', 'dx'
   
     :return: None
@@ -1200,15 +1211,34 @@ def anomalous_operator(name, link, amplitude, **kwargs):
     """
 
     global the_model
-    the_model.record += "anomalous_operator('"+name+"', "+str(link)+', '+str(amplitude)
-    for x in kwargs:
-        if type(kwargs[x]) is str:
-            the_model.record += ', '+x+"='"+kwargs[x]+"'"
-        else:	
-            the_model.record += ', '+x+'='+str(kwargs[x])
-    the_model.record += ')\n'	
 
-    qcm.anomalous_operator(name, link, amplitude, **kwargs)
+    if link == [0,0,0]:
+        if "tau" in kwargs:
+            if kwargs["tau"] != 0:
+                warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
+                kwargs["tau"] = 0
+        else:
+            kwargs["tau"] = 0
+    
+    if type(the_model.sites) is list:
+        the_model._finalize()
+
+    band1, band2 = __band_manager(band1, band2) 
+
+    for band_no1 in band1:
+        for band_no2 in band2:
+            the_model.record += "anomalous_operator('"+name+"', "+str(link)+', '+str(amplitude)
+            the_model.record += ', band1='+str(band_no1)
+            the_model.record += ', band2='+str(band_no2)
+
+            for x in kwargs:
+                if type(kwargs[x]) is str:
+                    the_model.record += ', '+x+"='"+kwargs[x]+"'"
+                else:	
+                    the_model.record += ', '+x+'='+str(kwargs[x])
+            the_model.record += ')\n'
+
+            qcm.anomalous_operator(name, link, amplitude, band1=band_no1, band2=band_no2, **kwargs)
 
 ################################################################################
 def explicit_operator(name, elem, **kwargs):
