@@ -783,10 +783,7 @@ def sectors(R=None, N=None, S=None):
     else:
         raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
 
-    #########################PRINT GAMING#########################
-    print(sector_string_list)
-    #########################PRINT GAMING#########################
-    # set_target_sectors(sector_string_list)
+    set_target_sectors(sector_string_list)
     
 ################################################################################
 def parameters(label=0):
