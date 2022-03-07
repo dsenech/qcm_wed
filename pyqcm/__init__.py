@@ -757,7 +757,7 @@ def sectors(R=None, N=None, S=None):
     sector_string_list = []
     
     if type(R) is not list and type(N) is not list and type(S) is not list:
-        sector_string_list.append(__sector_string_builder(R, N, S))
+        sector_string_list.append(__sector_string_builder(R, N, S)) # if all arguments are int
 
     elif type(R) is list and type(N) is list and type(S) is list:
         if len(R) != len(N) or len(N) != len(S):
@@ -765,25 +765,14 @@ def sectors(R=None, N=None, S=None):
 
         if type(R[0]) is list:
             for i in range(len(R)):
-                sector_string = ""
-                for j in range(len(R[i])):
-                    sector_string += f"{__sector_string_builder(R[i][j], N[i][j], S[i][j])}/"
-                sector_string = sector_string[:-1] # removes the last caracter (/) from string
-                sector_string_list.append(sector_string)
+                sector_string_list.append(__cluster_sector_string_builder(R[i], N[i], S[i])) # if all arguments are nested lists
         else:
-            sector_string = ""
-            for i in range(len(R)):
-                sector_string += f"{__sector_string_builder(R[i], N[i], S[i])}/"
-            sector_string = sector_string[:-1] # removes the last caracter (/) from string
-            sector_string_list.append(sector_string)
+            sector_string_list.append(__cluster_sector_string_builder(R, N, S)) # if all arguments are lists
          
     else:
         raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
-###################DEBUG##################
-    print(sector_string_list)
 
-    # set_target_sectors([sector_string])
-####################DEBUG#################
+    set_target_sectors(sector_string_list)
     
 ################################################################################
 def parameters(label=0):
