@@ -754,6 +754,15 @@ def __cluster_sector_string_builder(R, N, S):
 
 
 def sectors(R=None, N=None, S=None):
+    """Alternative method of setting target sectors (see `set_target_sectors(...)`). An example of usage is, R = [[1,2], [3,4]] --> ["R1.../R2...", "R3.../R4..."].
+    
+    :param int or [int] or [[int]] R: Symmetry sector.
+    :param int or [int] or [[int]] N: Particle number.
+    :param int or [int] or [[int]] S: Total spin.
+
+    :return: None
+
+    """
     sector_string_list = []
     
     if type(R) is not list and type(N) is not list and type(S) is not list:
@@ -765,6 +774,8 @@ def sectors(R=None, N=None, S=None):
 
         if type(R[0]) is list:
             for i in range(len(R)):
+                if len(R[i]) != len(N[i]) or len(N[i]) != len(S[i]):
+                    raise ValueError("Sublists at same indices must have same length!")
                 sector_string_list.append(__cluster_sector_string_builder(R[i], N[i], S[i])) # if all arguments are nested lists
         else:
             sector_string_list.append(__cluster_sector_string_builder(R, N, S)) # if all arguments are lists
@@ -772,7 +783,10 @@ def sectors(R=None, N=None, S=None):
     else:
         raise ValueError(f"R, N and S are mismatched! Here, type(R)={type(R)}, type(N)={type(N)}, type(S)={type(S)}")
 
-    set_target_sectors(sector_string_list)
+    #########################PRINT GAMING#########################
+    print(sector_string_list)
+    #########################PRINT GAMING#########################
+    # set_target_sectors(sector_string_list)
     
 ################################################################################
 def parameters(label=0):
