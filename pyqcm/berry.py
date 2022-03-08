@@ -5,7 +5,7 @@ import pyqcm.spectral
 from pyqcm import qcm
 
 ################################################################################
-def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, subdivide=False, plane='xy', k_perp=0.0, file=None, plt_ax=None, **kwargs):
+def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=None, subdivide=False, plane='xy', k_perp=0.0, file=None, plt_ax=None, **kwargs):
     """Draws a 2D density plot of the Berry curvature as a function of wavevector, on a square grid going from -pi to pi in each direction.
     
     :param int nk: number of wavevectors on the side of the grid
@@ -13,7 +13,7 @@ def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, su
     :param str period: type of periodization used (e.g. 'G', 'M', 'None')
     :param list range: range of plot [originX, originY, side], in multiples of pi
     :param int label: label of the model instance (0 by default)
-    :param int band: the band to use in the computation (1 to number of bands). 0 (default) means a sum over all bands.
+    :param int band: the band to use in the computation (1 to number of bands). None (default) means a sum over all bands.
     :param int subdivide: True if plaquette subdivision is used.
     :param float k_perp: momentum component in the third direction (x pi)
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
@@ -30,6 +30,9 @@ def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, su
     else:
         ax = plt_ax
     ax.set_aspect(1)
+
+    if band is None:
+        band=0 # this is a quick and simple uniformity change across pyqcm functions
 
     pyqcm.set_global_parameter('eta', eta)
     pyqcm.set_global_parameter('periodization', period)
@@ -87,7 +90,7 @@ def Berry_curvature(nk=200, eta=0.0, period='G', range=None, label=0, band=0, su
 
 
 ################################################################################
-def Chern_number(nk=100, eta=0.0, period='G', offset=[0., 0., 0.], label=0, band=0, subdivide=False):
+def Chern_number(nk=100, eta=0.0, period='G', offset=[0., 0., 0.], label=0, band=None, subdivide=False):
     """Computes the Chern number by summing the Berry curvature over wavevectors on a square grid going from (0,0) to (pi,pi)
 
     :param int nk: number of wavevectors on the side of the grid
@@ -95,11 +98,14 @@ def Chern_number(nk=100, eta=0.0, period='G', offset=[0., 0., 0.], label=0, band
     :param str period: type of periodization used (e.g. 'G', 'M', 'None')
     :param wavevector offset: wavevector offset of the computation grid
     :param int label: label of the model instance (0 by default)
-    :param int band: the band to use in the computation (1 to number of bands). 0 (default) means a sum over all occupied bands.
+    :param int band: the band to use in the computation (1 to number of bands). None (default) means a sum over all occupied bands.
     :param boolean subdivide: recursivity flag (wavevector grid subdivision)
     :returns float: The Chern number
 
     """
+
+    if band is None:
+        band=0 # this is a quick and simple uniformity change across pyqcm functions
 
     pyqcm.set_global_parameter('eta', eta)
     offset = np.array(offset)
@@ -115,24 +121,28 @@ def Chern_number(nk=100, eta=0.0, period='G', offset=[0., 0., 0.], label=0, band
 
 
 ################################################################################
-def monopole(k, a=0.01, nk=20, label=0, band=0, subdivide=False):
+def monopole(k, a=0.01, nk=20, label=0, band=None, subdivide=False):
     """computes the topological charge of a node in a Weyl semi-metal
 
     :param [double] k: wavevector, position of the node
     :param float a: half-side of the cube surrounding the node 
     :param int nk: number of divisions along the side of the cube
     :param int label: label of the model instance (0 by default)
-    :param int band: band to compute the charge of (if 0, sums over all bands)
+    :param int band: band to compute the charge of (if None, sums over all bands)
     :param booleean subdivide: True if subdivision is allowed (False by default)
     :param int label: label of the model instance (0 by default)
     :return float: the monopole charge
 
     """
+
+    if band is None:
+        band=0 # this is a quick and simple uniformity change across pyqcm functions
+
     return qcm.monopole(0.5*np.array(k), a*0.5, nk, band, subdivide, label)
     
 
 ################################################################################
-def Berry_flux(k0, R, nk=40, plane='xy', label=0, band=0):
+def Berry_flux(k0, R, nk=40, plane='xy', label=0, band=None):
     """Computes the integral of the Berry connexion along a closed circle
     
     :param int k0: center of the circle
@@ -140,11 +150,14 @@ def Berry_flux(k0, R, nk=40, plane='xy', label=0, band=0):
     :param int nk: number of wavevectors on the circle
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param int label: label of the model instance (0 by default)
-    :param int band: the band to use in the computation (1 to number of bands). 0 (default) means a sum over all bands.
+    :param int band: the band to use in the computation (1 to number of bands). None (default) means a sum over all bands.
     :param int label: label of the model instance (0 by default)
     :returns float: the flux
 
     """
+
+    if band is None:
+        band=0 # this is a quick and simple uniformity change across pyqcm functions
 
     phi_list = np.linspace(0.0, 2*np.pi, nk, endpoint=False)
     k = np.zeros((nk,3))
@@ -171,20 +184,23 @@ def Berry_flux(k0, R, nk=40, plane='xy', label=0, band=0):
     return qcm.Berry_flux(k, band, label)
 
 ################################################################################
-def monopole_map(nk=40, label=0, band=0, plane='z', k_perp=0.0, file=None, plt_ax = None, **kwargs):
+def monopole_map(nk=40, label=0, band=None, plane='z', k_perp=0.0, file=None, plt_ax = None, **kwargs):
     """Creates a plot of the monopole density (divergence of B) as a function of wavevector
 
     :param int nk: number of wavevector grid points on each side
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param str k_perp: offset in wavevector in the direction perpendicular to the plane (x pi)
     :param int label: label of the model instance (0 by default)
-    :param int band: the band to use in the computation (1 to number of bands). 0 (default) means a sum over all bands.
+    :param int band: the band to use in the computation (1 to number of bands). None (default) means a sum over all bands.
     :param str file: Name of the file to save the plot. If None, shows the plot on screen.
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
     :param kwargs: keyword arguments passed to the matplotlib 'plot' function
     :return: the contourplot object of matplotlib
 
     """
+
+    if band is None:
+        band=0 # this is a quick and simple uniformity change across pyqcm functions
 
     if plt_ax is None:
         plt.figure()
@@ -222,7 +238,7 @@ def monopole_map(nk=40, label=0, band=0, plane='z', k_perp=0.0, file=None, plt_a
     return CS
 
 ################################################################################
-def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoints=4, radius=None, file=None, plt_ax = None, **kwargs):
+def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=None, npoints=4, radius=None, file=None, plt_ax = None, **kwargs):
     """Creates a plot of the Berry flux as a function of wavevector
 
     :param int nk: number of wavevector grid points on each side
@@ -230,7 +246,7 @@ def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoin
     :param str dir: direction of flux, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param str k_perp: offset in wavevector in the direction perpendicular to the plane (x pi)
     :param int label: label of the model instance (0 by default)
-    :param int band: the band to use in the computation (1 to number of bands). 0 (default) means a sum over all bands.
+    :param int band: the band to use in the computation (1 to number of bands). None (default) means a sum over all bands.
     :param int npoints: nombre de points sur chaque boucle
     :param str file: Name of the file to save the plot. If None, shows the plot on screen.
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
@@ -238,6 +254,9 @@ def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoin
     :return: the contourplot object of matplotlib
 
     """
+
+    if band is None:
+        band=0 # this is a quick and simple uniformity change across pyqcm functions
 
     if plt_ax is None:
         plt.figure()
@@ -280,7 +299,7 @@ def Berry_flux_map(nk=40, plane='z', dir='z', k_perp=0.0, label=0, band=0, npoin
     return CS
 
 ################################################################################
-def Berry_field_map(nk=40, nsides = 4, plane='z', k_perp=0.0, label=0, band=0, file=None, plt_ax = None, **kwargs):
+def Berry_field_map(nk=40, nsides = 4, plane='z', k_perp=0.0, label=0, band=None, file=None, plt_ax = None, **kwargs):
     """Creates a plot of the Berry flux as a function of wavevector
 
     :param int nk: number of wavevector grid points on each side
@@ -288,13 +307,16 @@ def Berry_field_map(nk=40, nsides = 4, plane='z', k_perp=0.0, label=0, band=0, f
     :param str plane: momentum plane, 'xy'='z', 'yz'='x'='zy' or 'xz'='zx'='y'
     :param str k_perp: offset in wavevector in the direction perpendicular to the plane (x pi)
     :param int label: label of the model instance (0 by default)
-    :param int band: the band to use in the computation (1 to number of bands). 0 (default) means a sum over all bands.
+    :param int band: the band to use in the computation (1 to number of bands). None (default) means a sum over all bands.
     :param str file: Name of the file to save the plot. If None, shows the plot on screen.
     :param plt_ax: optional matplotlib axis set, to be passed when one wants to collect a subplot of a larger set
     :param kwargs: keyword arguments passed to the matplotlib 'plot' function
     :return: the contourplot object of matplotlib, the quiver object of matplotlib
 
     """
+
+    if band is None:
+        band=0 # this is a quick and simple uniformity change across pyqcm functions
 
     ax = None
     if plt_ax is None:
