@@ -1,10 +1,10 @@
 import numpy as np
-from pyqcm import *
+import pyqcm
 import matplotlib.pyplot as plt
 np.set_printoptions(precision=4, linewidth=512, suppress=True)
 
 def fixed_qmatrix(site):
-    Q = qmatrix()
+    Q = pyqcm.qmatrix()
     W = np.abs(Q[1][:,site])**2
     S = np.argsort(Q[0])
     return (Q[0][S], W[S])

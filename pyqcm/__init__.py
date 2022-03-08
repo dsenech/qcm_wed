@@ -466,7 +466,7 @@ def cluster_averages(label=0):
     return qcm.cluster_averages(label)
 
 ################################################################################
-def Lehmann_Green_function(k, band = 1, spin_down=False, label=0):
+def Lehmann_Green_function(k, band=1, spin_down=False, label=0):
     """
     computes the Lehmann representation of the periodized Green function for a set of wavevectors
 
