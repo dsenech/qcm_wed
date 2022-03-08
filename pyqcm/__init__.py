@@ -1217,17 +1217,9 @@ def anomalous_operator(name, link, amplitude, band1=None, band2=None, **kwargs):
     """
 
     global the_model
-
-    if link == [0,0,0]:
-        if "tau" in kwargs:
-            if kwargs["tau"] != 0:
-                warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
-                kwargs["tau"] = 0
-        else:
-            kwargs["tau"] = 0
     
     if type(the_model.sites) is list:
-        the_model._finalize()
+        the_model._finalize() 
 
     band1, band2 = __band_manager(band1, band2) 
 
@@ -1264,14 +1256,6 @@ def explicit_operator(name, elem, **kwargs):
 
     """
     global the_model
-
-    # if "tau" in kwargs:
-    #         if kwargs["tau"] != 0:
-    #             warn("***** Setting tau=0 since the link is [0,0,0] (on-site operator). *****")
-    #             kwargs["tau"] = 0
-    #     else:
-    #         kwargs["tau"] = 0
-
     the_model.record += "explicit_operator('"+name+"', "+str(elem)
     for x in kwargs:
         if type(kwargs[x]) is str:
