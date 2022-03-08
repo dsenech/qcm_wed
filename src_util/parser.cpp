@@ -303,7 +303,7 @@ void banner(const char c, const string &s, ostream &fout)
 
 void qcm_throw(const std::string& s)
 {
-    banner('*', s, std::cerr);
+    // banner('*', s, std::cerr);
     throw(s);
 }
 
@@ -311,7 +311,7 @@ void qcm_throw(const std::string& s)
 
 void qcm_ED_throw(const std::string& s)
 {
-    banner('*', s, std::cerr);
+    // banner('*', s, std::cerr);
     throw(s);
 }
 
