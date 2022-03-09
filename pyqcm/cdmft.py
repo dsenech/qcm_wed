@@ -176,7 +176,7 @@ def __frequency_grid(type='sharp', beta='50', wc=2):
         weight *= 1.0 / weight.sum()
         dist_function = 'self_wc_{0:.1f}_b_{1:d}'.format(wc, int(beta))
     else:
-        raise pyqcm.WrongArgumentError('frequency_grid', type)
+        raise pyqcm.WrongArgumentError(f"frequency_grid set as type `{type}`")
     return dist_function
 
 ######################################################################

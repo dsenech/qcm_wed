@@ -27,6 +27,7 @@ solver = 'ED'
 
 class OutOfBoundsError(Exception):
     pass
+
 class TooManyIterationsError(Exception):
     pass
 
