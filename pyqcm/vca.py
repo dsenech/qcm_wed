@@ -569,7 +569,8 @@ def vca(
         if hartree != None:
             val += '{:.8g}\t'.format(omega)
             des += 'omegaH\t'
-        pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
+        # pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
+        pyqcm.write_summary(file, suppl_descr = des, suppl_values = val)
         first_time = False
 
     if root:

@@ -466,7 +466,8 @@ def cdmft(
         # writing the parameters in a progress file
         des = 'distance\tdiff_param\tdiff_hybrid\t'
         val = '{: #.2e}\t{: #.2e}\t{: #.2e}\t'.format(dist_value, diff_param, diffH)
-        pyqcm.write_summary('cdmft_iter.tsv', first = first_time2, suppl_descr = des, suppl_values = val)
+        # pyqcm.write_summary('cdmft_iter.tsv', first = first_time2, suppl_descr = des, suppl_values = val)
+        pyqcm.write_summary('cdmft_iter.tsv', suppl_descr = des, suppl_values = val)
         first_time2 = False
         #______________________________________________________________________
                 
@@ -550,7 +551,8 @@ def cdmft(
                     val += '{: #.6e}\t'.format(x.ave)
                 des += 'series_length\t'
                 val += '{:d}\t'.format(observable_series_length)
-            pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
+            # pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
+            pyqcm.write_summary(file, suppl_descr = des, suppl_values = val)
             first_time = False
             first_time2 = True
 
