@@ -129,7 +129,7 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
 
         for i in range(n):
             if(np.abs(x[i]) > max[i]):
-                raise pyqcm.OutOfBoundsError(variable=i, iteration=iteration)
+                raise pyqcm.OutOfBoundsError(f"variable --> {i}, iteration --> {iteration}") 
 
         converged = True
         for i in range(n):
@@ -541,7 +541,7 @@ def vca(
             sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, False, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # quasi-Newton process
     except pyqcm.OutOfBoundsError as E:
         print('variable ', E.variable + 1, ' is out of bounds: abs(', names[E.variable], ') > ', max[E.variable])
-        raise pyqcm.OutOfBoundsError(variable=E.variable, iteration=E.iteration)
+        raise pyqcm.OutOfBoundsError(f"variable --> {E.variable}, iteration --> {E.iteration}")
 
     except pyqcm.TooManyIterationsError as E:
         print('quasi-Newton method failed to converge after ', E.max_iteration, ' iterations')
@@ -569,7 +569,8 @@ def vca(
         if hartree != None:
             val += '{:.8g}\t'.format(omega)
             des += 'omegaH\t'
-        pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
+        # pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
+        pyqcm.write_summary(file, suppl_descr = des, suppl_values = val)
         first_time = False
 
     if root:
