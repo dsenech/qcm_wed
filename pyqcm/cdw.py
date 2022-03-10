@@ -198,7 +198,7 @@ class cluster:
         ax.plot([0, e[1,0]], [0, e[1,1]], 'r-', lw=0.5)
         S = self.sites
         S = S@basis
-        fac = 12/np.max(np.abs(cdw))
+        fac = 8/np.max(np.abs(cdw))
         for j1 in range(-1,2,1):
             for j2 in range(-1,2,1):
                 es = j1*e[0,:] + j2*e[1,:]
@@ -206,6 +206,7 @@ class cluster:
                     ss = es + S[i,:]
                     if cdw[i] > 0: ax.plot(ss[0], ss[1], 'bo', ms=fac*cdw[i])
                     else: ax.plot(ss[0], ss[1], 'ro', ms=-fac*cdw[i])
+                    ax.plot(ss[0], ss[1], 'k.', ms=1)
         if plt_ax is None:
             plt.show()
 
@@ -264,7 +265,7 @@ def cdw_energy(C, U, _V, n, cluster=False, pr=False):
 
 
 #----------------------------------------------------------------------
-def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3)):
+def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3), file=None):
     """
     Computes the possible CDW states of the cluster, to be used with the Hartree approximation
 
@@ -316,9 +317,9 @@ def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3)):
     print('intra-cluster V matrix:\n',Vc)
     print('inter-cluster V matrix:\n',Vic)
 
-    fig, ax = plt.subplots((C.N+3)//4, 4, sharex=True, sharey=True)
-    fig.set_size_inches(6, 1.5*ax.shape[0])
-    if C.N > 4:
+    fig, ax = plt.subplots((C.N+1)//2, 2, sharex=True, sharey=True)
+    fig.set_size_inches(6, 3*ax.shape[0])
+    if C.N > 2:
         ax = np.reshape(ax, (C.N))
 
     w, v = np.linalg.eigh(Vic)
@@ -330,7 +331,8 @@ def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3)):
         ax[i].tick_params(top=False, bottom=False, left=False, right=False, labelleft=False, labelbottom=False)
 
     # plt.tight_layout()
-    plt.show()
+    if file != None: plt.savefig(file)
+    else: plt.show()
     return w, v, Vic, Vc
 
 
