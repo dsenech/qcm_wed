@@ -31,6 +31,7 @@ namespace QCM{
   double Berry_flux(vector<vector3D<double>>& k, int band, int label);
   double monopole(vector3D<double>& k, double a, int nk, int band, bool rec, int label);
   double Potthoff_functional(int label);
+  double potential_energy(int label);
   double spectral_average(const string& name, const complex<double> w, int label);
   int mixing();
   int spatial_dimension();

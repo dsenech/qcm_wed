@@ -12,6 +12,7 @@ struct lattice_model_instance{
 	bool gf_solved; //!< true if the Green function has been already solved  for that instance
 	bool average_solved; //!< true if the lattice averages have already been computed for that instance
 	bool SEF_solved; //!< true if the Potthoff functional (SEF) has already been computed for that instance
+	bool PE_solved; //!< true if the potential energy has already been computed for that instance
 	shared_ptr<lattice_model> model; //!< backtrace to the lattice model
 	matrix<Complex> H; //!< one-body  matrix (k-independent part)
 	matrix<Complex> H_down; //!< one-body  matrix (k-independent part) for the spin-down part, if mixing=4

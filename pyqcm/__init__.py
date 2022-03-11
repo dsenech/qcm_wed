@@ -890,6 +890,18 @@ def periodized_Green_function_element(r, c, z, k, spin_down=False, label=0):
 
 
 ################################################################################
+def potential_energy(label=0):
+    """
+    computes the potential energy for a given instance, as the functional trace of Sigma x G
+
+    :param int label: label of the model instance
+    :return: the value of the potential energy
+
+    """
+    return qcm.potential_energy(label)
+
+
+################################################################################
 def Potthoff_functional(hartree=None, file='sef.tsv', label=0):
     """
     computes the Potthoff functional for a given instance

@@ -40,11 +40,7 @@ vector<pair<string,double>> lattice_model_instance::averages(const vector<string
     auto F = [this] (Complex w, vector3D<double> &k, const int *nv, double *I) mutable {average_integrand(w, k, nv, I);};
     QCM::wk_integral(model->spatial_dimension, F, Iv, accur_OP, global_bool("verb_integrals"));
   }
-	
-  if(global_bool("potential_energy")) E_pot = potential_energy();
-
-  if(global_bool("SEF_calc")) Potthoff_functional();
-
+	  
   size_t i = 0;
   ave.resize(ops.size());
 	for(auto& op : ops){
@@ -400,6 +396,9 @@ vector<double> lattice_model_instance::momentum_profile_per(const lattice_operat
  */
 double lattice_model_instance::potential_energy()
 {
+  if(PE_solved) return E_pot;
+  PE_solved = true;
+
   double accur_OP = global_double("accur_OP");
   if(!gf_solved) Green_function_solve();
  
@@ -421,7 +420,8 @@ double lattice_model_instance::potential_energy()
 
   set_global_double("cutoff_scale", prev_cutoff); // restores to previous value
   if(model->mixing == HS_mixing::full) I[0] *= 0.5; // full Nambu doubling overestimates by a factor of 2
-  return 0.5*I[0]/model->Lc;
+  E_pot = 0.5*I[0]/model->Lc;
+  return E_pot;
 }
 
 

@@ -13,8 +13,6 @@ namespace QCM {
     new_global_bool(false, "dual_basis", "uses the dual basis for wavevector computations");
     new_global_bool(false, "periodic","considers the cluster(s) as periodic");
     new_global_bool(false, "periodized_averages","computes lattice averages using the periodized Green function");
-    new_global_bool(false, "potential_energy","Calculates the potential energy with Tr(Sigma*G) when computing averages");
-    new_global_bool(false, "SEF_calc","Calculates the Self-energy functional, even when not performing VCA");
     new_global_bool(false, "zero_dim","sets the spatial dimension to zero, on any model");
     new_global_bool(false, "print_all","prints dependent parameters as well");
 

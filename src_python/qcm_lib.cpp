@@ -15,7 +15,7 @@ functions are available (type help(<function> or <function>? in ipython) for hel
 
 
 static PyMethodDef methods[] = {
-//-------------------- QMC_ED --------------------------------------------------------------
+//-------------------- QCM_ED --------------------------------------------------------------
   { "cluster_averages", cluster_averages_python, METH_VARARGS, cluster_averages_help },
   { "complex_HS", complex_HS_python, METH_VARARGS, complex_HS_help },
   { "fidelity", fidelity_python, METH_VARARGS, fidelity_help },
@@ -47,7 +47,7 @@ static PyMethodDef methods[] = {
   { "susceptibility", susceptibility_python, METH_VARARGS, susceptibility_help },
   { "write_instance_to_file", write_instance_to_file_python, METH_VARARGS, write_instance_to_file_help },
   { "write_instance", write_instance_python, METH_VARARGS, write_instance_help },
-//-------------------- QMC --------------------------------------------------------------
+//-------------------- QCM --------------------------------------------------------------
   { "add_cluster", add_cluster_python, METH_VARARGS, add_cluster_help },
   { "anomalous_operator", (PyCFunction)anomalous_operator_python, METH_VARARGS | METH_KEYWORDS, anomalous_operator_help },
   { "averages", averages_python, METH_VARARGS, averages_help },
@@ -85,6 +85,7 @@ static PyMethodDef methods[] = {
   { "parameters", parameters_python, METH_VARARGS, parameters_help },
   { "periodized_Green_function_element", periodized_Green_function_element_python, METH_VARARGS, periodized_Green_function_element_help },
   { "periodized_Green_function", periodized_Green_function_python, METH_VARARGS, periodized_Green_function_help },
+  { "potential_energy", potential_energy_python, METH_VARARGS, potential_energy_help },
   { "Potthoff_functional", Potthoff_functional_python, METH_VARARGS, Potthoff_functional_help },
   { "print_model", (PyCFunction)print_model_python, METH_VARARGS | METH_KEYWORDS, print_model_help },
   { "print_options", print_options_python, METH_VARARGS, print_options_help },

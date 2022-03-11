@@ -44,6 +44,7 @@ lattice_model_instance::lattice_model_instance(shared_ptr<lattice_model> _model,
   gf_solved = false;
   average_solved = false;
   SEF_solved = false;
+  PE_solved = false;
   E_pot = 0.0;
   E_kin = 0.0;
   if(sectors.size() == 0) qcm_throw("target sectors were not specified!");
@@ -615,10 +616,10 @@ void lattice_model_instance::print_info()
   if(average_solved){
     ostr1 << "E_kin\t";
     ostr2 << setprecision(print_precision) << E_kin << '\t';
-    if(global_bool("potential_energy")){
-      ostr1 << "E_pot\t";
-      ostr2 << setprecision(print_precision) << E_pot << '\t';
-    }
+  }
+  if(PE_solved){
+    ostr1 << "E_pot\t";
+    ostr2 << setprecision(print_precision) << E_pot << '\t';
   }
   ground_state();
   print_parameters(ostr1, print_format::names);

@@ -1251,6 +1251,29 @@ static PyObject* Potthoff_functional_python(PyObject *self, PyObject *args)
 
 
 //==============================================================================
+const char* potential_energy_help =
+R"{(
+computes the potential_energy for a given instance
+arguments:
+1. label (optional) :  label of the model instance (default 0)
+returns: the value of the potential_energy
+){";
+//------------------------------------------------------------------------------
+static PyObject* potential_energy_python(PyObject *self, PyObject *args)
+{
+  int label=0;
+  double PE;
+  try{
+    if(!PyArg_ParseTuple(args, "|i", &label))
+      qcm_throw("failed to read parameters in call to potential_energy (python)");
+    PE = QCM::potential_energy(label);
+  } catch(const string& s) {qcm_catch(s);}
+  return Py_BuildValue("d", PE);
+}
+
+
+
+//==============================================================================
 const char* print_model_help =
 R"{(
 Prints a description of the model into a file

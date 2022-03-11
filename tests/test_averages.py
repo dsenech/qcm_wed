@@ -9,8 +9,10 @@ U = 4
 mu = 0.5*U
 """)
 
-print("\ntesting lattice averages (all operators):\n")
+print("\ntesting lattice averages (all operators, also with Potthoff functional and potential energy):\n")
 pyqcm.new_model_instance()
+print('Potthoff functional = ', pyqcm.Potthoff_functional())
+print('potential energy = ', pyqcm.potential_energy())
 pyqcm.print_averages(pyqcm.averages())
 
 print("\ntesting lattice averages (selected operators):\n")

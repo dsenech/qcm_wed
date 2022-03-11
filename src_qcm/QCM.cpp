@@ -465,6 +465,18 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
   
   
   /**
+   computes the potential energy (Tr (Sigma.G))
+   */
+  double potential_energy(int label)
+  {
+    if(lattice_model_instances.find(label) == lattice_model_instances.end()) qcm_throw("The instance # "+to_string(label)+" does not exist.");
+    return lattice_model_instances.at(label)->potential_energy();
+  }
+  
+  
+  
+
+  /**
    computes the lattice averages
    */
   vector<pair<string,double>> averages(const vector<string> &_ops, int label)
