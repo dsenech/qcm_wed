@@ -9,3 +9,4 @@ _skbuild
 build
 qcm_git_hash.py
 external
+doc/build/

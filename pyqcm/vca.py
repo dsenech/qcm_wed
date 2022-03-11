@@ -837,6 +837,8 @@ def __transition(varia, P, bracket, step=0.001, verb=False):
 
 
     x0, r = brentq(F, bracket[0], bracket[1], maxiter=100, full_output=True, disp=True)
+
+    print(r.flag)
     if not r.converged:
         raise RuntimeError('the root finding routine could not find a solution!')
         
