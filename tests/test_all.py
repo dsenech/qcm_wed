@@ -36,6 +36,9 @@ class TestAll(unittest.TestCase):
     def test_fixed_density_loop(self):
         self.assertFalse(run_file("test_fixed_density_loop.py")) #### TEMPORARILY SHORTENED
 
+    def test_hartree(self):
+        self.assertFalse(run_file("test_hartree.py"))
+
     def test_hybridization(self):
         self.assertFalse(run_file("test_hybridization.py"))
 
