@@ -34,7 +34,7 @@ class TestAll(unittest.TestCase):
         self.assertFalse(run_file("test_cdmft.py"))
 
     def test_fixed_density_loop(self):
-        self.assertFalse(run_file("test_fixed_density_loop.py")) ######### needs to be shortened
+        self.assertFalse(run_file("test_fixed_density_loop.py")) #### TEMPORARILY SHORTENED
 
     def test_hybridization(self):
         self.assertFalse(run_file("test_hybridization.py"))
@@ -52,10 +52,10 @@ class TestAll(unittest.TestCase):
         self.assertFalse(run_file("test_mixing2.py"))
 
     def test_spectral(self):
-        self.assertFalse(run_file("test_spectral.py")) ################# make sure that all is output as pdf to allow user-less execution (applies to the previous mixing I think)
+        self.assertFalse(run_file("test_spectral.py"))
 
     def test_vca(self):
-        self.assertFalse(run_file("test_vca.py")) ####### graphs need to go to pdf
+        self.assertFalse(run_file("test_vca.py"))
 
 
 if __name__ == "__main__":
