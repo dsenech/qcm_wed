@@ -22,7 +22,8 @@ def test_fixed_density_loop():
         maxdmu=0.2,  # maximum change in mu
         func=F,
         loop_param='U', 
-        loop_values=np.arange(6, 0, -0.1),
+        # loop_values=np.arange(6, 0, -0.1),
+        loop_values=np.arange(6, 4, -0.1),
         # var_param='M_1',
         dens_tol=0.002,
         dir='',

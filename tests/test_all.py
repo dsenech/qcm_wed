@@ -1,13 +1,22 @@
+"""
+TESTING BATTERY TO VERIFY THE INTEGRETY AND FUNCTIONNALITY OF PYQCM
+"""
+
 import unittest
 import os
 
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+if not os.path.exists(f"{CURRENT_DIR}/test_outputs"):
+    os.mkdir(f"{CURRENT_DIR}/test_outputs")
+
+os.chdir(f"{CURRENT_DIR}/test_outputs")
 
 
 def run_file(test_name):
     """Runs a file of a given name inside the testing directory. Mostly aesthetic.
     """
-    return os.system(f"python {DIR_PATH}/{test_name}")
+    return os.system(f"python {CURRENT_DIR}/test_files/{test_name}")
 
 
 class TestAll(unittest.TestCase):

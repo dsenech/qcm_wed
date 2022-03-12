@@ -25,9 +25,9 @@ def test_vca():
 
     banner('testing vca() with explicit starting values', c='#', skip=1); vca(names=['M_1', 't_1'], start=[0.1, 1.1], accur=[5e-4, 5e-4], steps=[5e-5, 5e-5], max=[10,10], NR=False)
 
-    banner('testing plot_sef()', c='#', skip=1); plot_sef('M_1', np.arange(1e-9, 0.3, 0.02), accur_SEF=1e-4, show=True)
+    banner('testing plot_sef()', c='#', skip=1); plot_sef('M_1', np.arange(1e-9, 0.3, 0.02), accur_SEF=1e-4, file="SEF.pdf", show=False)
 
-    banner('testing plot_GS_energy()', c='#', skip=1); plot_GS_energy('M_1', np.arange(1e-9, 0.3, 0.02))
+    banner('testing plot_GS_energy()', c='#', skip=1); plot_GS_energy('M_1', np.arange(1e-9, 0.3, 0.02), file="GS_energy.pdf")
 
     # banner('testing transition_line()', c='#', skip=1) ########## Temporary fix ##########
     # set_parameter('U', 1)

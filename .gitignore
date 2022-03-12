@@ -10,3 +10,4 @@ build
 qcm_git_hash.py
 external
 doc/build/
+tests/test_outputs/
