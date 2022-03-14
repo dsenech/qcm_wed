@@ -26,7 +26,6 @@ extern int max_num_threads;
 
 bool sliced = false;
 int cuba_threads=1;
-int neval;
 
 typedef int (*integrand_t_vec)(const int *ndim, const double x[], const int *ncomp, double f[], void *userdata, const int *nvec, const int *core);
 int k_cuba_integrand(const int *dim, const double x[], const int *nv, double I[], void *userdata, const int *nvec, const int *core);
@@ -205,6 +204,8 @@ void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv,
   vector<double> value(ncomp,0);
   vector<double> err(ncomp,0);
   double accur = accuracy;
+  int neval, nregions, fail;
+  neval=0;
   
   k_integrand = f;
   
@@ -219,8 +220,6 @@ void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv,
       cuba_mineval=(int)global_int("cuba3D_mineval");
       cuba_maxpoints=4000000;
     }
-    int neval, nregions, fail;
-	  neval=0;
     Cuhre(dim, ncomp, (integrand_t)k_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &neval, &fail, value.data(), err.data(), prob.data());
 	if(verb) cout << "Cuhre  : " << neval << " points in " << nregions << "regions" << endl;
   }
@@ -259,7 +258,7 @@ void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vec
 	w_domain = small_scale;
 	double accur = accuracy*M_PI/w_domain;
 	double fac = w_domain*M_1_PI;
-  neval=0;
+  int neval=0;
 	gauss_kronrod(ncomp, low_freq_w_integrand, 0, 1, accur, value.data(), false, neval);
 	if(verb) cout << "region 1 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
