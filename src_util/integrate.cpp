@@ -36,7 +36,7 @@ int high_freq_cuba_integrand(const int *ndim, const double x[], const int *ncomp
 int low_freq_w_integrand(const int *ndim, const double x[], const int *ncomp, double f[], void *userdata, const int *nvec, const int *core);
 int mid_freq_w_integrand(const int *ndim, const double x[], const int *ncomp, double f[], void *userdata, const int *nvec, const int *core);
 int high_freq_w_integrand(const int *ndim, const double x[], const int *ncomp, double f[], void *userdata, const int *nvec, const int *core);
-void gauss_kronrod(const int ncomp, integrand_t_vec integrand, double a, double b, double accur, double integral[], bool vec);
+void gauss_kronrod(const int ncomp, integrand_t_vec integrand, double a, double b, double accur, double integral[], bool vec, int& neval);
 
 //------------------------------------------------------------------------------
 // variables local to this file
@@ -98,7 +98,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 {
 	int ndim = dim+1;
 	int cuba_mineval, cuba_maxpoints;
-  	cuba_threads=max_num_threads;
+  cuba_threads= max_num_threads;
 	
 	if(verb) cout << "CUBA integration (" << cuba_threads << " threads)" << endl;
 
@@ -122,7 +122,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 		cuba_maxpoints=20000000;
 	}
 	
-	int cubaneval, nregions, fail;
+	int neval, nregions, fail;
   
   small_scale = global_double("small_scale");
   large_scale = global_double("large_scale");
@@ -131,16 +131,15 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 
 	//------------------------------------------------------------------------------
 	// first region : frequencies below small_scale
-	
+	neval=0;
 	w_domain = small_scale;
 	double accur = accuracy*M_PI/w_domain;
 	double fac = w_domain*M_1_PI;
-  neval=0;
 	if(ndim==1){
-		gauss_kronrod(ncomp, low_freq_cuba_integrand, 0, 1, accur, value.data(), false);
+		gauss_kronrod(ncomp, low_freq_cuba_integrand, 0, 1, accur, value.data(), false, neval);
 	}
 	else{
-		Cuhre(ndim, ncomp, (integrand_t)low_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
+		Cuhre(ndim, ncomp, (integrand_t)low_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &neval, &fail, value.data(), err.data(), prob.data());
 	}
 	if(verb) cout << "region 1 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
@@ -148,17 +147,17 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 	//------------------------------------------------------------------------------
 	// second region : frequencies between small_scale and large_scale
 	
+	neval=0;
 	w_domain = large_scale-small_scale;
 	accur = accuracy*M_PI/w_domain;
 	fac = w_domain*M_1_PI;
   to_zero(value);
-  neval=0;
 
 	if(ndim==1){
-		gauss_kronrod(ncomp, mid_freq_cuba_integrand, 0, 1, accur, value.data(), false);
+		gauss_kronrod(ncomp, mid_freq_cuba_integrand, 0, 1, accur, value.data(), false, neval);
 	}
 	else{
-		Cuhre(ndim, ncomp, (integrand_t)mid_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
+		Cuhre(ndim, ncomp, (integrand_t)mid_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &neval, &fail, value.data(), err.data(), prob.data());
 	}
 	if(verb) cout << "region 2 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
@@ -166,17 +165,17 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 	//------------------------------------------------------------------------------
 	// third region : inverse frequencies below 1/large_scale
   
-  neval=0;
+	neval=0;
   w_domain = 1.0/large_scale;
   accur = accuracy*M_PI/w_domain;
   fac = w_domain*M_1_PI;
   to_zero(value);
   
   if(ndim==1){
-    gauss_kronrod(ncomp, high_freq_cuba_integrand, 0, 1, accur, value.data(), false);
+    gauss_kronrod(ncomp, high_freq_cuba_integrand, 0, 1, accur, value.data(), false, neval);
   }
   else{
-    Cuhre(ndim, ncomp, (integrand_t)high_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
+    Cuhre(ndim, ncomp, (integrand_t)high_freq_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &neval, &fail, value.data(), err.data(), prob.data());
   }
   if(verb) cout << "region 3 : " << neval << " evaluations" << endl;
   for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
@@ -209,7 +208,7 @@ void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv,
   
   k_integrand = f;
   
-  if(dim==1) gauss_kronrod(ncomp, k_cuba_integrand, 0.0, 1.0, accur, value.data(), true);
+  if(dim==1) gauss_kronrod(ncomp, k_cuba_integrand, 0.0, 1.0, accur, value.data(), true, neval);
   else{
     vector<double> prob(ncomp,0);
     if(dim==2){
@@ -220,9 +219,9 @@ void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv,
       cuba_mineval=(int)global_int("cuba3D_mineval");
       cuba_maxpoints=4000000;
     }
-    neval=0;
-    int cubaneval, nregions, fail;
-    Cuhre(dim, ncomp, (integrand_t)k_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &cubaneval, &fail, value.data(), err.data(), prob.data());
+    int neval, nregions, fail;
+	  neval=0;
+    Cuhre(dim, ncomp, (integrand_t)k_cuba_integrand, nullptr, cuba_threads, 1e-10, accur, CUBA_FLAG, cuba_mineval, cuba_maxpoints, 0, "", nullptr, &nregions, &neval, &fail, value.data(), err.data(), prob.data());
 	if(verb) cout << "Cuhre  : " << neval << " points in " << nregions << "regions" << endl;
   }
   for(int i=0; i<ncomp; ++i) Iv[i] += value[i];
@@ -261,7 +260,7 @@ void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vec
 	double accur = accuracy*M_PI/w_domain;
 	double fac = w_domain*M_1_PI;
   neval=0;
-	gauss_kronrod(ncomp, low_freq_w_integrand, 0, 1, accur, value.data(), false);
+	gauss_kronrod(ncomp, low_freq_w_integrand, 0, 1, accur, value.data(), false, neval);
 	if(verb) cout << "region 1 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 	
@@ -274,7 +273,7 @@ void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vec
   to_zero(value);
   neval=0;
 
-	gauss_kronrod(ncomp, mid_freq_w_integrand, 0, 1, accur, value.data(), false);
+	gauss_kronrod(ncomp, mid_freq_w_integrand, 0, 1, accur, value.data(), false, neval);
 	if(verb) cout << "region 2 : " << neval << " evaluations" << endl;
 	for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 	
@@ -287,7 +286,7 @@ void ED::w_integral(function<void (Complex w, const int *nv, double I[])> f, vec
   fac = w_domain*M_1_PI;
   to_zero(value);
   
-  gauss_kronrod(ncomp, high_freq_w_integrand, 0, 1, accur, value.data(), false);
+  gauss_kronrod(ncomp, high_freq_w_integrand, 0, 1, accur, value.data(), false, neval);
   if(verb) cout << "region 3 : " << neval << " evaluations" << endl;
   for(int i=0; i<ncomp; ++i) Iv[i] += value[i]*fac;
 }
@@ -311,7 +310,6 @@ int low_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
   if(*dim==1){
     #pragma omp parallel for
     for(int i=0; i< *nvec; i++){
-      neval++;
       Complex w(0,x[i]*w_domain);
       vector3D<double> k(0.0,0.0,0.0);
       wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -321,7 +319,6 @@ int low_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
   else if(*dim==2){
     #pragma omp parallel for
 		for(int i=0; i< *nvec; i++){
-      neval++;
 			Complex w(0,x[2*i]*w_domain);
 			vector3D<double> k(x[2*i+1],0.0,0.0);
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -331,7 +328,6 @@ int low_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
 	else if(*dim==3){
     #pragma omp parallel for
 		for(int i=0; i< *nvec; i++){
-      neval++;
 			Complex w(0,x[3*i]*w_domain);
 			vector3D<double> k(x[3*i+1],x[3*i+2],0.0);
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -341,7 +337,6 @@ int low_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
 	else if(*dim==4){
     #pragma omp parallel for
 		for(int i=0; i< *nvec; i++){
-      neval++;
 			Complex w(0,x[4*i]*w_domain);
 			vector3D<double> k(x[4*i+1],x[4*i+2],x[4*i+3]);
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -361,7 +356,6 @@ int mid_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
   if(*dim==1){
   #pragma omp parallel for
     for(int i=0; i< *nvec; i++){
-      neval++;
       Complex w(0,x[i]*w_domain+small_scale);
       vector3D<double> k(0.0,0.0,0.0);
       wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -371,7 +365,6 @@ int mid_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
   else if(*dim==2){
     #pragma omp parallel for
 		for(int i=0; i< *nvec; i++){
-      neval++;
 			Complex w(0,x[2*i]*w_domain+small_scale);
 			vector3D<double> k(x[2*i+1],0.0,0.0);
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -381,7 +374,6 @@ int mid_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
 	else if(*dim==3){
     #pragma omp parallel for
 		for(int i=0; i< *nvec; i++){
-      neval++;
 			Complex w(0,x[3*i]*w_domain+small_scale);
 			vector3D<double> k(x[3*i+1],x[3*i+2],0.0);
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -391,7 +383,6 @@ int mid_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
 	else if(*dim==4){
     #pragma omp parallel for
 		for(int i=0; i< *nvec; i++){
-      neval++;
 			Complex w(0,x[4*i]*w_domain+small_scale);
 			vector3D<double> k(x[4*i+1],x[4*i+2],x[4*i+3]);
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
@@ -413,7 +404,6 @@ int high_freq_cuba_integrand(const int *dim, const double x[], const int *nv, do
   if(*dim==1){
 #pragma omp parallel for
     for(int i=0; i< *nvec; i++){
-      neval++;
       double iw = x[i]*w_domain;
       if(iw < iw_cutoff){
         for(size_t j=0; j < *nv; ++j) I[(*nv)*i+j] = 0.0;
@@ -430,7 +420,6 @@ int high_freq_cuba_integrand(const int *dim, const double x[], const int *nv, do
   else if(*dim==2){
 #pragma omp parallel for
     for(int i=0; i< *nvec; i++){
-      neval++;
       double iw = x[2*i]*w_domain;
       if(iw < iw_cutoff){
         for(size_t j=0; j < *nv; ++j) I[(*nv)*i+j] = 0.0;
@@ -447,7 +436,6 @@ int high_freq_cuba_integrand(const int *dim, const double x[], const int *nv, do
   else if(*dim==3){
 #pragma omp parallel for
     for(int i=0; i< *nvec; i++){
-      neval++;
       double iw = x[3*i]*w_domain;
       if(iw < iw_cutoff){
         for(size_t j=0; j < *nv; ++j) I[(*nv)*i+j] = 0.0;
@@ -464,7 +452,6 @@ int high_freq_cuba_integrand(const int *dim, const double x[], const int *nv, do
   else if(*dim==4){
 #pragma omp parallel for
     for(int i=0; i< *nvec; i++){
-      neval++;
       double iw = x[4*i]*w_domain;
       if(iw < iw_cutoff){
         for(size_t j=0; j < *nv; ++j) I[(*nv)*i+j] = 0.0;
@@ -525,7 +512,6 @@ int low_freq_w_integrand(const int *dim, const double x[], const int *nv, double
 {
 	#pragma omp parallel for
 	for(int i=0; i< *nvec; i++){
-		neval++;
 		Complex w(0,x[i]*w_domain);
 		w_integrand(w,nv,&I[(*nv)*i]);
 	}
@@ -542,7 +528,6 @@ int mid_freq_w_integrand(const int *dim, const double x[], const int *nv, double
 {
   #pragma omp parallel for
 	for(int i=0; i< *nvec; i++){
-		neval++;
 		Complex w(0,x[i]*w_domain+small_scale);
 		w_integrand(w,nv,&I[(*nv)*i]);
 	}
@@ -561,7 +546,6 @@ int high_freq_w_integrand(const int *dim, const double x[], const int *nv, doubl
   
 #pragma omp parallel for
 	for(int i=0; i< *nvec; i++){
-		neval++;
 		double iw = x[i]*w_domain;
 		if(iw < iw_cutoff){
 			for(size_t j=0; j < *nv; ++j) I[(*nv)*i+j] = 0.0;
@@ -694,8 +678,9 @@ namespace std
  @param b		upper bound
  @param accur		required absolute accuracy of the integral
  @param integral		values of the integrals
+ @param neval		number of function evaluation (out)
  */
-void gauss_kronrod(const int ncomp, integrand_t_vec integrand, double a, double b, double accur, double integral[], bool vec){
+void gauss_kronrod(const int ncomp, integrand_t_vec integrand, double a, double b, double accur, double integral[], bool vec, int& neval){
 	
 	
 	const int min_regions = 8;
@@ -724,8 +709,8 @@ void gauss_kronrod(const int ncomp, integrand_t_vec integrand, double a, double 
 		double ap = it->a;
 		double bp = it->b;
 		regions.erase(it);
-		regions.insert(GK_region(ap, 0.5*(ap+bp), integrand));
-		regions.insert(GK_region(0.5*(ap+bp), bp, integrand));
+		regions.insert(GK_region(ap, 0.5*(ap+bp), integrand)); neval++;
+		regions.insert(GK_region(0.5*(ap+bp), bp, integrand)); neval++;
 	}
 	
 	for(auto& x : regions){
