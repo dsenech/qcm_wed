@@ -9,6 +9,9 @@
 #include "QCM.hpp"
 #include "qcm_ED.hpp"
 #include "cuba.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #define CUBA_FLAG 0
 #define GLS_INTERVALS 128
 
@@ -16,10 +19,6 @@
 double small_scale;
 double large_scale;
 
-//..............................................................................
-// external variables or declarations
-
-extern int max_num_threads;
 
 //------------------------------------------------------------------------------
 // declarations local to this file
@@ -97,7 +96,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 {
 	int ndim = dim+1;
 	int cuba_mineval, cuba_maxpoints;
-  cuba_threads= max_num_threads;
+  cuba_threads = omp_get_max_threads();
 	
 	if(verb) cout << "CUBA integration (" << cuba_threads << " threads)" << endl;
 
@@ -198,7 +197,7 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
 void QCM::k_integral(int dim, function<void (vector3D<double> &k, const int *nv, double I[])> f, vector<double> &Iv, const double accuracy, bool verb)
 {
   int cuba_mineval, cuba_maxpoints;
-  cuba_threads=max_num_threads;
+  cuba_threads = omp_get_max_threads();
   
   int ncomp = (int)Iv.size();
   vector<double> value(ncomp,0);

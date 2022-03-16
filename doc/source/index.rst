@@ -21,6 +21,7 @@ Welcome to pyqcm's documentation!
    vca
    utilities
    options
+   parallel
 
 
 Indices and tables

@@ -3,8 +3,6 @@
 #include "qcm_ED_wrap.hpp"
 #include "qcm_ED_only.hpp"
 
-int max_num_threads=1;
-
 //==============================================================================
 // doc string
 const char* qcm_ED_help =
@@ -99,22 +97,13 @@ void qcm_ED_catch(const std::string& s)
 }
 
 
-  /**
-   initialization
-   */
-  void ED::qcm_ED_init()
-  {
-    setenv("CUBACORES","0",0); // IMPORTANT: always set this to zero. Use vectorization instead, via openMP.
-    global_parameter_init();
-
-#ifdef _OPENMP
-    char* omp_num_threads = getenv("OMP_NUM_THREADS");
-    if(omp_num_threads == nullptr){
-      max_num_threads = 1;
-      setenv("OMP_NUM_THREADS","1",0);
-    }
-    else max_num_threads = from_string<int>(string(omp_num_threads));
-    // omp_set_max_active_levels(2);
-    // omp_set_max_active_levels(2);
-#endif
-  }
+/**
+ initialization
+ */
+void ED::qcm_ED_init()
+{
+  // Initialize environment variable
+  // May be overwrite by the user
+  setenv("CUBACORES","0",0); 
+  global_parameter_init();
+}
