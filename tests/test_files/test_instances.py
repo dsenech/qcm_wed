@@ -19,12 +19,12 @@ for i,u in enumerate(U):
     I.print('record_test_{:d}.py'.format(i))
 
 for i,u in enumerate(U):
-    plt.subplot(2,2,i+1)
-    pyqcm.spectral.spectral_function(wmax=6, path='line', label=i, plt_ax=plt.gca())
-    plt.title('U = {:1.2f}, instance {:d}'.format(u, i))
+    # plt.subplot(2,2,i+1)
+    pyqcm.spectral.spectral_function(wmax=6, path='line', label=i, plt_ax=plt.gca(), file=f"test_instances_U{u}.pdf")
+    # plt.title('U = {:1.2f}, instance {:d}'.format(u, i))
 
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()
 
 ##################################################################
 # TEST UNITAIRE
