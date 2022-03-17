@@ -469,6 +469,8 @@ def cdmft(
         # pyqcm.write_summary('cdmft_iter.tsv', first = first_time2, suppl_descr = des, suppl_values = val)
         pyqcm.write_summary('cdmft_iter.tsv', suppl_descr = des, suppl_values = val)
         first_time2 = False
+
+
         #______________________________________________________________________
                 
         # checking convergence on the parameters (note the sqrt(nvar) factor in order not to punish large parameter sets)
@@ -555,6 +557,14 @@ def cdmft(
             pyqcm.write_summary(file, suppl_descr = des, suppl_values = val)
             first_time = False
             first_time2 = True
+
+        # writing the frequency grid to a file
+        if 'self' in dist_function:
+            pyqcm.write_summary('cdmft_grid.tsv', suppl_descr = des, suppl_values = val)
+            with open('cdmft_grid.tsv','a') as gridfile:
+                np.savetxt(gridfile, np.stack((w.imag, weight),axis=-1),header='w\tweight', fmt='%.8f', delimiter='\t')
+                gridfile.close()
+
 
         pyqcm.banner('CDMFT completed successfully', '*')
     else:

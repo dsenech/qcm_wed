@@ -94,8 +94,9 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False)
         if not L:
             raise RuntimeError('file ended without specified lattice operators')
 
-    nc = len(op_name)
-    while op_name != L[0:nc]:
+    op_namet = op_name+'\t'
+    nc = len(op_namet)
+    while op_namet != L[0:nc]:
         L = fin.readline()
         if not L:
             raise RuntimeError(f'file ended without the operator {op_name}')
