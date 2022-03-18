@@ -68,7 +68,7 @@ Real-valued options
     "accur_OP", "0.0001", "accuracy of lattice averages"
     "small_scale", "0.5", "low-frequency region for imaginary frequency axis integrals"
     "accur_SEF", "5e-08", "Accuracy of the Potthoff functional"
-    "accur_continued_fraction", "0.01", "value of beta below which the simple Lanczod process stops"
+    "accur_continued_fraction", "0.01", "value of beta below which the simple Lanczos process stops"
     "accur_Davidson", "1e-05", "maximum norm of residuals in the Davidson-Liu algorithm"
     "accur_lanczos", "1e-12", "tolerance of the Ritz residual estimate in the Lanczos method"
     "accur_band_lanczos", "1e-12", "energy difference tolerance for stopping the BL process"
