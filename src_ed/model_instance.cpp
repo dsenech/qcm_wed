@@ -4,7 +4,6 @@
 #include "model_instance.hpp"
 #include "matrix.hpp"
 
-extern size_t max_num_threads;
 
 template<>
 matrix<Complex> model_instance<double>::hopping_matrix(bool spin_down)

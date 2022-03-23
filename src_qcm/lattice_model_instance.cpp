@@ -99,12 +99,7 @@ vector<pair<double,string>> lattice_model_instance::ground_state()
     }
   }
   else{
-    #ifdef _OPENMP
-      extern int max_num_threads;
-      int nt = max_num_threads;
-      if(nt > model->inequiv.size()) nt = model->inequiv.size();
-      #pragma omp parallel for num_threads(nt)
-    #endif  
+    #pragma omp parallel for 
     for(size_t i = 0; i<model->inequiv.size(); i++){
       auto I = model->inequiv[i];
       gs[I] = ED::ground_state_solve(n_clus*label+I);
@@ -166,12 +161,7 @@ void lattice_model_instance::Green_function_solve()
     }
   }
   else{
-    #ifdef _OPENMP
-      extern int max_num_threads;
-      int nt = max_num_threads;
-      if(nt > model->inequiv.size()) nt = model->inequiv.size();
-      #pragma omp parallel for num_threads(nt)
-    #endif
+    #pragma omp parallel for
     for(size_t i = 0; i<model->inequiv.size(); i++){
       auto I = model->inequiv[i];
       ED::Green_function_solve(n_clus*label+I);

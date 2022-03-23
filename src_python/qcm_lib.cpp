@@ -2,8 +2,10 @@
 
 #include "qcm_wrap.hpp"
 #include "qcm_ED_wrap.hpp"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
-int max_num_threads=1;
 
 //==============================================================================
 // doc string
@@ -153,19 +155,17 @@ PyInit_qcm(void)
 void QCM::qcm_init()
 {
   qcm_model = make_shared<lattice_model>();
-  setenv("CUBACORES","0",0); // IMPORTANT: always set this to zero. Use vectorization instead, via openMP.
+  // Initialize environment variable
+  // May be overwrite by the user
+  setenv("CUBACORES","0",0); 
+  //setenv("OMP_NUM_THREADS","1",0);
   QCM::global_parameter_init();
-
+  
   #ifdef _OPENMP
-  char* omp_num_threads = getenv("OMP_NUM_THREADS");
-  if(omp_num_threads == nullptr){
-    max_num_threads = 1;
-    setenv("OMP_NUM_THREADS","1",0);
-  }
-  else max_num_threads = from_string<int>(string(omp_num_threads));
-  cout << "Number of openMP threads = " << max_num_threads << endl;
+  //omp_set_num_threads((int) *getenv("OMP_NUM_THREADS") - 48);
   omp_set_max_active_levels(2);
-  #endif    
+  cout << "Number of OpenMP threads = " << omp_get_max_threads() << endl;
+  #endif   
 }
 
 

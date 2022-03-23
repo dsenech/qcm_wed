@@ -1,10 +1,20 @@
+
+import os
+#Moise: note I don't like set environment variable here, because if someone uses QCM library to built c++ application, the problem will still occur...
+#must be before importing qcm
+if "OPENBLAS_NUM_THREADS" not in os.environ.keys():
+  os.environ["OPENBLAS_NUM_THREADS"] = "1"
+if "BLIS_NUM_THREADS" not in os.environ.keys():
+  os.environ["BLIS_NUM_THREADS"] = "1"
+#OMP_NUM_THREADS in QCM
+#CUBACORES in QCM
+
 import numpy as np
 import re
 import time
 import copy
 from . import qcm
 from warnings import warn
-from os import path
 
 parameter_set_str = ''
 des_dict = {}  # use to store description lines in output files. filename->current description line
@@ -1828,7 +1838,7 @@ def read_from_file(out_file, n=0):
 
     """
 
-    if not path.isfile(out_file):
+    if not os.path.isfile(out_file):
         raise FileNotFoundError(f"file `{out_file}` could not be found!")
 
     print('reading data file ' + out_file + ', line ' + str(n + 1))
@@ -1876,7 +1886,7 @@ def params_from_file(out_file, n=0):
 
     """
 
-    if not path.isfile(out_file):
+    if not os.path.isfile(out_file):
         raise FileNotFoundError(f"file `{out_file}` could not be found!")
 
     print('reading data file ' + out_file + ', line ' + str(n + 1))
@@ -1960,7 +1970,7 @@ def read_from_file_legacy(filename):
     reads model parameters from a text file, for legacy results
     :param str filename: name of the input text file
     """
-    if not path.isfile(filename):
+    if not os.path.isfile(filename):
         raise FileNotFoundError(f"file `{filename}` could not be found!")
     
     with open(filename, 'r') as f:
