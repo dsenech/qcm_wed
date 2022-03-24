@@ -65,7 +65,7 @@ struct Hermitian_operator
   template<typename HS_field>
   void expectation_value(const state<HS_field> &gs, double &average, double &average2){
     if(Hamiltonian_format == H_FORMAT::H_format_onthefly){
-      auto B = the_model->basis.at(gs.sec);
+      auto B = the_model->provide_basis(gs.sec);
       vector<HS_field> tmp_gs(B->dim);
       multiply_add_OTF(gs.psi, tmp_gs, 1.0, B);
       average += gs.weight*real(tmp_gs*gs.psi);
@@ -78,7 +78,7 @@ struct Hermitian_operator
 
   template<typename HS_field>
   void dense_form(matrix<HS_field> &h, double z, sector sec){
-    auto B = the_model->basis.at(sec);
+    auto B = the_model->provide_basis(sec);
     for(int i=0; i<B->dim; i++){
       vector<HS_field> x(B->dim);
       vector<HS_field> y(B->dim);

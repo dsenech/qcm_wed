@@ -36,7 +36,7 @@ template<typename HS_field>
 HS_nondiagonal_operator<HS_field>::HS_nondiagonal_operator(shared_ptr<model> _the_model, const string &_name, sector _sec)
 : HS_Hermitian_operator(_the_model, _name, _sec)
 {
-  B = the_model->basis.at(sec);
+  B = the_model->provide_basis(sec);
 }
 
 

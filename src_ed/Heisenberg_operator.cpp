@@ -40,7 +40,7 @@ void Heisenberg_operator::set_target(vector<bool> &in_bath){
  */
 shared_ptr<HS_Hermitian_operator> Heisenberg_operator::build_HS_operator(sector sec, bool complex_Hilbert_space)
 {
-  shared_ptr<ED_mixed_basis> B = the_model->basis.at(sec);
+  shared_ptr<ED_mixed_basis> B = the_model->provide_basis(sec);
   if(B->group->complex_irrep[B->sec.irrep]) return make_shared<HS_Heisenberg_operator<Complex>>(the_model, name, sec, elements, dir);
   else return make_shared<HS_Heisenberg_operator<double>>(the_model, name, sec, elements, dir);
 }

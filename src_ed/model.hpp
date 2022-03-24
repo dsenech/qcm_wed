@@ -39,10 +39,10 @@ struct model
   bool create_or_destroy(int pm, const symmetric_orbital &a, state<double> &x, vector<double> &y, double z);
   bool create_or_destroy(int pm, const symmetric_orbital &a, state<Complex> &x, vector<Complex> &y, Complex z);
   void print(ostream& fout);
-  void build_HS_objects(const sector& GS_sector, bool is_complex);
-  void build_HS_objects_GF(const sector& GS_sector, int mixing, bool spin_down, bool is_complex);
-  vector<pair<sector,int>> needed_sectors_GF(const sector& GS_sector, int mixing, bool spin_down);
   void print_graph(const vector<vector<double>> &pos);
+  shared_ptr<ED_mixed_basis> provide_basis(const sector& sec);
+  shared_ptr<ED_factorized_basis> provide_factorized_basis(const sector& sec);
+  void build_HS_operators(const sector& sec, bool is_complex);
 };
 
 

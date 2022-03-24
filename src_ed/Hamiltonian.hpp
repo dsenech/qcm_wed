@@ -53,19 +53,17 @@ struct Hamiltonian
 
 /**
  constructor
- @param _B : pointer to Hilbert space basis
- @param _sparse_ops : map providing values to the different terms of the Hamiltonian
  */
 template<typename HilbertField>
 Hamiltonian<HilbertField>::Hamiltonian(shared_ptr<model> _the_model, const map<string, double> &value, sector _sec)
 : the_model(_the_model), sec(_sec), format(H_format_csr)
 {
   if(the_model->is_factorized){
-    dim = the_model->factorized_basis.at(_sec)->dim;
+    dim = the_model->provide_factorized_basis(_sec)->dim;
     format = H_format_factorized;
   }
   else{
-    B = the_model->basis.at(_sec);
+    B = the_model->provide_basis(_sec);
     dim = B->dim;
     int dim_max_full = global_int("max_dim_full");
     if(dim < dim_max_full) format = H_format_dense;
@@ -137,11 +135,13 @@ Hamiltonian<HilbertField>::Hamiltonian(shared_ptr<model> _the_model, const map<s
 template<typename HilbertField>
 map<shared_ptr<HS_Hermitian_operator>, double> Hamiltonian<HilbertField>::HS_ops_map(const map<string, double> &value)
 {
+  bool is_complex = false;
+  if(typeid(HilbertField) == typeid(Complex)) is_complex = true;
   map<shared_ptr<HS_Hermitian_operator>, double> sparse_ops;
   for(auto& x : value){
     Hermitian_operator& op = *the_model->term.at(x.first);
     if(op.HS_operator.find(sec) == op.HS_operator.end()){
-      qcm_ED_throw("HS operator "+op.name+" for sector "+sec.name()+" not found!");
+      op.HS_operator[sec] = op.build_HS_operator(sec, is_complex); // ***TEMPO***
     }
     sparse_ops[op.HS_operator.at(sec)] = value.at(x.first);
   }

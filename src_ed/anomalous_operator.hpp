@@ -205,7 +205,7 @@ double anomalous_operator<op_field>::uncorrelated_average(matrix<Complex>& Gave,
 template<typename op_field>
 shared_ptr<HS_Hermitian_operator> anomalous_operator<op_field>::build_HS_operator(sector sec, bool complex_HS_op)
 {
-  shared_ptr<ED_mixed_basis> B = the_model->basis.at(sec);
+  shared_ptr<ED_mixed_basis> B = the_model->provide_basis(sec);
   if(complex_HS_op) return make_shared<HS_anomalous_operator<Complex>>(the_model, name, sec, elements);
   else return make_shared<HS_anomalous_operator<double>>(the_model, name, sec, elements);
 }
