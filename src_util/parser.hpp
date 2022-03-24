@@ -65,6 +65,7 @@ void qcm_catch(const std::string& s);
 void qcm_ED_catch(const std::string& s);
 void qcm_ED_throw(const std::string& s);
 void qcm_throw(const std::string& s);
+void qcm_warning(const std::string& s);
 
 //-----------------------------------------------------------------------------
 // Declarations and code

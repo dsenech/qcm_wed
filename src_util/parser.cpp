@@ -3,6 +3,7 @@
 #include <cstdio>
 
 #include "parser.hpp"
+#include "global_parameter.hpp"
 
 using namespace std;
 
@@ -315,3 +316,8 @@ void qcm_ED_throw(const std::string& s)
     throw(s);
 }
 
+
+void qcm_warning(const std::string& s)
+{
+    if(global_bool("verb_warning")) cout << "QCM WARNING : " << s << endl;
+}

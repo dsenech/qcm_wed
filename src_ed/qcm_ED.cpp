@@ -42,7 +42,8 @@ namespace ED{
     if(global_bool("verb_Hilbert")) ED_basis::verb = true;
 
     if(models.find(name) != models.end()){
-      qcm_ED_throw("The name "+name+" has already been used for a model");
+      qcm_warning("The name "+name+" has already been used for a model. Ignoring (using same model as before)");
+      return;
     }
     if(nb>32) qcm_ED_throw("number of bath orbitals exceeds limits or negative!");
     if(L>1024) qcm_ED_throw("number of cluster sites  exceeds limits or negative!");
@@ -63,7 +64,9 @@ namespace ED{
     if(models.find(model_name) == models.end())
       qcm_ED_throw("The model "+model_name+" is not defined. Check spelling.");
     shared_ptr<model> M = models.at(model_name);
-    if(M->is_closed) qcm_ED_throw("model " + model_name + " has already been instantiated and is closed for modifications");
+    if(M->is_closed){
+      qcm_warning("model " + model_name + " has already been instantiated and is closed for modifications. Ignoring.");
+    }
     if(_type == "one-body") M->term[_name] = make_shared<one_body_operator<double>>(_name, M, elements);
     else if(_type == "anomalous") M->term[_name] = make_shared<anomalous_operator<double>>(_name, M, elements);
     else if(_type == "interaction") M->term[_name] = make_shared<interaction_operator>(_name, M, elements);
@@ -79,8 +82,12 @@ namespace ED{
   void new_operator(const string &model_name, const string &_name, const string &_type, const vector<matrix_element<Complex>> &elements)
   {
     if(!elements.size()) return;
+    if(models.find(model_name) == models.end())
+      qcm_ED_throw("The model "+model_name+" is not defined. Check spelling.");
     shared_ptr<model> M = models.at(model_name);
-    if(M->is_closed) qcm_ED_throw("model " + model_name + " has already been instantiated and is closed for modifications");
+    if(M->is_closed){
+      qcm_warning("model " + model_name + " has already been instantiated and is closed for modifications. Ignoring.");
+    }
     if(_type == "one-body") M->term[_name] = make_shared<one_body_operator<Complex>>(_name, M, elements);
     else if(_type == "anomalous") M->term[_name] = make_shared<anomalous_operator<Complex>>(_name, M, elements);
     else cout << "ED_WARNING : type of operator " << _name << " is not yet implemented" << endl;
