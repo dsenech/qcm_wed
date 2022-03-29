@@ -1137,7 +1137,7 @@ def cdmft_distance_debug(varia=None, vset=None, beta=50, wc=2.0, grid_type = 'sh
     :param str grid_type: type of frequency grid along the imaginary axis : 'sharp', 'ifreq', 'self'
     :param [str] counterterms: list of counterterms names (cluster operators that should strive to have zero average)
     :param boolean SEF: if True, computes the Potthoff functional at the end
-    :param [class observable]: list of observables used to assess convergence
+    :param [class] observable: list of observables used to assess convergence
     :returns: None
 
     """
