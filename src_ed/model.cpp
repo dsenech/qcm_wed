@@ -52,23 +52,39 @@ void model::print(ostream& fout)
 
 
 
+/**
+ returns the basis required for the sector sec. Builds it if needed.
+ @param sec sector of the state 
+*/
+shared_ptr<ED_mixed_basis> model::provide_basis(const sector& sec)
+{
+  if(basis.find(sec) == basis.end()) basis[sec] = make_shared<ED_mixed_basis>(sec, group);
+  return basis[sec];
+}
+
+
+
 
 /**
- Builds the bases and operators needed for the computation of the ground state
+ returns the basis required for the sector sec. Builds it if needed.
+ @param sec sector of the state 
+*/
+shared_ptr<ED_factorized_basis> model::provide_factorized_basis(const sector& sec)
+{
+  if(factorized_basis.find(sec) == factorized_basis.end()) 
+    factorized_basis[sec] = make_shared<ED_factorized_basis>(sec, n_orb);
+  return factorized_basis[sec];
+}
+
+
+
+/**
+ Builds the operators necessary in a given sector
  @param GS_sector sector of the state 
  @param complex true if the HS operators must be complex-valued
 */
-void model::build_HS_objects(const sector& sec, bool is_complex)
+void model::build_HS_operators(const sector& sec, bool is_complex)
 {
-  if(is_factorized){
-    if(factorized_basis.find(sec) == factorized_basis.end()) factorized_basis[sec] = make_shared<ED_factorized_basis>(sec, n_orb);
-  }
-  else{
-    if(basis.find(sec) == basis.end()) basis[sec] = make_shared<ED_mixed_basis>(sec, group);
-  }
-  if(Hamiltonian_format == H_FORMAT::H_format_onthefly) return;
-
-  // building the operators
   for(auto& x : term){
     if(!x.second->is_active) continue;
     if(x.second->HS_operator.find(sec) == x.second->HS_operator.end())
@@ -77,156 +93,6 @@ void model::build_HS_objects(const sector& sec, bool is_complex)
 }
 
 
-
-/**
- Builds the bases and operators needed for the computation of the Green function
- @param GS_sector sector of the state on which the Green function is to be built
- @param spin_down true if we are building the spin down component of the GF
- @param complex true if the HS operators must be complex-valued
- */
-void model::build_HS_objects_GF(const sector& GS_sector, int mixing, bool spin_down, bool is_complex)
-{
-  auto needed_secs = needed_sectors_GF(GS_sector, mixing, spin_down);
-  int n_sec = needed_secs.size();
-
-  // building the bases
-  vector<shared_ptr<ED_mixed_basis>> needed_bases(n_sec);
-  vector<shared_ptr<ED_factorized_basis>> needed_factorized_bases(n_sec);
-
-  if(is_factorized){
-    #pragma omp parallel for
-    for(int i=0; i<n_sec; i++){
-      if(basis.find(needed_secs[i].first) == basis.end())
-        needed_factorized_bases[i] = make_shared<ED_factorized_basis>(needed_secs[i].first, n_orb);
-    }
-
-    for(int i=0; i<n_sec; i++){
-      if(factorized_basis.find(needed_secs[i].first) == factorized_basis.end())
-        factorized_basis[needed_secs[i].first] = needed_factorized_bases[i];
-      // else needed_factorized_bases[i] = factorized_basis[needed_secs[i].first];
-    }
-  }
-  else{
-    #pragma omp parallel for
-    for(int i=0; i<n_sec; i++){
-      if(basis.find(needed_secs[i].first) == basis.end())
-        needed_bases[i] = make_shared<ED_mixed_basis>(needed_secs[i].first, group);
-    }
-
-    for(int i=0; i<n_sec; i++){
-      if(basis.find(needed_secs[i].first) == basis.end())
-        basis[needed_secs[i].first] = needed_bases[i];
-      // else needed_bases[i] = basis[needed_secs[i].first];
-    }
-  }
-
-  if(Hamiltonian_format == H_FORMAT::H_format_onthefly) return;
-
-  if(!is_factorized){
-    // building the creation and annihilation operators
-    // list of needed destruction identifiers
-    vector<destruction_identifier> D;
-    vector<shared_ptr<ED_mixed_basis>> needed_B_bases;
-    vector<shared_ptr<ED_mixed_basis>> needed_T_bases;
-    D.reserve(16);
-    needed_B_bases.reserve(16);
-    needed_T_bases.reserve(16);
-
-    int ns = 2*sym_orb[mixing].size();
-    for(int s=0; s< ns; s++){
-      int r = s/2;
-      int pm = 2*(s%2)-1;
-      if(sym_orb[mixing][r].size() == 0) continue; // irrep not present
-      int spin = (spin_down)? 1:sym_orb[mixing][r][0].spin;
-      sector target_sec = group->shift_sector(GS_sector, pm, spin, r);
-      if(!group->sector_is_valid(target_sec)) continue; // target sector is null
-      for(size_t i=0; i< sym_orb[mixing][r].size(); i++){
-        symmetric_orbital sorb = sym_orb[mixing][r][i];
-        if(spin_down) sorb.spin =1;
-        if((pm == 1 and sorb.nambu==0) or (pm == -1 and sorb.nambu==1)){
-          D.push_back({target_sec, sorb});
-          needed_B_bases.push_back(basis.at(target_sec));
-          needed_T_bases.push_back(basis.at(GS_sector));
-        }  
-        else{
-          D.push_back({GS_sector, sorb});
-          needed_T_bases.push_back(basis.at(target_sec));
-          needed_B_bases.push_back(basis.at(GS_sector));
-        }
-      }
-    }
-
-    // cout << "needed destructions operators:\n";
-    // for(auto& x : D) cout << x.secB << ":" << x.sorb << ", "; cout << endl;
-
-    if(is_complex){
-      vector<shared_ptr<destruction_operator<Complex>>> needed_destruction(D.size());
-      #pragma omp parallel for
-      for(int i=0; i<D.size(); i++){
-        if(destruction_complex.find(D[i])==destruction_complex.end())
-          needed_destruction[i] = make_shared<destruction_operator<Complex>>(needed_B_bases[i], needed_T_bases[i], D[i].sorb);
-      }
-      for(int i=0; i<D.size(); i++){
-        if(destruction_complex.find(D[i])==destruction_complex.end()) destruction_complex[D[i]] = needed_destruction[i];
-      }
-    }
-    else{
-      vector<shared_ptr<destruction_operator<double>>> needed_destruction(D.size());
-      #pragma omp parallel for
-      for(int i=0; i<D.size(); i++){
-        if(destruction.find(D[i])==destruction.end())
-          needed_destruction[i] = make_shared<destruction_operator<double>>(needed_B_bases[i], needed_T_bases[i], D[i].sorb);
-      }
-      for(int i=0; i<D.size(); i++){
-        if(destruction.find(D[i])==destruction.end()) destruction[D[i]] = needed_destruction[i];
-      }
-    }
-  }
-  // building the operators
-  for(auto& x : term){
-    Hermitian_operator& op = *x.second;
-    if(!op.is_active) continue;
-    vector<shared_ptr<HS_Hermitian_operator>> needed_ops(n_sec);
-    #pragma omp parallel for
-    for(int i=0; i<n_sec; i++){
-      if(op.HS_operator.find(needed_secs[i].first) == op.HS_operator.end())
-        needed_ops[i] = op.build_HS_operator(needed_secs[i].first, is_complex or group->complex_irrep[needed_secs[i].first.irrep]);
-    }
-    for(int i=0; i<n_sec; i++){
-      if(op.HS_operator.find(needed_secs[i].first) == op.HS_operator.end())
-        op.HS_operator[needed_secs[i].first] = needed_ops[i];
-    }
-  }
-}
-
-
-
-
-/**
- Builds the list of needed sectors for computing the Green function
- @param GS_sector sector of the state on which the Green function is to be built
- @param spin_down true if we are building the spin down component of the GF
- */
-vector<pair<sector,int>> model::needed_sectors_GF(const sector& GS_sector, int mixing, bool spin_down)
-{
-  vector<pair<sector,int>> needed_secs;
-
-  // building the list of needed sectors
-  needed_secs.reserve(16);
-
-  for(size_t r=0; r<sym_orb[mixing].size(); r++){
-    for(int pm = -1; pm<2; pm += 2){ // loop over destruction (pm = -1) and creation (pm = +1)
-      
-      // constructing the target sector
-      if(sym_orb[mixing][r].size() == 0) continue; // irrep not present
-      int spin = (spin_down)? 1:sym_orb[mixing][r][0].spin;
-      sector target_sec = group->shift_sector(GS_sector, pm, spin, r);
-      if(!group->sector_is_valid(target_sec)) continue;
-      needed_secs.push_back({target_sec, pm});
-    }
-  }
-  return needed_secs;
-}
 
 
 /**
@@ -278,8 +144,8 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<double> 
   sector target_sec = group->shift_sector(x.sec, pm, a.spin, a.irrep);
 
   if(is_factorized){
-    auto B = factorized_basis.at(x.sec);
-    auto T = factorized_basis.at(target_sec);
+    auto B = provide_factorized_basis(x.sec);
+    auto T = provide_factorized_basis(target_sec);
     if(y.size() != T->dim) y.resize(T->dim);
     if(pm==1){ // creation
       for(uint32_t I=0; I<T->dim; ++I){
@@ -299,9 +165,9 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<double> 
     }
   }
   else{
-    auto B = basis.at(x.sec);
+    auto B = provide_basis(x.sec);
     sector target_sec = group->shift_sector(x.sec, pm, a.spin, a.irrep);
-    auto T = basis.at(target_sec);
+    auto T = provide_basis(target_sec);
     if(y.size() != T->dim) y.resize(T->dim);
 
     if(pm==1){ // creation
@@ -316,7 +182,7 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<double> 
       else{
         destruction_identifier D(target_sec,a);
         if(destruction.find(D)==destruction.end()){
-          cout << "destruction operator [" << target_sec << ", " << a << "] not found!" << endl;
+          destruction[D] = make_shared<destruction_operator<double>>(T, B, D.sorb);
         }
         destruction.at(D)->multiply_add_conjugate(x.psi,y,z);
       }
@@ -334,14 +200,12 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<double> 
       else{
         destruction_identifier D(x.sec,a);
         if(destruction.find(D)==destruction.end()){
-          cout << "destruction operator [" << x.sec << ", " << a << "] not found!" << endl;
+          destruction[D] = make_shared<destruction_operator<double>>(B, T, D.sorb);
         }
         destruction.at(D)->multiply_add(x.psi,y,z);
       }
-      // cout << "destruction at " << a.label << '\n' << x.psi << '\n' << y << "\n\n"; // tempo
     }
   }
-  // cout << x.psi << '\n' << y << "\n\n"; // tempo
   return true;
 }
 
@@ -365,8 +229,8 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
   sector target_sec = group->shift_sector(x.sec, pm, a.spin, a.irrep);
 
   if(is_factorized){
-    auto B = factorized_basis.at(x.sec);
-    auto T = factorized_basis.at(target_sec);
+    auto B = provide_factorized_basis(x.sec);
+    auto T = provide_factorized_basis(target_sec);
     if(y.size() != T->dim) y.resize(T->dim);
     if(pm==1){ // creation
       for(uint32_t I=0; I<T->dim; ++I){
@@ -386,9 +250,9 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
     }
   }
   else{
-    auto B = basis.at(x.sec);
+    auto B = provide_basis(x.sec);
     sector target_sec = group->shift_sector(x.sec, pm, a.spin, a.irrep);
-    auto T = basis.at(target_sec);
+    auto T = provide_basis(target_sec);
     if(T->dim == 0) return false;
     if(y.size() != T->dim) y.resize(T->dim);
 
@@ -404,7 +268,7 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
       else{
         destruction_identifier D(target_sec,a);
         if(destruction_complex.find(D)==destruction_complex.end()){
-          cout << "destruction operator [" << target_sec << ", " << a << "] not found!" << endl;
+          destruction_complex[D] = make_shared<destruction_operator<Complex>>(T, B, D.sorb);
         }
         destruction_complex.at(D)->multiply_add_conjugate(x.psi,y,z);
       }
@@ -422,7 +286,7 @@ bool model::create_or_destroy(int pm, const symmetric_orbital &a, state<Complex>
       else{
         destruction_identifier D(x.sec,a);
         if(destruction_complex.find(D)==destruction_complex.end()){
-          cout << "destruction operator [" << x.sec << ", " << a << "] not found!" << endl;
+          destruction_complex[D] = make_shared<destruction_operator<Complex>>(B, T, D.sorb);
         }
         destruction_complex.at(D)->multiply_add(x.psi,y,z);
       }

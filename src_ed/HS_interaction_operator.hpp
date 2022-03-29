@@ -32,12 +32,12 @@ HS_interaction_operator::HS_interaction_operator(shared_ptr<model> _the_model, c
 {
   size_t dim;
   if(the_model->is_factorized){
-    B = the_model->factorized_basis.at(sec);
+    B = the_model->provide_factorized_basis(sec);
     dim = B->dim;
   }
   else{
-    dim = the_model->basis.at(sec)->dim;
-    B = the_model->basis.at(sec);
+    dim = the_model->provide_basis(sec)->dim;
+    B = the_model->provide_basis(sec);
   }
   elem.resize(dim);
   

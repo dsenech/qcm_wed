@@ -38,7 +38,7 @@ template<typename op_field>
 HS_factorized_operator<op_field>::HS_factorized_operator(shared_ptr<model> _the_model, const string &_name, sector _sec, one_body_operator<op_field> *op)
 : HS_Hermitian_operator(_the_model, _name, _sec)
 {
-  B = the_model->factorized_basis.at(sec);
+  B = the_model->provide_factorized_basis(sec);
   int Nup = sec.Nup();
   int Ndw = sec.Ndw();
 

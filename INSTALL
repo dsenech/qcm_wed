@@ -23,20 +23,20 @@ pip install .
 These instructions allow a finely tunned compilation of the qcm library and dependencies for better performance.
 Library and dependencies compilation and installation are no more handled automatically.
 
-1. Clone PyQCM and download CUBA source:
+1. Clone PyQCM:
 
 ```
 git clone https://bitbucket.org/dsenechQCM/qcm_wed.git
-wget http://www.feynarts.de/cuba/Cuba-4.2.1.tar.gz
-tar -xf Cuba-4.2.1.tar.gz
 ```
 
-2. Configure and compile CUBA:
+2. If CUBA library is not installed on your system, follow the following step:
 
 ```
-cd Cuba-4.2.1 #enter extraction CUBA directory
-./configure CFLAGS="-O3 -fPIC -ffast-math -fomit-frame-pointer"
-make lib
+wget http://www.feynarts.de/cuba/Cuba-4.2.2.tar.gz #download
+tar -xf Cuba-4.2.2.tar.gz #decompress
+cd Cuba-4.2.2 #enter extraction CUBA directory
+./configure CFLAGS="-O3 -fPIC -ffast-math -fomit-frame-pointer" #configure
+make lib #compile
 cd .. #return common directory
 ```
 
@@ -45,10 +45,12 @@ cd .. #return common directory
 ```
 cd qcm_wed #enter extraction CUBA directory
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../Cuba-4.2.2
 make
-make install
+cp ./qcm.so.1.0 ../pyqcm/qcm.so
 ```
+
+Note the CUBA_DIR variable must be the path to the extracted Cuba folder (step 2), or to the folder containing the compiled Cuba library (`libcuba.a`) along with the header `cuba.h`.
 
 4. Run `setup.py` script to install the python library:
 

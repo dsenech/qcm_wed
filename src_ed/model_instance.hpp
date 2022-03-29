@@ -185,7 +185,7 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
   // loop over sectors to find the ground state sector
   
   for(auto& s:sector_set){
-    the_model->build_HS_objects(s, is_complex);
+    the_model->build_HS_operators(s, is_complex);
     Hamiltonian<HilbertField> H(the_model, value, s);
     if(H.dim == 0) continue;
     
@@ -397,12 +397,10 @@ void model_instance<HilbertField>::Green_function_solve()
 
     bool is_complex = (typeid(HilbertField) == typeid(Complex));
 
-    the_model->build_HS_objects_GF(x->sec, mixing, false, is_complex);
     if(GF_solver == GF_format_CF) build_cf(*x, false);
     else build_qmatrix(*x,false);
     
     if(mixing&HS_mixing::up_down){
-      the_model->build_HS_objects_GF(x->sec, mixing, true, is_complex);
       if(GF_solver == GF_format_CF) build_cf(*x,true);
       else build_qmatrix(*x,true);
     }
@@ -1066,11 +1064,11 @@ void model_instance<HilbertField>::print_wavefunction(ostream& fout)
 {
   for (auto& s : states){
     if(the_model->is_factorized){
-      auto B = the_model->factorized_basis.at(s->sec);
+      auto B = the_model->provide_factorized_basis(s->sec);
       s->write_wavefunction(fout, *B);
     }
     else{
-      auto B = the_model->basis.at(s->sec);
+      auto B = the_model->provide_basis(s->sec);
       s->write_wavefunction(fout, *B);
     }
   }

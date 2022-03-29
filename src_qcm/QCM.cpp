@@ -597,6 +597,10 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    */
   void add_cluster(const string &name, const vector3D<int64_t> &cpos, const vector<vector3D<int64_t>> &pos, int ref)
   {
+    if(qcm_model->is_closed){
+      qcm_warning("model already created. Ignoring.");
+      return;
+    }
     auto tmp = ED::model_size(name);
     try{
       if(get<0>(tmp) != pos.size()) qcm_throw("The number of sites of cluster "+name+" is inconsistent with the cluster model");
@@ -627,6 +631,10 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
     try{
       if(qcm_model==nullptr) qcm_throw("no cluster has been added to the model!");
     } catch(const string& s) {qcm_catch(s);}
+    if(qcm_model->is_closed){
+      qcm_warning("model already created. Ignoring.");
+      return;
+    }
     qcm_model->name = name;
     qcm_model->superlattice = lattice3D(superlattice);
     qcm_model->unit_cell = lattice3D(unit_cell);
@@ -660,6 +668,10 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    */
   void interaction_operator(const string &name, vector3D<int64_t> &link, double amplitude, int band1, int band2, const string &type)
   {
+    if(qcm_model->is_closed){
+      qcm_warning("model already created and closed. Ignoring operator creation.");
+      return;
+    }
     try{
       qcm_model->interaction_operator(name, link, amplitude, band1-1, band2-1, type);
     } catch(const string& s) {qcm_catch(s);}
@@ -680,6 +692,10 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    */
   void hopping_operator(const string &name, vector3D<int64_t> &link, double amplitude, int band1, int band2, int tau, int sigma)
   {
+    if(qcm_model->is_closed){
+      qcm_warning("model already created and closed. Ignoring operator creation.");
+      return;
+    }
     try{
       qcm_model->hopping_operator(name, link, amplitude, band1-1, band2-1, tau, sigma);
     } catch(const string& s) {qcm_catch(s);}
@@ -697,6 +713,10 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    */
   void anomalous_operator(const string &name, vector3D<int64_t> &link, complex<double> amplitude, int band1, int band2, const string& type)
   {
+    if(qcm_model->is_closed){
+      qcm_warning("model already created and closed. Ignoring operator creation.");
+      return;
+    }
     try{
       qcm_model->anomalous_operator(name, link, amplitude, band1-1, band2-1, type);
     } catch(const string& s) {qcm_catch(s);}
@@ -714,6 +734,10 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    */
   void density_wave(const string &name, vector3D<int64_t> &link, complex<double> amplitude, int band, vector3D<double> Q, double phase, const string& type)
   {
+    if(qcm_model->is_closed){
+      qcm_warning("model already created and closed. Ignoring operator creation.");
+      return;
+    }
     try{
       qcm_model->density_wave(name, link, amplitude, band-1, Q, phase, type);
     } catch(const string& s) {qcm_catch(s);}
@@ -729,6 +753,10 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    */
   void explicit_operator(const string &name, const string &type, const vector<tuple<vector3D<int64_t>, vector3D<int64_t>, complex<double>>> &elem, int tau, int sigma)
   {
+    if(qcm_model->is_closed){
+      qcm_warning("model already created and closed. Ignoring operator creation.");
+      return;
+    }
     try{
       qcm_model->explicit_operator(name, type, elem, tau, sigma);
     } catch(const string& s) {qcm_catch(s);}
