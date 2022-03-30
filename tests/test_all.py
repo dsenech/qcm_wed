@@ -1,65 +1,33 @@
-"""
-TESTING BATTERY TO VERIFY THE INTEGRETY AND FUNCTIONNALITY OF PYQCM
-"""
+# """
+# TESTING BATTERY TO VERIFY THE INTEGRETY AND FUNCTIONNALITY OF PYQCM
+# """
 
 import unittest
 import os
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+TEST_FILES = []
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__)) # gets current path of script
 
-if not os.path.exists(f"{CURRENT_DIR}/test_outputs"):
-    os.mkdir(f"{CURRENT_DIR}/test_outputs")
+if not os.path.exists(f"{SCRIPT_DIR}/test_outputs"): # checks if the output dir exists and if not creates it
+    os.mkdir(f"{SCRIPT_DIR}/test_outputs")
 
-os.chdir(f"{CURRENT_DIR}/test_outputs")
+os.chdir(f"{SCRIPT_DIR}/test_outputs") # changes working dir to the test output dir
 
+for file in os.listdir(f"{SCRIPT_DIR}/test_files"): # finds all test files in the testing directory following the pattern test***********.py
+    if file[:4]=="test" and file[-3:]==".py":
+        TEST_FILES.append(file)
 
 def run_file(test_name):
     """Runs a file of a given name inside the testing directory. Mostly aesthetic.
     """
-    return os.system(f"python {CURRENT_DIR}/test_files/{test_name}")
+    return os.system(f"python {SCRIPT_DIR}/test_files/{test_name}")
 
 
 class TestAll(unittest.TestCase):
 
-    def test_averages_bath(self):
-        self.assertFalse(run_file("test_averages_bath.py"))
-
-    def test_averages(self):
-        self.assertFalse(run_file("test_averages.py"))
-
-    def test_berry(self):
-        self.assertFalse(run_file("test_berry.py"))
-
-    def test_cdmft(self):
-        self.assertFalse(run_file("test_cdmft.py"))
-
-    def test_fixed_density_loop(self):
-        self.assertFalse(run_file("test_fixed_density_loop.py")) #### TEMPORARILY SHORTENED
-
-    def test_hartree(self):
-        self.assertFalse(run_file("test_hartree.py"))
-
-    def test_hybridization(self):
-        self.assertFalse(run_file("test_hybridization.py"))
-
-    def test_instances(self):
-        self.assertFalse(run_file("test_instances.py"))
-
-    def test_mixing_cf(self):
-        self.assertFalse(run_file("test_mixing_cf.py"))
-
-    def test_mixing(self):
-        self.assertFalse(run_file("test_mixing.py"))
-
-    def test_mixing2(self):
-        self.assertFalse(run_file("test_mixing2.py"))
-
-    def test_spectral(self):
-        self.assertFalse(run_file("test_spectral.py"))
-
-    def test_vca(self):
-        self.assertFalse(run_file("test_vca.py"))
-
+    # generates the appropriate methods given the detected test files
+    for file in TEST_FILES:
+        exec(f"""def {file[:-3]}(self): \n\tself.assertFalse(run_file("{file}"))""")
 
 if __name__ == "__main__":
     unittest.main()
