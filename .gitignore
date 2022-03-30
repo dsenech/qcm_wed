@@ -9,3 +9,5 @@ _skbuild
 qcm_git_hash.py
 external
 tests/test_outputs/
+doc/build
+build
