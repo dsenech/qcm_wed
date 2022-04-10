@@ -1,4 +1,5 @@
 from pyqcm import *
+set_global_parameter('verb_warning')
 
 new_cluster_model('L4', 4, 0)
 add_cluster('L4', [0, 0, 0], [[0, 0, 0], [1, 0, 0], [2, 0, 0], [3, 0, 0]])
@@ -35,5 +36,5 @@ explicit_operator('V1m', [
 ([3,0,0], [0,0,0],-e),
 ], tau=0, type='one-body')
 
-
-# print_model('model.out')
+# from pyqcm.draw_operator import draw_operator
+# draw_operator('t')

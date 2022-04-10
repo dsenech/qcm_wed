@@ -48,16 +48,16 @@ def __kgrid(ax, nk, quadrant=False, k_perp=0.0, plane='xy', size=1.0):
     if quadrant:
         orig = np.array([0.5*(1-size), 0.5*(1-size), 0.0])
         k = pyqcm.wavevector_grid(nk, orig, size, k_perp, plane)
-        ax.set_xticks((0, 0.5, 1))
-        ax.set_yticks((0, 0.5, 1))
+        ax.set_xticks((0, 0.5/size, 1/size))
+        ax.set_yticks((0, 0.5/size, 1/size))
         ax.set_xticklabels(('$0$', '$\pi/2$', '$\pi$'))
         ax.set_yticklabels(('$0$', '$\pi/2$', '$\pi$'))
         x = np.linspace(0, 1, nk)
     else:
         orig = np.array([-size, -size, 0])
         k = pyqcm.wavevector_grid(nk, orig, size*2, k_perp, plane)
-        ax.set_xticks((-1, 0, 1))
-        ax.set_yticks((-1, 0, 1))
+        ax.set_xticks((-1/size, 0, 1/size))
+        ax.set_yticks((-1/size, 0, 1/size))
         ax.set_xticklabels(('$-\pi$', '$0$', '$\pi$'))
         ax.set_yticklabels(('$-\pi$', '$0$', '$\pi$'))
         x = np.linspace(-1, 1, nk)
@@ -522,7 +522,8 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
     :returns: the contour plot object
     
     """
-
+    if spin_down and pyqcm.mixing() != 4:
+        raise RuntimeError('spin_down can only be True is mixing = 4')
     if plt_ax is None:
         plt.figure()
         plt.gcf().set_size_inches(14/2.54, 14/2.54)

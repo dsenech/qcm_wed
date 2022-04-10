@@ -68,6 +68,8 @@ new_cluster_operator('L2_4b', 'pb1', 'anomalous', [
     (6, 5+no, -1.0)
 ])
 
+
+
 #-------------------------------------------------------------------
 # construction of the lattice model 
 
@@ -89,3 +91,7 @@ anomalous_operator('dy', [1,0,0], 1, type='dy') # NN triplet
 anomalous_operator('dx', [1,0,0], 1, type='dx') # NN triplet
 density_wave('M', 'Z', [1,0,0])
 density_wave('pT', 'dz', [1,0,0], amplitude=1, link=[1,0,0])
+
+
+from pyqcm.draw_operator import draw_cluster_operator, draw_operator
+draw_cluster_operator('L2_4b', 'pb1')
