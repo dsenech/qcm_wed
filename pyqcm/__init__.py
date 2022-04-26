@@ -27,6 +27,13 @@ except:
     print('submodule qcm_git_hash not found. Will not be able to record git version in output files')
     git_hash = 'NA'
 
+try:
+    from . import qcm_git_hash
+    version = qcm_git_hash.version
+except:
+    print('version number not found. Will not be able to record version number in output files')
+    version = 'NA'
+
 np.set_printoptions(precision=6, linewidth=200, suppress=True, sign=' ')
 
 ################################################################################
@@ -943,8 +950,8 @@ def properties(label=0):
 
     """
     des, data = qcm.properties(label)
-    des += 'githash\t'
-    data += git_hash + '\t'
+    des += 'githash\tversion\t'
+    data += git_hash + '\t' + version + '\t'
     return des, data
 
 ################################################################################
@@ -1899,7 +1906,7 @@ def params_from_file(out_file, n=0):
     V = V.split()
     print(str(len(V)) + ' columns read')
 
-    out_keys = ['model', 'omega', 'githash', 'githash_ED', 'iterations', 'dist_function', 'diff_hybrid', 'temp', 'E_kin', 'E_pot', 'solver', 'time', 'mean_field_niter', 'distance']
+    out_keys = ['model', 'omega', 'githash', 'iterations', 'dist_function', 'diff_hybrid', 'temp', 'E_kin', 'E_pot', 'solver', 'time', 'mean_field_niter', 'distance']
 
     D = {}
     for i in range(len(K)):

@@ -9,6 +9,7 @@
 #include <iomanip>
 
 #include "matrix.hpp"
+#include "parser.hpp"
 
 #define FACTOR 4
 #define TINY 1e-14
@@ -87,7 +88,8 @@ void Davidson(T &hamil, size_t dim, size_t K, vector<double> &val, vector<vector
 
 	size_t iter;
 	for(iter=0; iter<max_iter_lanczos; iter++){
-		
+		check_signals();
+
 		//--------------------------------------------------------------------------
 		// STEP B
 		// eigenvalues and eigenvectors of bhb

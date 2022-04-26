@@ -25,7 +25,7 @@ hybrid_to_param = None
 Gdim = 0
 nclus = 0
 nmixed = 1
-mixing = 0
+_mixing = 0
 clusters = None
 maxfev = 500000
 
@@ -190,7 +190,7 @@ def __diff_hybrid(hyb1, hyb2):
     :returns float: the difference in hybridization arrays
     
     """
-    global nclus, nmixed, w, weight, mixing
+    global nclus, nmixed, w, weight, _mixing
     nw = len(w)
 
     diff = 0.0
@@ -200,9 +200,9 @@ def __diff_hybrid(hyb1, hyb2):
             norm = np.linalg.norm(diffH)
             diff += weight[i]*norm*norm
 
-    if mixing == 0:
+    if _mixing == 0:
         diff *= 2
-    elif mixing == 3:
+    elif _mixing == 3:
         diff /= 2
     diff /= nw  
     return np.sqrt(diff)
@@ -317,7 +317,7 @@ def cdmft(
     :returns: None
 
     """
-    global w, wr, weight, var, mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
+    global w, wr, weight, var, _mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
 
     if type(hartree) is not list and hartree is not None:
         hartree = [hartree] # quick fix to protect against hartree=`obj` behavior
@@ -347,8 +347,8 @@ def cdmft(
 
     print('minimization method = ', method)
     pyqcm.new_model_instance()
-    mixing = pyqcm.mixing()
-    print('mixing state = ', mixing)
+    _mixing = pyqcm.mixing()
+    print('_mixing state = ', _mixing)
     Gdim = pyqcm.Green_function_dimension()
     nsites, nbands, clusters, bath_size, ref = pyqcm.model_size()
     clusters = np.array(clusters)
@@ -399,12 +399,12 @@ def cdmft(
         t1 = timeit.default_timer()
         if superiter > 0:
             Hyb0 = Hyb
-            if mixing == 4:
+            if _mixing == 4:
                 Hyb_down0 = Hyb_down
         dist_function = __frequency_grid(grid_type, beta, wc)
         qcm.CDMFT_host(wr, weight)
         Hyb = __set_Hyb()
-        if mixing == 4:
+        if _mixing == 4:
             Hyb_down = __set_Hyb(True)
 
         t2 = timeit.default_timer()
@@ -482,7 +482,7 @@ def cdmft(
         # checking convergence on the hybridization matrix
         if superiter > 0:
             diffH = __diff_hybrid(Hyb, Hyb0)
-            if mixing == 4:
+            if _mixing == 4:
                 diffH += __diff_hybrid(Hyb_down, Hyb_down0)
             if (diffH < accur_hybrid) and hartree_converged:
                 pyqcm.banner('CDMFT converged on the hybridization function', '=')
@@ -1151,7 +1151,7 @@ def cdmft_distance_debug(varia=None, vset=None, beta=50, wc=2.0, grid_type = 'sh
     :returns: None
 
     """
-    global w, wr, weight, var, mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
+    global w, wr, weight, var, _mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
 
     # identifying the variational parameters
     var = varia
@@ -1161,8 +1161,8 @@ def cdmft_distance_debug(varia=None, vset=None, beta=50, wc=2.0, grid_type = 'sh
         raise ValueError('CDMFT requires at least one variational parameter...Aborting.')
 
     pyqcm.new_model_instance()
-    mixing = pyqcm.mixing()
-    print('mixing state = ', mixing)
+    _mixing = pyqcm.mixing()
+    print('_mixing state = ', _mixing)
     Gdim = pyqcm.Green_function_dimension()
     nsites, nbands, clusters, bath_size, ref = pyqcm.model_size()
     clusters = np.array(clusters)

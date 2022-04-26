@@ -508,7 +508,7 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
     :param int band: if None, sums all the bands. Otherwise just shows the weight for that band (starts at 1)
     :param boolean spin_down: true is the spin down sector is to be computed (applies if mixing = 4)
     :param boolean quadrant: if True, plots the first quadrant of a square Brillouin zone only
-    :param str opt: The quantity to plot. 'GF' = Green function, 'self' = self-energy, 'Z' = quasi-particle weigt
+    :param str opt: The quantity to plot. 'GF' = Green function, 'self' = self-energy, 'Z' = quasi-particle weight
     :param float k_perp: momentum component in the third direction (in multiple of pi)
     :param float freq: frequency at which the spectral function is computed (0 by default)
     :param float max: maximum value of the plotting range (if None, maximum of the data)
@@ -563,6 +563,8 @@ def mdc(nk=200, eta=0.1, label=0, band=None, spin_down=False, quadrant=False, op
 
     # acting with symmetries
     if sym != None:
+        if quadrant:
+            raise RuntimeError('quadrant option must be False is symmetrization is done in mdc()')
         if 'R' in sym:
             A = 0.5*(A + A.T)
         if 'X' in sym:

@@ -230,6 +230,8 @@ void lattice_model_instance::self_energy(Green_function_k &M)
  */
 matrix<Complex> lattice_model_instance::projected_Green_function(Complex w, bool spin_down)
 {
+
+	if(global_bool("verb_ED")) cout << "Computing projected GF at w = " << w << endl;
 	matrix<Complex> PGF(model->dim_GF);
 	Green_function G = cluster_Green_function(w, false, spin_down);
 	size_t kgrid_side = global_int("kgrid_side");
@@ -244,17 +246,17 @@ matrix<Complex> lattice_model_instance::projected_Green_function(Complex w, bool
 				Green_function_k M(G,{0.0,0.0,0.0});
 				set_Gcpt(M);
 				PGF += M.Gcpt;
-        nk++;
+        		nk++;
 			}
 			break;
 		case 1:
 			// #pragma omp parallel for
-      for(int i=0; i<kgrid_side; i++){
+    		for(int i=0; i<kgrid_side; i++){
 				Green_function_k M(G,{(i+0.5)*step,0.0,0.0});
 				set_Gcpt(M);
 				// #pragma omp critical
 				PGF += M.Gcpt;
-        nk++;
+        		nk++;
 			}
 			break;
 		case 2:
@@ -265,7 +267,7 @@ matrix<Complex> lattice_model_instance::projected_Green_function(Complex w, bool
 					set_Gcpt(M);
 					// #pragma omp critical
 					PGF += M.Gcpt;
-          nk++;
+          			nk++;
 				}
 			}
 			break;
@@ -315,6 +317,7 @@ void lattice_model_instance::CDMFT_Host(const vector<double>& freqs, const vecto
 	}
 
 	// #pragma omp parallel for
+	if(global_bool("verb_ED")) cout << "Building host function" << endl;
 	for(int i=0; i<freqs.size(); i++){
 		Complex w(0.0, freqs[i]);
 		auto Gproj= projected_Green_function(w, false);
@@ -331,6 +334,7 @@ void lattice_model_instance::CDMFT_Host(const vector<double>& freqs, const vecto
 		}
 	}
 	if(model->mixing & HS_mixing::up_down){
+		if (global_bool("verb_ED")) cout << "Building host function for spin down" << endl;
 		if(G_host_down.size()==0){
 			G_host_down.assign(freqs.size(), vector<matrix<Complex>>(n_clus));
 			for(int i=0; i<freqs.size(); i++){
