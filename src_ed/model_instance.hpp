@@ -421,7 +421,7 @@ matrix<complex<double>> model_instance<HilbertField>::Green_function(const Compl
 {
   #pragma omp master
   {
-    if(spin_down and !(mixing&HS_mixing::up_down))
+    if(spin_down and !(mixing&HS_mixing::up_down or mixing==0))
       qcm_ED_throw("spin_down=True impossible with Hilbert space mixing "+to_string(mixing));
     if(!gf_solved) Green_function_solve();
   }
