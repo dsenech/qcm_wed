@@ -1,16 +1,21 @@
 #include <cstring>
 #include <fstream>
-#include<unordered_map>
+// #include<unordered_map>
+#include<map>
 
 #include "global_parameter.hpp"
 #include "parser.hpp"
 
 bool is_global_parameter_initialized = false;
 
-unordered_map<string, global_parameter<bool>> GP_bool;
-unordered_map<string, global_parameter<size_t>> GP_int;
-unordered_map<string, global_parameter<double>> GP_double;
-unordered_map<string, global_parameter<char>> GP_char;
+// unordered_map<string, global_parameter<bool>> GP_bool;
+// unordered_map<string, global_parameter<size_t>> GP_int;
+// unordered_map<string, global_parameter<double>> GP_double;
+// unordered_map<string, global_parameter<char>> GP_char;
+map<string, global_parameter<bool>> GP_bool;
+map<string, global_parameter<size_t>> GP_int;
+map<string, global_parameter<double>> GP_double;
+map<string, global_parameter<char>> GP_char;
 
 H_FORMAT Hamiltonian_format;
 

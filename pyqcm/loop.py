@@ -278,15 +278,15 @@ def fixed_density_loop(
 
 		# density search:
 		max_trials = 12
-		mu2 = np.zeros(max_trials)
-		n = np.zeros(max_trials)
+		mu2 = np.zeros(max_trials+1)
+		n = np.zeros(max_trials+1)
 		var2 = {}
 		if var_param != None:
 			for v in var_param:
 				var2[v] = np.empty(max_trials)
 
 		mu_converged = False
-		for j in range(max_trials+1):
+		for j in range(max_trials):
 			#+++ CALLING THE FUNCTION +++
 			pyqcm.set_parameter('mu', mu)
 			pyqcm.banner('mu = {:1.4f}'.format(mu), '+')

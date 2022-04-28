@@ -39,7 +39,7 @@ Vm_obj = hartree("Vm", "V", 1, lattice=True) # lattice=True ---> use lattice ave
 
 V_start = 4
 V_stop = 0
-V_step = -0.1
+V_step = -0.2
 
 #########################################################################################
 ############################# - Self-consistency approach - #############################

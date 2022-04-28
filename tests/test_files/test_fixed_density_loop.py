@@ -1,8 +1,14 @@
 from pyqcm import *
 from pyqcm.loop import *
 
-import model_2x2_C2
+import model_1D_4
 set_global_parameter('accur_OP', 1e-3)
+set_target_sectors(['R0:N4:S0'])
+set_parameters("""
+t = 1
+U = 4
+mu = 8
+""")
 
 ##################################################################
 # TEST UNITAIRE
@@ -17,14 +23,12 @@ def test_fixed_density_loop():
 
     fixed_density_loop(
         5,  # starting  value of mu
-        1.05, # target density
+        1.1, # target density
         kappa=1.0,
-        maxdmu=0.2,  # maximum change in mu
+        maxdmu=0.5,  # maximum change in mu
         func=F,
         loop_param='U', 
-        # loop_values=np.arange(6, 0, -0.1), ################### TEMPORARY FIX
-        loop_values=np.arange(6, 4, -0.1),
-        # var_param='M_1',
+        loop_values=np.arange(6, 4, -0.2),
         dens_tol=0.002,
         dir='',
         measure=None

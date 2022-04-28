@@ -5,7 +5,8 @@
 
 #include <memory>
 #include <array>
-#include<unordered_map>
+// #include<unordered_map>
+#include<map>
 
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
@@ -27,7 +28,8 @@ vector<string> strings_from_PyList(PyObject* lst);
 extern shared_ptr<parameter_set> param_set;
 extern shared_ptr<lattice_model> qcm_model;
 extern vector<string> target_sectors;
-extern unordered_map<string, global_parameter<bool>> GP_bool;
+// extern unordered_map<string, global_parameter<bool>> GP_bool;
+extern map<string, global_parameter<bool>> GP_bool;
 void qcm_catch(const string& s);
 
 static PyObject *qcm_Error;
