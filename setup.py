@@ -8,14 +8,17 @@ import skbuild
 import os
 import subprocess
 git_hash = str(subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']))
-version = str(subprocess.check_output(['git', 'describe', '--exact-match', '--tags']))
+# version = str(subprocess.check_output(['git', 'describe', '--exact-match', '--tags']))
 git_hash = git_hash[2:-3]
-version = version[2:-3]
+# version = version[2:-3]
+version = 'NA'
 
 fout = open("pyqcm/qcm_git_hash.py", "w")
 fout.write("git_hash = '{:s}'\n".format(git_hash))
 fout.write("version = '{:s}'\n".format(version))
 fout.close() 
+ 
+
 
 skbuild.setup(
     name="pyqcm",
