@@ -1046,6 +1046,17 @@ def set_global_parameter(name, value=None):
         return qcm.set_global_parameter(name, value)
 
 ################################################################################
+def get_global_parameter(name, value=None):
+    """
+    gets the value of a global parameter. 
+
+    :param str name: name of the global option
+    :return: the value, according to type
+
+    """
+    return qcm.get_global_parameter(name)
+
+################################################################################
 def set_parameter(name, value, pr=False):
     """
     sets the value of a parameter within a parameter_set

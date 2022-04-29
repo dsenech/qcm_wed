@@ -60,6 +60,14 @@ char global_char(const string& name)
   return GP_char.at(name).value;
 }
 
+
+bool is_global_bool(const string& name) {return (GP_bool.find(name) != GP_bool.end());}
+bool is_global_int(const string& name) {return (GP_int.find(name) != GP_int.end());}
+bool is_global_double(const string& name) {return (GP_double.find(name) != GP_double.end());}
+bool is_global_char(const string& name) {return (GP_char.find(name) != GP_char.end());}
+
+
+
 void print_options(int to_file)
 {
   if(to_file==1) Print_global_parameters_latex();

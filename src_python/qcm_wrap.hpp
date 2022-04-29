@@ -1524,6 +1524,38 @@ static PyObject* set_global_parameter_python(PyObject *self, PyObject *args)
 
 
 //==============================================================================
+const char* get_global_parameter_help =
+R"{(
+gets the value of a global parameter.
+returns : the value of the global parameter, either boolean, integer, float or string
+){";
+//------------------------------------------------------------------------------
+static PyObject* get_global_parameter_python(PyObject *self, PyObject *args)
+{
+  char* S1 = nullptr;
+  PyObject *obj = nullptr;
+  
+  try{
+    if(!PyArg_ParseTuple(args, "s", &S1))
+      qcm_throw("failed to read parameters in call to get_global_parameter (python)");
+  } catch(const string& s) {qcm_catch(s);}
+  
+  string name(S1);
+  char C[2];
+  if(is_global_bool(name)) return Py_BuildValue("i", global_bool(name));
+  else if(is_global_int(name)) return Py_BuildValue("i", global_int(name));
+  else if(is_global_double(name)) return Py_BuildValue("d", global_double(name));
+  else if(is_global_char(name)) {
+    C[0] = global_char(name);
+    return Py_BuildValue("s", C);
+  }
+  else qcm_throw(name+" is not the name of a global_parameter");
+  return Py_BuildValue("");
+}
+
+
+
+//==============================================================================
 const char* set_parameter_help =
 R"{(
 sets the value of a parameter within a parameter_set

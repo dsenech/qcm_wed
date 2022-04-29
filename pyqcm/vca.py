@@ -113,6 +113,7 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
     while iteration < max_iteration:
         x0 = x
         x, dx, gradient, ihessian = __quasi_newton_step(iteration, func, x0, step, gradient, dx, bfgs)
+        __vca_accuracy_warning(accur, ihessian)
         iteration += 1
 
         if hartree != None:
@@ -328,6 +329,7 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
         gradient0 = np.copy(gradient)
         dx, F, gradient, hessian = __newton_raphson_step(func, x, step)
         ihessian = np.linalg.inv(hessian)
+        __vca_accuracy_warning(accur, ihessian)
 
         if hartree != None:
             hartree_converged = True
@@ -405,6 +407,82 @@ def __newton_raphson_step(func=None, x=None, step=None):
 
 
 ################################################################################
+# checking consistency of accuracy with effective precision
+
+def __vca_accuracy_warning(accur, ihessian):
+
+    accur_SEF = pyqcm.get_global_parameter('accur_SEF')
+    inv_der2 = np.diagonal(ihessian)
+    inv_der2 = np.sqrt(accur_SEF*np.abs(inv_der2))
+    print('effective VCA precision: ', inv_der2)
+    for i in range(len(accur)):
+        if inv_der2[i] > accur[i]:
+            print('WARNING : effective accuracy of variable {:d} lower than what is required. Maybe lower required accuracy (i.e. increase "accur") or lower "accur_SEF"'.format(i+1))
+    
+
+################################################################################
+# Newton-Raphson in 1D
+
+def __altNR(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max_iteration=30, max_iter_diff=None, hartree=None):
+    """Performs a Newton-Raphson procedure in one variable by reusing old points as much as possible
+    
+    :param func: a function of 1 variable
+    :param [float] start: the starting value
+    :param [float] step: the first step 
+    :param [float] accur: the required accuracy
+    :param [float] max: maximum absolute value of the parameter
+    :param float gtol: the gradient tolerance (gradient must be smaller than gtol for convergence)
+    :param int max_iterations:  maximum number of iterations, beyond which an exception is raised
+    :param float max_iter_diff: optional maximum value of the maximum step
+    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
+    :returns (float, float, float): the value of the function, the gradient, and the 2nd derivative
+
+    """
+
+    # initial three points
+    X = np.zeros(3)
+    Y = np.zeros(3)
+    X[0] = start[0]-step[0]
+    X[1] = start[0]
+    X[2] = start[0]+step[0]
+    Y[0] = func([X[0]])
+    Y[1] = func([X[1]])
+    Y[2] = func([X[2]])
+
+    iter = 0
+    xp0 = 1e9
+    accur_SEF = pyqcm.get_global_parameter('accur_SEF')
+    while iter < max_iteration:
+        iter += 1
+        C = np.polyfit(X,Y,2)
+        xp = -0.5*C[1]/C[0]
+        if np.abs(xp) > max[0]:
+            raise pyqcm.OutOfBoundsError(f"variable --> {0}, iteration --> {iter}") 
+
+        der1 = 2*C[0]*xp0 + C[1]
+        der2 = 2*C[0]
+        dx = np.sqrt(accur_SEF/np.abs(der2))
+        if iter > 1:
+            print('---> X :', X, '\tder1 = {:.6g}\tder2 = {:.3g}'.format(der1, der2), '\teffective precision: {:.3g}'.format(dx))
+            if dx > accur:
+                print('WARNING : effective accuracy lower than what is required. Maybe lower required accuracy (i.e. increase "accur") or lower "accur_SEF"')
+        if np.abs(der1) < gtol:
+            print('VCA 1D : convergence on gradient')
+            break
+        I = np.argmax(np.abs(X-xp))
+        X[I] = xp
+        Y[I] = func([X[I]])
+        if iter > 1 and np.abs(xp-xp0) < accur:
+            print('VCA 1D : convergence on position')
+            break
+        xp0 = xp
+    if iter == max_iteration:
+        raise pyqcm.TooManyIterationsError(max_iteration)
+
+    return np.array([xp]), np.array([der1]), np.array([[1.0/der2]])
+
+
+################################################################################
 # PUBLIC FUNCTIONS
 ################################################################################
 # performs the VCA
@@ -422,7 +500,8 @@ def vca(
     max_iter_diff=None, 
     NR=False, 
     hartree=None, 
-    hartree_self_consistent=False
+    hartree_self_consistent=False,
+    altNR=False,
 ):
     """Performs a VCA with the QN or NR method
     
@@ -438,6 +517,7 @@ def vca(
     :param boolean NR: True if the Newton-Raphson method is used, False if the quasi-Newton method is used
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :param boolean hartree_self_consistent: True if the Hartree approximation is treated in the self-consistent, rather than variational, way.
+    :param boolen altNR: if True, uses an alternate Newton-Raphson method in the case of one variational parameter.
     :return: None
     
     """
@@ -535,7 +615,9 @@ def vca(
 
 
     try:
-        if NR :
+        if nvar == 1 and altNR:
+            sol, grad, iH = __altNR(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # special Newton-Raphson process in 1 variable
+        elif NR :
             sol, grad, iH = __newton_raphson(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # Newton-Raphson process
         else:
             sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, False, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # quasi-Newton process

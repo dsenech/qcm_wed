@@ -71,5 +71,10 @@ void set_global_double(const string& param, double value);
 void set_global_int(const string& param, size_t value);
 void set_global_char(const string& param, char value);
 void print_options(int to_file = 0);
+bool is_global_bool(const string& name);
+bool is_global_int(const string& name);
+bool is_global_double(const string& name);
+bool is_global_char(const string& name);
+
 
 #endif

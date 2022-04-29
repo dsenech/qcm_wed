@@ -69,6 +69,7 @@ static PyMethodDef methods[] = {
   { "dispersion", dispersion_python, METH_VARARGS, dispersion_help },
   { "dos", dos_python, METH_VARARGS, dos_help },
   { "explicit_operator", (PyCFunction)explicit_operator_python, METH_VARARGS | METH_KEYWORDS, explicit_operator_help },
+  { "get_global_parameter", get_global_parameter_python, METH_VARARGS, get_global_parameter_help },
   { "Green_function_dimension", Green_function_dimension_python, METH_VARARGS, Green_function_dimension_help },
   { "Green_function_solve", Green_function_solve_python, METH_VARARGS, Green_function_solve_help },
   { "ground_state", ground_state_python, METH_VARARGS, ground_state_help },

@@ -68,7 +68,7 @@ def controlled_loop(
 	:param func: a function called at each step of the loop
 	:param [str] varia: names of the variational parameters
 	:param str loop_param: name of the parameter looped over
-	:param (float, float, float) loop_range: range of the loop (min, max, step)
+	:param (float, float, float) loop_range: range of the loop (start, end, step)
 	:param control_func: (optional) name of the function that controls the loop (returns boolean)
 	:param boolean adjust: if True, adjusts the steps depending on control or status of convergence
 	:param boolean predict: if True, uses a linear or quadratic predictor
@@ -455,7 +455,7 @@ def linear_loop(
 	params = None,
 	predict=True
 ):
-	"""Performs a controlled loop for VCA or CDMFT with a predictor
+	"""Performs a loop for VCA or CDMFT with a predictor
 
 	:param N: number of intervals within the loop
 	:param func: function called at each step of the loop
@@ -471,7 +471,7 @@ def linear_loop(
 	if varia is None:
 		raise pyqcm.MissingArgError('variational parameters (varia) must be specified')
 	if type(varia) != list:
-		raise TypeError('the argument "varia" of controlled_loop must be a list')
+		raise TypeError('the argument "varia" of linear_loop must be a list')
 
 	current_value = {}
 
