@@ -54,17 +54,14 @@ lattice_model_instance::lattice_model_instance(shared_ptr<lattice_model> _model,
   for(auto& x : params){
     string name = x.first;
     auto P = model->name_and_label(name, true);
-    // cout << "---->  " << P.first << '\t' << P.second << endl; // TEMPO
     if(P.second){
       if(x.second != 0.0){
         cluster_values[P.second-1][P.first] = x.second;
-        // cout << P.second-1 << '\t' << P.first << '\t' << x.second << endl; // TEMPO
       }
     }
     else model->term.at(name)->is_active = true;
   }
   for(size_t i=0; i<n_clus; i++){
-    // cout << "cluster no " << i+1 << " name = " << model->clusters[i].name << endl; // TEMPO
     if(cluster_values[i].size() == 0) qcm_throw("cluster "+to_string(i)+" has no nonzero operators");
     ED::new_model_instance(model->clusters[i].name, cluster_values[i], sectors[i], label*n_clus+i);
     model->clusters[i].mixing = ED::mixing(label*n_clus+i);

@@ -503,7 +503,7 @@ matrix<Complex> model_instance<HilbertField>::self_energy(const Complex &z, bool
   gf_block_matrix.inverse();
   matrix<Complex> S(gf_block_matrix.r);
   the_model->group->to_site_basis(gf_block_matrix, S, n_mixed);
-  S += spin_down ? tc_down : tc;
+  S += (spin_down and mixing&HS_mixing::up_down) ? tc_down : tc;
   if(the_model->n_bath) S.v += hybridization_function(z, spin_down).v;
   S.v *= -1;
   S += z;
@@ -577,60 +577,6 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     Q->q[r].check_norm(global_double("accur_Q_matrix"));
     Q->q[r].v.v *= sqrt(Omega.weight);
   }
-
-//??????????????????????????????????????????????????????????????????????????????????????
-// CHECKING ANTICOMMUTATION RELATIONS TO CHECK THE VALIDITY OF THE DESTRUCTION OPERATORS
-  // for(int r=0; r<sym_orb.size(); r++){
-  //   int spin = (spin_down)? 1:sym_orb[r][0].spin;
-  //   sector target_sec = the_model->group->shift_sector(Omega.sec, 1, spin, r);
-  //   vector<vector<HilbertField>> phi(sym_orb[r].size());
-  //   vector<state<HilbertField>> phi2(sym_orb[r].size()); // TEMPO
-  //   int dim_target;
-  //   for(size_t i=0; i< sym_orb[r].size(); i++){
-  //     vector<HilbertField> Om2(Omega.psi.size());
-  //     symmetric_orbital sorb = sym_orb[r][i];
-  //     if(spin_down) sorb.spin =1;
-  //     the_model->create_or_destroy(1, sorb, Omega, phi[i], HilbertField(1.0));
-  //     dim_target = phi[i].size();
-  //     phi2[i] = state<HilbertField>(target_sec, phi[i].size()); phi2[i].psi = phi[i]; // TEMPO
-  //     the_model->create_or_destroy(-1, sorb, phi2[i], Om2, HilbertField(1.0));// TEMPO
-  //     sector target_sec2 = the_model->group->shift_sector(Omega.sec, -1, spin, r);
-  //     to_zero(phi[i]);
-  //     the_model->create_or_destroy(-1, sorb, Omega, phi[i], HilbertField(1.0));// TEMPO
-  //     phi2[i] = state<HilbertField>(target_sec2, phi[i].size()); phi2[i].psi = phi[i]; // TEMPO
-  //     the_model->create_or_destroy(1, sorb, phi2[i], Om2, HilbertField(1.0));// TEMPO
-  //     cout << "check : " << Om2 * Omega.psi << endl;
-  //   }
-
-
-  //   // destruction_identifier D(Omega.sec, sym_orb[r][0]);
-  //   // matrix<Complex> C1(the_model->destruction_complex.at(D)->r, the_model->destruction_complex.at(D)->c);
-  //   // the_model->destruction_complex.at(D)->dense_form(C1, 1.0);
-  //   // matrix<Complex> C1d(C1);
-  //   // C1d.hermitian_conjugate();
-
-  //   // sector target_sec2 = the_model->group->shift_sector(Omega.sec,-1, spin, r);
-  //   // D = destruction_identifier(target_sec2, sym_orb[r][0]);
-  //   // matrix<Complex> C2(the_model->destruction_complex.at(D)->r, the_model->destruction_complex.at(D)->c);
-  //   // the_model->destruction_complex.at(D)->dense_form(C2, 1.0);
-  //   // matrix<Complex> C2d(C2);
-  //   // C2d.hermitian_conjugate();
-
-
-  //   // matrix<Complex> anticom1(C1.r);
-  //   // matrix<Complex> anticom2(C2.c);
-
-  //   // anticom1.product(C1,C1d);
-  //   // anticom2.product(C2d,C2);
-  //   // anticom1.v += anticom2.v;
-  //   // cout << "anticommutator:\n" << anticom1 << endl;
-
-  // }
-  
-
-
-//??????????????????????????????????????????????????????????????????????????????????????
-
 }
 
 
@@ -819,7 +765,6 @@ pair<double, string> model_instance<HilbertField>::one_body_solve()
   Q.v.cconjugate();
   Qset->q[0] = Q;
   for(auto& x:Q.e) if(x < 0.0) GS_energy += x;
-  // cout << "eigenvalues : " << Q.e << endl; // TEMPO
 
 
   // computing M, the average M_{ab} = \L c^\dagger_b c_a \R
