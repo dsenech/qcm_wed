@@ -849,16 +849,19 @@ def parameter_set(opt='all'):
                 P2[x] = P[x][0]
         return P2
     elif opt == 'report':
-        rep = ''
-        for x in P:
-            if P[x][1] is None:
-                rep += x + ' = ' + str(P[x][0]) + '\n'
-            else:
-                rep += x + ' = ' + str(P[x][2]) + ' x ' + P[x][1] + '\n'
-        return rep
+        qcm.print_parameter_set()
+        return
     else:
         return P
         
+################################################################################
+def print_parameter_set():
+    """
+    prints the content of the parameter set
+
+    """
+    qcm.print_parameter_set()
+
 
 ################################################################################
 def periodized_Green_function(z, k, spin_down=False, label=0):

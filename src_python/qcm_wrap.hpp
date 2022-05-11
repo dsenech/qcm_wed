@@ -1032,6 +1032,20 @@ static PyObject* parameters_python(PyObject *self, PyObject *args)
 
 
 //==============================================================================
+const char* print_parameter_set_help =
+R"{(
+Print the parameter set to the screen
+){";
+//------------------------------------------------------------------------------
+static PyObject* print_parameter_set_python(PyObject *self, PyObject *args)
+{
+  param_set->print(cout);
+  return Py_BuildValue("");
+}
+
+
+
+//==============================================================================
 const char* parameter_set_help =
 R"{(
 returns the content of the parameter set

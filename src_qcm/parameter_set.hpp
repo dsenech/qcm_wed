@@ -32,7 +32,7 @@ struct parameter{
 //! set of parameters for a model, including dependencies
 struct parameter_set{
   shared_ptr<lattice_model> model; //!< backtrace to the model
-  map<string,shared_ptr<parameter>> param; //!< map of strings to lattice parameters
+  map<string,shared_ptr<parameter>> param; //!< map of strings to parameters
   vector<string> CDMFT_variational; //!< list of CDMFT variational parameters
 
   parameter_set();

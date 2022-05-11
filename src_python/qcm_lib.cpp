@@ -92,6 +92,7 @@ static PyMethodDef methods[] = {
   { "Potthoff_functional", Potthoff_functional_python, METH_VARARGS, Potthoff_functional_help },
   { "print_model", (PyCFunction)print_model_python, METH_VARARGS | METH_KEYWORDS, print_model_help },
   { "print_options", print_options_python, METH_VARARGS, print_options_help },
+  { "print_parameter_set", print_parameter_set_python, METH_VARARGS, print_parameter_set_help },
   { "projected_Green_function", projected_Green_function_python, METH_VARARGS, projected_Green_function_help },
   { "properties", properties_python, METH_VARARGS, properties_help },
   { "reduced_Green_function_dimension", reduced_Green_function_dimension_python, METH_VARARGS, reduced_Green_function_dimension_help },
