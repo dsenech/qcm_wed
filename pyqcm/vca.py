@@ -5,6 +5,7 @@
 import numpy as np
 import pyqcm
 import time
+from scipy.optimize import minimize
 
 #-------------------------------------------------------------------------------
 # MPI matter
@@ -486,6 +487,7 @@ def __altNR(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max
 # PUBLIC FUNCTIONS
 ################################################################################
 # performs the VCA
+SEF_eval = 0
 
 def vca(
     var2sef=None,
@@ -498,7 +500,7 @@ def vca(
     accur_grad=1e-6, 
     max_iter=30, 
     max_iter_diff=None, 
-    NR=False, 
+    method='SYMR1', 
     hartree=None, 
     hartree_self_consistent=False,
     altNR=False,
@@ -514,13 +516,14 @@ def vca(
     :param float accur_grad: max value of gradient for convergence
     :param int max_iter: maximum number of iterations in the procedure
     :param float max_iter_diff: optional maximum value of the maximum step in the quasi-Newton method
-    :param boolean NR: True if the Newton-Raphson method is used, False if the quasi-Newton method is used
+    :param str method: method used to optimize ('SYMR1', 'NR', 'BFGS', 'altNR', 'Nelder-Mead', 'COBYLA', 'Powell', 'CG')
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :param boolean hartree_self_consistent: True if the Hartree approximation is treated in the self-consistent, rather than variational, way.
     :param boolen altNR: if True, uses an alternate Newton-Raphson method in the case of one variational parameter.
     :return: None
     
     """
+    global SEF_eval
     # type and length checks
     if type(names) != list:
         if type(names) != str:
@@ -596,13 +599,16 @@ def vca(
         print('the argument "steps" should have ', nvar, ' components')
         raise pyqcm.MissingArgError('steps')
 
+    SEF_eval = 0
     def var2x(x):
+        global SEF_eval
         if var2sef is None:
             for i in range(len(names)): 
                 pyqcm.set_parameter(names[i], x[i])
             print('x = ', x) # new
         else:
             var2sef(x)    
+        SEF_eval += 1
         pyqcm.new_model_instance()
         return pyqcm.Potthoff_functional(hartree)
         
@@ -613,27 +619,87 @@ def vca(
     var_val = pyqcm.__varia_table(names,start)
     print(var_val)
 
+    scipy_minimization = False
+    if method == 'Nelder-Mead' or method == 'COBYLA' or method == 'Powell'  or method == 'CG'  or method == 'BFGS':
+        scipy_minimization = True
 
+    if scipy_minimization and hartree_self_consistent:
+        raise ValueError('Hartree self-consistency not allowed when using SciPy minimization methods in VCA')
+
+    ftol = 1e-4
+    iH = None
+
+    #------------------------------------- SWITCH ACCORDING TO METHOD -----------------------------------------
     try:
-        if nvar == 1 and altNR:
+        if method == 'altNR':
+            if nvar != 1:
+                raise ValueError('vca method altNR only works with one variable')
             sol, grad, iH = __altNR(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # special Newton-Raphson process in 1 variable
-        elif NR :
+
+        elif method == 'NR' :
             sol, grad, iH = __newton_raphson(var2x, start, steps, accur, max, accur_grad, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # Newton-Raphson process
-        else:
+
+        elif method == 'SYMR1' :
             sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, False, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # quasi-Newton process
+
+        elif method == 'BFGS2' :
+            sol, grad, iH = __quasi_newton(var2x, start, steps, accur, max, accur_grad, True, max_iteration=max_iter, max_iter_diff=max_iter_diff, hartree=hartree_self)  # quasi-Newton process
+
+        elif method == 'Nelder-Mead':
+            initial_simplex = np.zeros((nvar+1,nvar))
+            for i in range(nvar+1):
+                initial_simplex[i, :] = start
+            for i in range(nvar):
+                initial_simplex[i+1, i] += steps[i]
+            if type(accur) == list:
+                accur = accur[0]
+            solution = minimize(var2x, start, method='Nelder-Mead', options={'maxfev':200, 'xatol': accur, 'fatol':ftol, 'initial_simplex': initial_simplex, 'adaptive': True, 'disp':True})
+            iter_done = solution.nit
+            sol = solution.x
+
+        elif method == 'Powell':
+            accur = accur[0]
+            solution = minimize(var2x, start, method='Powell', tol = ftol, options={'xtol': accur, 'ftol': ftol, 'disp':True})
+            iter_done = solution.nit
+            sol = solution.x
+            if type(sol) != list:
+                sol = [sol]
+
+        elif method == 'CG':
+            solution = minimize(var2x, start, method='CG', jac=False, tol = ftol, options={'eps':accur, 'maxiter':200, 'disp':True})
+            iter_done = solution.nit
+            sol = solution.x
+
+        elif method == 'BFGS':
+            solution = minimize(var2x, start, method='BFGS', jac=False, tol = ftol, options={'eps':accur, 'disp':True})
+            iter_done = solution.nit
+            sol = solution.x
+            iH = solution.hess_inv
+
+        elif method == 'COBYLA':
+            solution = minimize(var2x, start, method='COBYLA', options={'rhobeg':steps[0], 'maxiter':200, 'tol': ftol, 'disp':True})
+            iter_done = solution.nfev
+            sol = solution.x
+        else:
+            raise ValueError('method {:s} unknown in VCA'.format(method))
+
+    #----------------------------------------------------------------------------------------------------------
+
+
     except pyqcm.OutOfBoundsError as E:
         print('variable ', E.variable + 1, ' is out of bounds: abs(', names[E.variable], ') > ', max[E.variable])
         raise pyqcm.OutOfBoundsError(f"variable --> {E.variable}, iteration --> {E.iteration}")
 
     except pyqcm.TooManyIterationsError as E:
-        print('quasi-Newton method failed to converge after ', E.max_iteration, ' iterations')
+        print('VCA method failed to converge after ', E.max_iteration, ' iterations')
         raise pyqcm.TooManyIterationsError(E.max_iteration)
 
     omega = var2x(sol)  # final, converged value
     if root:
         print('saddle point = ', sol)
-        print('gradient = ', grad)
-        print('second derivatives :', 1.0 / np.diag(iH))
+        if scipy_minimization is False: 
+            print('gradient = ', grad)
+            print('second derivatives :', 1.0 / np.diag(iH))
         print('computing properties of converged solution...')
         print('omega = ', omega)
     ave = pyqcm.averages()
@@ -641,13 +707,14 @@ def vca(
 
     # writes the solution in the standard file
     if root:
-        H = np.linalg.inv(iH)  # Hessian at the solution (inverse of iH)
-        val = ''
-        for i in range(nvar):
-            val += '{:.4g}\t'.format(H[i, i])
-        des = ''
-        for i in range(nvar):
-            des += '2der_' + names[i] + '\t'
+        val = method + '\t{:d}\t'.format(SEF_eval)
+        des = 'method\tSEF_eval\t'
+        if iH is not None: 
+            H = np.linalg.inv(iH)  # Hessian at the solution (inverse of iH)
+            for i in range(nvar):
+                val += '{:.4g}\t'.format(H[i, i])
+            for i in range(nvar):
+                des += '2der_' + names[i] + '\t'
         if hartree != None:
             val += '{:.8g}\t'.format(omega)
             des += 'omegaH\t'
@@ -658,7 +725,10 @@ def vca(
     if root:
         pyqcm.banner('VCA ended normally', '*')
 
-    return sol, 1.0/np.diag(iH)
+    if scipy_minimization is False:
+        return sol, 1.0/np.diag(iH)
+    else:
+        return sol, None
 
 ################################################################################
 def plot_sef(param, prm, file="sef.tsv", accur_SEF=1e-4, hartree=None, show=True):
@@ -754,136 +824,6 @@ def plot_GS_energy(param, prm, clus=0, file=None, plt_ax=None, **kwargs):
     elif plt_ax is None:
         plt.show()
 
-
-################################################################################
-# performs the VCA by minimization
-
-def vca_min(names=None, start=None, steps=None, file="vca.tsv", accur=1e-4, ftol=1e-8, method='Nelder-Mead', hartree=None):
-    """Performs the VCA assuming that the solution is a minimum of the Potthoff functional
-    Uses minimization routines from scipy.optimize.
-    
-    :param str or [str] names: names of the variational parameters
-    :param float or [float] start: starting values 
-    :param float or [float] steps: initial steps (relevant to some minimization methods)
-    :param float accur: accuracy of parameters
-    :param float ftol: convergence criterion for the value of the SEF
-    :param str method: minimization method used in scipy.optimize.minimize()
-    :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
-    :return: None
-
-    """
-    # type and length checks
-    if names is None:
-        print('missing argument names : variational parameters must be specified')
-        raise pyqcm.MissingArgError('names')
-    if steps is None:
-        steps = 10*np.array(accur)
-
-    if type(names) != list:
-        if type(names) != str:
-            raise ValueError('argument names of vca_min() must be a string or a list of strings')
-        single = True
-        names = [names]
-        if start != None:
-            if type(start) != float and type(start) != int:
-                raise ValueError('argument start of vca_min() must be a float or a list of floats')
-            start = [start]
-        if type(steps) != float:
-            raise ValueError('argument steps of vca_min() must be a float or a list of floats')
-        steps = [steps]
-        nvar = 1
-    else:
-        nvar = len(names)  # number of variational parameters
-        if start != None:
-            if len(start) == nvar:
-                raise ValueError('argument start of vca_min() must have {:d} elements'.format(nvar))
-        if type(steps) != list or type(accur) != list:
-            raise ValueError('arguments steps and accur of vca_min() must be lists of {:d} elements each'.format(nvar))
-        if len(steps) != nvar or len(accur) != nvar:
-            raise ValueError('arguments steps and accur of vca_min() must be lists of {:d} elements each'.format(nvar))
-
-    if type(hartree) is not list and hartree is not None:
-        hartree = [hartree]
-
-    L = pyqcm.model_size()[0]
-
-    if start is None:
-        pyqcm.new_model_instance()
-        start = [0.0]*nvar
-        P = pyqcm.parameters()
-        for i,v in enumerate(names):
-            start[i] = P[v]
-
-    if accur is None:
-        accur = 1e-4*np.ones(nvar)
-
-
-
-    def F(x):
-        for i in range(len(names)): 
-            pyqcm.set_parameter(names[i], x[i])
-            print('x = ', x) # new
-        pyqcm.new_model_instance()
-        return pyqcm.Potthoff_functional(hartree)
-
-    from scipy.optimize import minimize
-    ftol = 1e-4
-    X = None
-
-    if method == 'Nelder-Mead':
-        initial_simplex = np.zeros((nvar+1,nvar))
-        for i in range(nvar+1):
-            initial_simplex[i, :] = start
-        for i in range(nvar):
-            initial_simplex[i+1, i] += steps[i]
-        sol = minimize(F, start, method='Nelder-Mead', options={'maxfev':200, 'xatol': accur, 'fatol':ftol, 'initial_simplex': initial_simplex, 'adaptive': True, 'disp':True})
-        iter_done = sol.nit
-        X = sol.x
-
-    elif method == 'Powell':
-        sol = minimize(F, start, method='Powell', tol = ftol, options={'xtol': accur, 'ftol': ftol, 'disp':True})
-        iter_done = sol.nit
-        X = sol.x
-        if type(X) != list:
-            X = [X]
-
-    elif method == 'CG':
-        sol = minimize(F, start, method='CG', jac=False, tol = ftol, options={'eps':accur, 'maxiter':200, 'disp':True})
-        iter_done = sol.nit
-        X = sol.x
-
-    elif method == 'BFGS':
-        sol = minimize(F, start, method='BFGS', jac=False, tol = ftol, options={'eps':accur, 'disp':True})
-        iter_done = sol.nit
-        X = sol.x
-
-    elif method == 'COBYLA':
-        sol = minimize(F, start, method='COBYLA', options={'rhobeg':steps[0], 'maxiter':200, 'tol': ftol, 'disp':True})
-        iter_done = sol.nfev
-        X = sol.x
-        
-    else:
-        raise ValueError(f'unknown method specified for minimization: {method}') 
-
-    if not sol.success:
-        print(sol.message)
-        raise pyqcm.MinimizationError()
-
-    omega = F(X)  # final, converged value
-    ave = pyqcm.averages()
-    des, val = pyqcm.properties()
-
-    val += time.strftime("%Y-%m-%d@%H:%M", time.localtime())
-    # writes the solution in the standard file
-    if root:
-        fout = open(file, 'a')
-        des += 'time'    
-        fout.write(des + '\n')
-        fout.write(val + '\n')
-        fout.close()
-
-    if root:
-        print('*************** VCA ended normally ***************')
 
 
 ################################################################################
