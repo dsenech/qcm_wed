@@ -1912,22 +1912,14 @@ def params_from_file(out_file, n=0):
     V = V.split()
     print(str(len(V)) + ' columns read')
 
-    out_keys = ['model', 'omega', 'githash', 'iterations', 'dist_function', 'diff_hybrid', 'temp', 'E_kin', 'E_pot', 'solver', 'time', 'mean_field_niter', 'distance']
+    out_keys = ['model', 'omega', 'E_kin', 'E_pot']
 
     D = {}
     for i in range(len(K)):
         if K[i] in out_keys:
             continue
         elif K[i][0:4] == 'ave_':
-            continue
-        elif K[i][0:4] == 'var_':
-            continue
-        elif K[i][0:3] == 'E0_':
-            continue
-        elif K[i][0:2] == 'N_':
-            continue
-        elif K[i][0:7] == 'sector_':
-            continue
+            break
         else:
             D[K[i]] = float(V[i])
     return D
