@@ -34,7 +34,7 @@ susceptibility(string operator_name, frequencies, int label = 0)
 
 static PyMethodDef methods[] = {
 //-------------------- QMC_ED --------------------------------------------------------------
-  { "complex_HS", complex_HS_python, METH_VARARGS, complex_HS_help },
+  { "ED_complex_HS", ED_complex_HS_python, METH_VARARGS, ED_complex_HS_help },
   { "fidelity", fidelity_python, METH_VARARGS, fidelity_help },
   { "Green_function_dimensionC", Green_function_dimensionC_python, METH_VARARGS, Green_function_dimensionC_help },
   { "Green_function_solveC", Green_function_solveC_python, METH_VARARGS, Green_function_solveC_help },

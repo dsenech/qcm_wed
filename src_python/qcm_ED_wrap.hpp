@@ -21,14 +21,14 @@ static PyObject *qcm_ED_Error;
 //==============================================================================
 // Wrappers
 //==============================================================================
-const char* complex_HS_help =
+const char* ED_complex_HS_help =
 R"(
 return 1 if the Hilbert space is complex, 0 if it is real
 arguments:
 1. label of model_instance (optional, default=0)
 )";
 //------------------------------------------------------------------------------
-static PyObject* complex_HS_python(PyObject *self, PyObject *args)
+static PyObject* ED_complex_HS_python(PyObject *self, PyObject *args)
 {
   int label=0;
   int result=0;

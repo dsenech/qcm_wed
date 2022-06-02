@@ -28,6 +28,7 @@ struct lattice_matrix_element;
  Interface per se
  */
 namespace QCM{
+  bool complex_HS(size_t label);
   double Berry_flux(vector<vector3D<double>>& k, int band, int label);
   double monopole(vector3D<double>& k, double a, int nk, int band, bool rec, int label);
   double Potthoff_functional(int label);

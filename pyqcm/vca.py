@@ -503,7 +503,7 @@ def vca(
     method='SYMR1', 
     hartree=None, 
     hartree_self_consistent=False,
-    altNR=False,
+    symmetrized_operator=None
 ):
     """Performs a VCA with the QN or NR method
     
@@ -519,7 +519,7 @@ def vca(
     :param str method: method used to optimize ('SYMR1', 'NR', 'BFGS', 'altNR', 'Nelder-Mead', 'COBYLA', 'Powell', 'CG')
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :param boolean hartree_self_consistent: True if the Hartree approximation is treated in the self-consistent, rather than variational, way.
-    :param boolen altNR: if True, uses an alternate Newton-Raphson method in the case of one variational parameter.
+    :param str symmetrized_operator: name of an operator wrt which the functional must be symmetrized
     :return: None
     
     """
@@ -610,7 +610,7 @@ def vca(
             var2sef(x)    
         SEF_eval += 1
         pyqcm.new_model_instance()
-        return pyqcm.Potthoff_functional(hartree)
+        return pyqcm.Potthoff_functional(hartree, symmetrized_operator=symmetrized_operator)
         
     if hartree is None:
         pyqcm.banner('VCA procedure', '*')
@@ -731,7 +731,7 @@ def vca(
         return sol, None
 
 ################################################################################
-def plot_sef(param, prm, file="sef.tsv", accur_SEF=1e-4, hartree=None, show=True):
+def plot_sef(param, prm, file="sef.tsv", accur_SEF=1e-4, hartree=None, show=True, symmetrized_operator=None):
     """Draws a plot of the Potthoff functional as a function of a parameter param taken from the list prm. The results are going to be appended to 'sef.tsv'
     
     :param str param: name of the parameter (independent variable)
@@ -755,7 +755,7 @@ def plot_sef(param, prm, file="sef.tsv", accur_SEF=1e-4, hartree=None, show=True
         pyqcm.new_model_instance()
         # print(pyqcm.parameter_set(opt='report'))
         # print('.'*80, '\n', pyqcm.cluster_parameters())
-        omega[i] = pyqcm.Potthoff_functional(hartree, file=file)
+        omega[i] = pyqcm.Potthoff_functional(hartree, file=file, symmetrized_operator=symmetrized_operator)
 
         print("omega(", prm[i], ") = ", omega[i])
     
@@ -829,7 +829,7 @@ def plot_GS_energy(param, prm, clus=0, file=None, plt_ax=None, **kwargs):
 ################################################################################
 # detects a continuous phase transition
 
-def __transition(varia, P, bracket, step=0.001, verb=False):
+def __transition(varia, P, bracket, step=0.001, verb=False, symmetrized_operator=None):
     """Detects a transition as a function of external parameter param by looking at the equality between 
     :math:`\Omega(h=s)` and :math:`\Omega(h=0)` where *h* is a single variational parameter (Weiss field)
     and *s* is a step. 
@@ -849,10 +849,10 @@ def __transition(varia, P, bracket, step=0.001, verb=False):
         pyqcm.set_parameter(P, x)
         pyqcm.set_parameter(varia, step)
         pyqcm.new_model_instance()
-        Om1 = pyqcm.Potthoff_functional()
+        Om1 = pyqcm.Potthoff_functional(symmetrized_operator=symmetrized_operator)
         pyqcm.set_parameter(varia, 1e-8)
         pyqcm.new_model_instance()
-        Om0 = pyqcm.Potthoff_functional()
+        Om0 = pyqcm.Potthoff_functional(symmetrized_operator=symmetrized_operator)
         if verb:
             print(P, '= ', x, '\tdelta Omega = ', Om1-Om0)
         return Om1-Om0

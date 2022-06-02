@@ -36,7 +36,7 @@ string strip_at(const string& s)
  */
 
 lattice_model_instance::lattice_model_instance(shared_ptr<lattice_model> _model, const map<string, double>& _params, const vector<string>& _sectors, int _label)
-: label(_label), model(_model), params(_params), sectors(_sectors)
+: label(_label), model(_model), params(_params), sectors(_sectors), complex_HS(false)
 {
   n_clus = model->clusters.size();
   vector<map<string,double>> cluster_values(n_clus);
@@ -61,6 +61,7 @@ lattice_model_instance::lattice_model_instance(shared_ptr<lattice_model> _model,
     }
     else model->term.at(name)->is_active = true;
   }
+
   for(size_t i=0; i<n_clus; i++){
     if(cluster_values[i].size() == 0) qcm_throw("cluster "+to_string(i)+" has no nonzero operators");
     ED::new_model_instance(model->clusters[i].name, cluster_values[i], sectors[i], label*n_clus+i);
@@ -114,6 +115,12 @@ vector<pair<double,string>> lattice_model_instance::ground_state()
     GS_energy[0] += gs[i].first;
     for(auto& x : clus_ave[i]) get<0>(x) += '_' + to_string(i+1);
   }
+
+  for(size_t i = 0; i<n_clus; i++){
+    auto I = model->inequiv[i];
+    if(ED::complex_HS(n_clus*label+I)) complex_HS = true;
+  }
+
   gs_solved = true;
   
   return gs;

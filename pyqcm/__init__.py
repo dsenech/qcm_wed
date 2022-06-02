@@ -117,6 +117,15 @@ def model_is_closed():
     return qcm.model_is_closed()
 
 ################################################################################
+def complex_HS(label=0):
+
+    """returns True if the model needs a complex Hilbert space. False otherwise.
+
+    """
+
+    return qcm.complex_HS(label)
+
+################################################################################
 def new_cluster_model(name, n_sites, n_bath=0, generators=None, bath_irrep=False):
     """Initiates a new model (no operators yet)
 
@@ -922,17 +931,31 @@ def potential_energy(label=0):
 
 
 ################################################################################
-def Potthoff_functional(hartree=None, file='sef.tsv', label=0):
+def Potthoff_functional(hartree=None, file='sef.tsv', label=0, symmetrized_operator=None):
     """
     computes the Potthoff functional for a given instance
 
     :param int label: label of the model instance
     :param str file: name of the file to append with the result
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
+    :param str symmetrized_operator: name of an operator wrt which the functional must be symmetrized
     :return: the value of the self-energy functional
 
     """
     OM = qcm.Potthoff_functional(label)
+
+    if symmetrized_operator is not None:
+        try:
+            P = parameters()
+            x = P[symmetrized_operator]
+            set_parameter(symmetrized_operator,-x)
+            new_model_instance()
+            OMsym = qcm.Potthoff_functional(label)
+            OM = 0.5*(OM + OMsym)
+            set_parameter(symmetrized_operator, x)
+        except:
+            pass
+            
     if hartree != None:
         L = model_size()[0]
         for C in hartree:

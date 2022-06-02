@@ -33,7 +33,7 @@ extern map<string, shared_ptr<model>> models;
 //==============================================================================
 namespace QCM{
   
-  
+
 /**
  * prints the definition of the model in a file
  * @param filename name of the output file
@@ -845,5 +845,12 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
     qcm_model->clusters[0].name = name;
     if (!models[name]->is_closed) qcm_model->close_model(true);
   }
+
+
+    bool complex_HS(size_t label)
+  {
+    return lattice_model_instances.at(label)->complex_HS;
+  }
+
 }
 

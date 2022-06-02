@@ -2087,12 +2087,37 @@ static PyObject* switch_cluster_model_python(PyObject *self, PyObject *args)
   
   try{
     if(!PyArg_ParseTuple(args, "s", &s1))
-      qcm_throw("failed to read parameters in call to lattice_model (python)");
+      qcm_throw("failed to read parameters in call to switch_cluster_model (python)");
   
     QCM::switch_cluster_model(string(s1));
   } catch(const string& s) {qcm_catch(s);}
   return Py_BuildValue("");
 }
+
+
+//==============================================================================
+const char* complex_HS_help =
+R"{(
+arguments:
+1. label : int, label of the model instance
+returns: True if the model instance requires a complex Hilbert space, False otherwise
+){";
+//------------------------------------------------------------------------------
+static PyObject* complex_HS_python(PyObject *self, PyObject *args)
+{
+  int label=0;
+  int result=0;
+
+  try{
+    if(!PyArg_ParseTuple(args, "|i", &label))
+      qcm_throw("failed to read parameters in call to complex_HS (python)");
+      result = (int)QCM::complex_HS(label);
+  } catch(const string& s) {qcm_catch(s);}
+  return Py_BuildValue("i", result);
+}
+
+
+
 
 
 #endif
