@@ -745,6 +745,13 @@ def plot_sef(param, prm, file="sef.tsv", accur_SEF=1e-4, hartree=None, show=True
     L = pyqcm.model_size()[0]
     pyqcm.first_SEF = True
 
+    if type(file) != str:
+	    raise TypeError('the argument "file" of plot_sef() must be a string')
+    if type(accur_SEF) != float:
+	    raise TypeError('the argument "accur_SEF" of plot_sef() must be a float')
+    if type(param) != str:
+	    raise TypeError('the argument "param" of plot_sef() must be a string, the name of a parameter')
+
     if type(hartree) is not list and hartree is not None:
         hartree = [hartree]
 

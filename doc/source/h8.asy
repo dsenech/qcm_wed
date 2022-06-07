@@ -7,8 +7,8 @@ pair e1 = (L,0);
 pair e2 = rotate(120)*e1;
 pair b1 = e1-e2;
 pair b2 = 2*e1+e2;
-pair E1 = 2*e1-2*e2;
-pair E2 = 2*e1+4*e2;
+pair E2 = 2*e1-2*e2;
+pair E1 = 4*e1+2*e2;
 
 path p1 = e1 -- (e1+e2);
 path p2 = e1 -- (2*e1);
@@ -44,7 +44,7 @@ for(int i=-r+1; i<r; ++i){
 }
 
 draw("$\mathbf{E}_1$",(0,0)--E1,2N,EndArrow(8));
-draw("$\mathbf{E}_2$",(0,0)--E2,NE,EndArrow(8));
+draw("$\mathbf{E}_2$",(0,0)--E2,2S,EndArrow(8));
 
 dotfactor=12;
 

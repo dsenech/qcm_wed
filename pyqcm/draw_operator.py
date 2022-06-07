@@ -124,7 +124,7 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
         J = int(X[1][0:-1])
         neighbor = int(X[2])
         if neighbor : continue
-        if I > J : continue
+        # if I > J : continue
         elements += [(I-1,J-1,v)]
 
     fin.close()
