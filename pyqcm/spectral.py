@@ -70,7 +70,7 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
 
     :param float wmax: the frequency range is from -wmax to wmax if w is a float. Otherwise wmax is a tuple and the range is (wmax[0], wmax[1])
     :param float eta: Lorentzian broadening
-    :param str path: a keyword that is passed to pyqcm.wavevector_grid() to produce a set of wavevectors along a path, or a tuple 
+    :param str path: a keyword that is passed to pyqcm.wavevector_path() to produce a set of wavevectors along a path, or a tuple 
     :param int nk: the number of wavevectors along each segment of the path (passed to pyqcm.wavevector_grid())
     :param int label: label of the instance of the model
     :param int band: if not None, only plots the spectral function associated with this orbital number (starts at 1). If None, sums over all bands.

@@ -1663,7 +1663,7 @@ def wavevector_path(n=32, shape='triangle'):
     Builds a wavevector path and associated tick marks
     
     :param int n: number of wavevectors per segment
-    :param str shape: the geometry of the path, one of: line, halfline, triangle, graphene, graphene2, diagonal, cubic, cubic2, tetragonal, tetragonal2  OR a tuple with two wavevectors for a straight path between the two
+    :param str shape: the geometry of the path, one of: line, halfline, triangle, graphene, graphene2, diagonal, cubic, cubic2, tetragonal, tetragonal2  OR a tuple with two wavevectors for a straight path between the two OR a filename ending with ".tsv". In the latter case, the file contains a tab-separated list of wavevectors (in units of pi) and tick marks: the first three columns are the x,y,z components of the wavevectors, and the last columns the strings (possibly latex) for the tick marks (write - in that column if you do not want a tick mark for a specific wavevector).
     :returns tuple: 1) a ndarray of wavevectors 2) a list of tick positions 3) a list of tick strings
 
     """
@@ -1828,8 +1828,27 @@ def wavevector_path(n=32, shape='triangle'):
         k[-1,2] = 0 
         ticks = np.array([0, n, 2 * n, 3 * n, 4 * n, 5 * n, 6 * n + 1])
         tick_labels = [r'$(0,0,0)$', r'$(0,\pi,0)$', r'$(\pi,\pi,0)$', r'$(0,0,0)$', r'$(\pi,\pi,\pi)$' , r'$(0,\pi,0)$', r'$(0,0,0)$']
+
     else:
-        print(f'-------> shape {shape} unknown')
+        if '.tsv' in shape:
+            try:
+                k = np.genfromtxt(shape, usecols=(0,1,2))
+                T = np.genfromtxt(shape, usecols=(3), dtype='str')
+            except:
+                raise ValueError('cannot read file '+shape+' properly')
+            ticks = []
+            tick_labels = []
+            for i in range(len(T)):
+                if T[i] != '-':
+                    ticks += [i]
+                    tick_labels += [T[i]]
+            ticks = np.array(ticks)
+            print(k)
+            print(ticks)
+            print(tick_labels, flush=True)
+        else:
+            raise ValueError('wavevector path shape '+shape+' unknown')
+
     return 0.5 * k, ticks, tick_labels
 
 
