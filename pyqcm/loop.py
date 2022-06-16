@@ -150,16 +150,15 @@ def controlled_loop(
 				sol[0, i] = P[varia[i]]
 
 		except pyqcm.OutOfBoundsError as E:
-			print('variable ', E.variable + 1, ' is out of bounds: abs(', varia[E.variable], ') > ', max[E.variable])
 			if loop_counter == 0 or not adjust:
-				print('Out of bound on starting values, aborting')
+				print('Out of bound on starting values in controlled_loop(), aborting')
 				return
 			else:
 				retry = True
 				continue
 		except pyqcm.TooManyIterationsError as E:
 			if loop_counter == 0 or not adjust:
-				print('Cannot converge on starting values, aborting')
+				print('Cannot converge on starting values in controlled_loop(), aborting')
 				return 
 			else:
 				retry = True
@@ -516,11 +515,10 @@ def linear_loop(
 				sol[0, i] = P[varia[i]]
 
 		except pyqcm.OutOfBoundsError as E:
-			print('variable ', E.variable + 1, ' is out of bounds: abs(', varia[E.variable], ') > ', max[E.variable])
-			print('Out of bound on starting values, aborting')
+			print('Out of bound on starting values in linear_loop(), aborting')
 			return
 		except pyqcm.TooManyIterationsError as E:
-			print('Cannot converge on starting values, aborting')
+			print('Cannot converge on starting values in linear_loop(), aborting')
 			return 
 
 	pyqcm.banner('linear loop ended normally', '%')

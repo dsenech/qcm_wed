@@ -129,10 +129,6 @@ def __quasi_newton(func=None, start=None, step=None, accur=None, max=10, gtol=1e
                 print('convergence on gradient after ', iteration, ' iterations')
             break
 
-        for i in range(n):
-            if(np.abs(x[i]) > max[i]):
-                raise pyqcm.OutOfBoundsError(f"variable --> {i}, iteration --> {iteration}") 
-
         converged = True
         for i in range(n):
             if np.abs(dx[i]) > accur[i]:
@@ -368,10 +364,6 @@ def __newton_raphson(func=None, start=None, step=None, accur=None, max=10, gtol=
         if root:
             print('NR iteration no ', iteration, '\t x = ', x, '\t steps = ', step, '\t dx = ', dx)
 
-        for i in range(n):
-            if(np.abs(x[i]) > max[i]):
-                raise pyqcm.OutOfBoundsError(variable=i, iteration=iteration)
-
         converged = True
         for i in range(n):
             if np.abs(dx[i]) > accur[i]:
@@ -457,8 +449,6 @@ def __altNR(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max
         iter += 1
         C = np.polyfit(X,Y,2)
         xp = -0.5*C[1]/C[0]
-        if np.abs(xp) > max[0]:
-            raise pyqcm.OutOfBoundsError(f"variable --> {0}, iteration --> {iter}") 
 
         der1 = 2*C[0]*xp0 + C[1]
         der2 = 2*C[0]
@@ -601,6 +591,9 @@ def vca(
 
     SEF_eval = 0
     def var2x(x):
+        for i in range(len(x)):
+            if np.abs(x[i]) > max[i]:
+                raise pyqcm.OutOfBoundsError(variable=names[i])
         global SEF_eval
         if var2sef is None:
             for i in range(len(names)): 
@@ -613,9 +606,9 @@ def vca(
         return pyqcm.Potthoff_functional(hartree, symmetrized_operator=symmetrized_operator)
         
     if hartree is None:
-        pyqcm.banner('VCA procedure', '*')
+        pyqcm.banner('VCA procedure, method {:s}'.format(method), '*')
     else:
-        pyqcm.banner('VCA procedure (combined with Hartree procedure)', '*')
+        pyqcm.banner('VCA procedure, (combined with Hartree procedure) method {:s}'.format(method), '*')
     var_val = pyqcm.__varia_table(names,start)
     print(var_val)
 
@@ -626,7 +619,7 @@ def vca(
     if scipy_minimization and hartree_self_consistent:
         raise ValueError('Hartree self-consistency not allowed when using SciPy minimization methods in VCA')
 
-    ftol = 1e-4
+    ftol = 2*pyqcm.qcm.get_global_parameter('accur_SEF')
     iH = None
 
     #------------------------------------- SWITCH ACCORDING TO METHOD -----------------------------------------
@@ -653,7 +646,7 @@ def vca(
                 initial_simplex[i+1, i] += steps[i]
             if type(accur) == list:
                 accur = accur[0]
-            solution = minimize(var2x, start, method='Nelder-Mead', options={'maxfev':200, 'xatol': accur, 'fatol':ftol, 'initial_simplex': initial_simplex, 'adaptive': True, 'disp':True})
+            solution = minimize(var2x, start, method='Nelder-Mead', options={'maxfev':3*max_iter, 'xatol': accur, 'fatol':ftol, 'initial_simplex': initial_simplex, 'adaptive': True, 'disp':True})
             iter_done = solution.nit
             sol = solution.x
 
@@ -666,7 +659,7 @@ def vca(
                 sol = [sol]
 
         elif method == 'CG':
-            solution = minimize(var2x, start, method='CG', jac=False, tol = ftol, options={'eps':accur, 'maxiter':200, 'disp':True})
+            solution = minimize(var2x, start, method='CG', jac=False, tol = ftol, options={'eps':accur, 'maxiter':3*max_iter, 'disp':True})
             iter_done = solution.nit
             sol = solution.x
 
@@ -677,7 +670,7 @@ def vca(
             iH = solution.hess_inv
 
         elif method == 'COBYLA':
-            solution = minimize(var2x, start, method='COBYLA', options={'rhobeg':steps[0], 'maxiter':200, 'tol': ftol, 'disp':True})
+            solution = minimize(var2x, start, method='COBYLA', options={'rhobeg':steps[0], 'maxiter':3*max_iter, 'tol': ftol, 'disp':True})
             iter_done = solution.nfev
             sol = solution.x
         else:
@@ -687,8 +680,8 @@ def vca(
 
 
     except pyqcm.OutOfBoundsError as E:
-        print('variable ', E.variable + 1, ' is out of bounds: abs(', names[E.variable], ') > ', max[E.variable])
-        raise pyqcm.OutOfBoundsError(f"variable --> {E.variable}, iteration --> {E.iteration}")
+        print(E)
+        raise pyqcm.OutOfBoundsError(E.variable)
 
     except pyqcm.TooManyIterationsError as E:
         print('VCA method failed to converge after ', E.max_iteration, ' iterations')

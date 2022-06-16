@@ -43,7 +43,15 @@ solver = 'ED'
 # EXCEPTIONS
 
 class OutOfBoundsError(Exception):
-    pass
+    def __init__(self, variable):
+        self.variable = variable
+    def __str__(self):
+        if type(self.variable) == str:
+            return 'variable {:s} is out of bounds'.format(self.variable)
+        elif type(self.variable) == int:
+            return 'variable no {:d} is out of bounds'.format(self.variable)
+        else:
+            return 'a variable is out of bounds'
 
 class TooManyIterationsError(Exception):
     pass
@@ -1843,9 +1851,6 @@ def wavevector_path(n=32, shape='triangle'):
                     ticks += [i]
                     tick_labels += [T[i]]
             ticks = np.array(ticks)
-            print(k)
-            print(ticks)
-            print(tick_labels, flush=True)
         else:
             raise ValueError('wavevector path shape '+shape+' unknown')
 
