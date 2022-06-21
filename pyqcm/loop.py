@@ -3,8 +3,6 @@ import pyqcm
 import pyqcm.cdmft
 import os
 
-from pyqcm import new_model_instance
-
 first_time=True
 
 ################################################################################
@@ -32,8 +30,8 @@ def loop_from_file(func, file):
 		for x in independent_params:
 			print(x, ' --> ', data[x][i])
 			pyqcm.set_parameter(x, data[x][i])
+		pyqcm.new_model_instance()
 		func()
-		new_model_instance()
 
 
 ################################################################################
@@ -143,8 +141,8 @@ def controlled_loop(
 				print(' ---> ', varia[i], ' = ', start[i])
 		try:
 			pyqcm.banner('loop index = {:d}, {:s} = {:1.4f}'.format(loop_counter + 1, loop_param, prm[0]), '=', skip=1)
+			pyqcm.new_model_instance()
 			func()
-			new_model_instance()
 			P = pyqcm.parameters()
 			for i in range(len(varia)):
 				sol[0, i] = P[varia[i]]
@@ -289,8 +287,8 @@ def fixed_density_loop(
 			#+++ CALLING THE FUNCTION +++
 			pyqcm.set_parameter('mu', mu)
 			pyqcm.banner('mu = {:1.4f}'.format(mu), '+')
+			pyqcm.new_model_instance()
 			func()
-			new_model_instance()
 			if cluster_density:
 				dens = pyqcm.cluster_averages()['mu'][0]
 			else:
@@ -385,7 +383,7 @@ def fade(F, p1, p2, n):
 		
 		for p in par:
 			pyqcm.set_parameter(p, par[p])
-		pyqcm.new_model_instance()
+		pyqcm.pyqcm.new_model_instance()
 		F()
 
 
@@ -416,8 +414,8 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 
 	iter = 0
 	while True:
+		pyqcm.new_model_instance()
 		F()
-		new_model_instance()
 		iter += 1
 		pyqcm.banner('Hartree iteration {:d}'.format(iter), '-')
 		diff_tot = 0
@@ -508,8 +506,8 @@ def linear_loop(
 		if iter > 0:
 			print('predictor: ', start, fit_type)
 		try:
+			pyqcm.new_model_instance()
 			func()
-			new_model_instance()
 			P = pyqcm.parameters()
 			for i in range(len(varia)):
 				sol[0, i] = P[varia[i]]

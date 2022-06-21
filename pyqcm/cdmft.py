@@ -1162,7 +1162,7 @@ def cdmft_distance_debug(varia=None, vset=None, beta=50, wc=2.0, grid_type = 'sh
 
     pyqcm.new_model_instance()
     _mixing = pyqcm.mixing()
-    print('_mixing state = ', _mixing)
+    print('mixing state = ', _mixing)
     Gdim = pyqcm.Green_function_dimension()
     nsites, nbands, clusters, bath_size, ref = pyqcm.model_size()
     clusters = np.array(clusters)

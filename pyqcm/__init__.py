@@ -1616,7 +1616,6 @@ def print_parameters(P):
 
 def write_summary(f, suppl_descr=None, suppl_values=None):
     global description_line
-    fout = open(f, 'a')
     first_in_file =False
     des, val = properties()
     try:
@@ -1633,6 +1632,7 @@ def write_summary(f, suppl_descr=None, suppl_values=None):
     if suppl_values != None:
         val += suppl_values
     val += time.strftime("%Y-%m-%d@%H:%M", time.localtime())
+    fout = open(f, 'a')
     if first:
         if suppl_descr != None:
             des += suppl_descr
