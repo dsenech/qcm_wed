@@ -490,7 +490,7 @@ def vca(
     accur_grad=1e-6, 
     max_iter=30, 
     max_iter_diff=None, 
-    method='SYMR1', 
+    method='NR', 
     hartree=None, 
     hartree_self_consistent=False,
     symmetrized_operator=None
@@ -689,10 +689,13 @@ def vca(
 
     omega = var2x(sol)  # final, converged value
     if root:
+        if iH is not None: 
+            H = np.linalg.inv(iH)  # Hessian at the solution (inverse of iH)
         print('saddle point = ', sol)
         if scipy_minimization is False: 
             print('gradient = ', grad)
-            print('second derivatives :', 1.0 / np.diag(iH))
+            print('second derivatives :', np.diag(H))
+            print('eigenvalues of Hessian :', np.linalg.eigh(H)[0])
         print('computing properties of converged solution...')
         print('omega = ', omega)
     ave = pyqcm.averages()
@@ -703,7 +706,6 @@ def vca(
         val = method + '\t{:d}\t'.format(SEF_eval)
         des = 'method\tSEF_eval\t'
         if iH is not None: 
-            H = np.linalg.inv(iH)  # Hessian at the solution (inverse of iH)
             for i in range(nvar):
                 val += '{:.4g}\t'.format(H[i, i])
             for i in range(nvar):
