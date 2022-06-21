@@ -277,7 +277,8 @@ def cdmft(
     maxiter=32, 
     accur=1e-3, 
     accur_hybrid=1e-4, 
-    accur_dist=1e-10, 
+    accur_dist=1e-10,
+    alpha = 0.0,
     displaymin=False, 
     method='CG', 
     file='cdmft.tsv', 
@@ -302,6 +303,7 @@ def cdmft(
     :param float accur: the procedure converges if parameters do not change by more than accur
     :param float accur_hybrid: the procedure converges on the hybridization function with this accuracy
     :param float accur_dist: convergence criterion when minimizing the distance function.
+    :param float alpha: damping parameter (fraction of the previous iteration in the new one) OR (float,int) with number of iterations where damping is used (at the beginning if positive, at the end if negative)
     :param boolean displaymin: displays the minimum distance function when minimized
     :param str method: method to use, as used in scipy.optimize.minimize()
     :param str file: name of the file where the solution is written
@@ -329,6 +331,17 @@ def cdmft(
         var = varia[0] + varia[1]
     else:
         var = varia
+        
+    begin_with_damping = False
+    n_damping = 1
+    if type(alpha) is tuple:
+        n_damping = alpha[1]
+        alpha = alpha[0]
+        if n_damping > 0:
+            begin_with_damping = True
+        else:
+            n_damping = -n_damping
+
 
     if hartree is None:
         pyqcm.banner('CDMFT procedure', '*', skip=1)
@@ -431,8 +444,14 @@ def cdmft(
         dist_value = sol.fun
         # updating the bath parameters (replace old by new)
 
-        for i in range(nvar):
-            pyqcm.set_parameter(var[i], sol.x[i])
+        if alpha > 0.0 and ((superiter < n_damping and begin_with_damping is True) or (superiter > n_damping and begin_with_damping is False)):
+            print('applying damping with alpha = ', alpha)
+            for i in range(nvar):
+                pyqcm.set_parameter(var[i], (1-alpha)*sol.x[i]+alpha*params_array[i])
+        else:
+            for i in range(nvar):
+                pyqcm.set_parameter(var[i], sol.x[i])
+
 
         diff_param = np.linalg.norm(params_array - sol.x)/np.sqrt(nvar)
         initial_step = diff_param
