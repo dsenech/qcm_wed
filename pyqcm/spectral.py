@@ -21,24 +21,23 @@ def set_legend_mdc(plane, k_perp):
         return '$k_y = {:1.3f}\pi$'.format(k_perp)
 
 ################################################################################
-def __frequency_array(wmax=6.0, eta=0.05):
+def __frequency_array(wmax=6.0, eta=0.05, matsubara=False):
     """Returns an array of complex frequencies for plotting spectral quantities
 
     """
 
     if type(wmax) is tuple:
         w = np.arange(wmax[0], wmax[1] + 1e-6, eta/4.0)  # defines the array of frequencies
-        wc = np.array([x + eta*1j for x in w], dtype=complex)
     elif type(wmax) is float or type(wmax) is int:
         w = np.arange(-wmax, wmax + 1e-6, eta/4.0)  # defines the array of frequencies
-        wc = np.array([x + eta*1j for x in w], dtype=complex)
-    elif type(wmax) is np.ndarray:
-        if wmax.dtype is np.complexfloating:
-            wc = wmax
-        else:
-            wc = np.array([x + eta*1j for x in wmax])
     else:
         raise TypeError('the type of argument "wmax" in spectral_function() is wrong')
+
+    if matsubara:
+        wc = w*1j
+    else:
+        wc = np.array([x + eta*1j for x in w], dtype=complex)
+
     return wc
 
 
@@ -68,7 +67,7 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
     """Plots the spectral function :math:`A(\mathbf{k},\omega)` along a wavevector path in the Brillouin zone.
     This version plots the spin-down part with the correct sign of the frequency in the Nambu formalism.
 
-    :param float wmax: the frequency range is from -wmax to wmax if w is a float. Otherwise wmax is a tuple and the range is (wmax[0], wmax[1])
+    :param float wmax: the frequency range is from -wmax to wmax if w is a float. If wmax is a tuple then the range is (wmax[0], wmax[1]). wmax can also be an explicit list of real frequencies
     :param float eta: Lorentzian broadening
     :param str path: a keyword that is passed to pyqcm.wavevector_path() to produce a set of wavevectors along a path, or a tuple 
     :param int nk: the number of wavevectors along each segment of the path (passed to pyqcm.wavevector_grid())
@@ -198,13 +197,15 @@ def spectral_function(wmax=6.0, eta=0.05, path='triangle', nk=32, label=0, band=
         
 
 ################################################################################
-def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None, plt_ax=None, **kwargs):
+def hybridization_function(wmax=6, eta=0.01, matsubara=False, clus = 0, realpart=False, label=0, file=None, plt_ax=None, **kwargs):
     """This function plots the imaginary part of the hybridization function Gamma as a function of frequency.
     Only the diagonal elements are plotted, but for all clusters if there is more than one.
     The arguments have the same meaning as in `plot_spectrum`, except 'realpart' which, if True, plots
     the real part instead of the imaginary part.
 
-    :param float wmax: the frequency range is [-wmax, wmax]
+    :param float wmax: the frequency range is from -wmax to wmax if w is a float. If wmax is a tuple then the range is (wmax[0], wmax[1]). wmax can also be an explicit list of real frequencies
+    :param float eta: Lorentzian broadening
+    :param boolean matsubara: If True, the frequency range is along the imaginary frequency axis
     :param int clus: cluster index (starts at 0)
     :param boolean realpart: if True, the real part of the Green function is shown, not the imaginary part
     :param int label: label of the model instance
@@ -221,7 +222,7 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
     else:
         ax = plt_ax
 
-    w = __frequency_array(wmax, eta=0.05)  # defines the array of frequencies
+    w = __frequency_array(wmax, eta, matsubara)  # defines the array of frequencies
     eta = 0.05j
     info = pyqcm.cluster_info()
     d = info[clus][3]
@@ -242,9 +243,14 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
                     A[i, l] += -g[l1, l2].imag
 
     offset = 2
-    ax.set_xlim(np.real(w[0]), np.real(w[-1]))
-    for j in range(d*d):
-        ax.plot(np.real(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
+    if matsubara:
+        ax.set_xlim(np.imag(w[0]), np.imag(w[-1]))
+        for j in range(d*d):
+            ax.plot(np.imag(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
+    else:
+        ax.set_xlim(np.real(w[0]), np.real(w[-1]))
+        for j in range(d*d):
+            ax.plot(np.real(w), A[:, j] + offset * j, 'b-', lw=0.5, **kwargs)
     ax.axvline(0, c='r', ls='solid', lw=0.5)
     if plt_ax is None:
         plt.xlabel(r'$\omega$')
@@ -259,16 +265,18 @@ def hybridization_function(wmax=6, clus = 0, realpart=False, label=0, file=None,
 
 
 ################################################################################
-def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, full=False, opt=None, spin_down=False, blocks=False, file=None, plt_ax=None, realpart=False, color = 'b', **kwargs):
+def cluster_spectral_function(wmax=6, eta = 0.05, matsubara=False, clus=0, label=0, offset=2, full=False, opt=None, spin_down=False, blocks=False, file=None, plt_ax=None, realpart=False, color = 'b', **kwargs):
     """Plots the spectral function of the cluster in the site basis
     
-    :param float  wmax: the frequency range is from -wmax to wmax
+    :param float wmax: the frequency range is from -wmax to wmax if w is a float. If wmax is a tuple then the range is (wmax[0], wmax[1]). wmax can also be an explicit list of real frequencies
     :param float eta: Lorentzian broadening
+    :param boolean matsubara: If True, the frequency range is along the imaginary frequency axis
     :param int clus: label of the cluster within the super unit cell (starts at 0)
     :param int label: label of the model instance
     :param float offset: vertical offset in the plot between the curves associated to successive wavevectors
     :param boolean full: if True, plots off-diagonal components as well
     :param boolean self: if True, plots the self-energy instead of the spectral function
+    :param str opt: if None, G is computed. Other options are 'self' (self-energy) and 'hyb' (hybridization function)
     :param boolean spin_down: if True, plots the spin down part, if different
     :param boolean blocks: if True, gives the GF in the symmetry basis (block diagonal)
     :param str file: if not None, saves the plot in a file with that name
@@ -285,7 +293,7 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
     else:
         ax = plt_ax
 
-    w = __frequency_array(wmax, eta)  # defines the array of frequencies
+    w = __frequency_array(wmax, eta, matsubara)  # defines the array of frequencies
     info = pyqcm.cluster_info()
     d = info[clus][3]
     if full:
@@ -319,11 +327,18 @@ def cluster_spectral_function(wmax=6, eta = 0.05, clus=0, label=0, offset=2, ful
             for j in range(d):
                 A[i, j] += -g[j, j].imag
 
-    plt.xlim(np.real(w[0]), np.real(w[-1]))
     max = np.max(A)
     plt.ylim(0, dd * offset + max)
-    for j in range(dd):
-        plt.plot(np.real(w), A[:, j] + offset * j, '-', lw=0.5, color=color, **kwargs)
+
+    if matsubara:
+        ax.set_xlim(np.imag(w[0]), np.imag(w[-1]))
+        for j in range(dd):
+            plt.plot(np.imag(w), A[:, j] + offset * j, '-', lw=0.5, color=color, **kwargs)
+    else:
+        ax.set_xlim(np.real(w[0]), np.real(w[-1]))
+        for j in range(dd):
+            plt.plot(np.real(w), A[:, j] + offset * j, '-', lw=0.5, color=color, **kwargs)
+
     plt.xlabel(r'$\omega$')
     plt.axvline(0, ls='solid', lw=0.5)
     plt.title(pyqcm.parameter_string(), fontsize=9)
@@ -420,7 +435,7 @@ def gap(k, band = 1, threshold=1e-3):
 def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=None, file=None, plt_ax=None, **kwargs):
     """Plots the density of states (DoS) as a function of frequency
 
-    :param float w: array of real frequencies or complex frequencies, or simply single maximum frequency
+    :param float wmax: the frequency range is from -wmax to wmax if w is a float. If wmax is a tuple then the range is (wmax[0], wmax[1]). wmax can also be an explicit list of real frequencies
     :param float eta: Lorentzian broadening, if w is real
     :param int label: label of the model instance 
     :param boolean sum: if True, the sum of the DoS of all bands is plotted in addition to each band individually

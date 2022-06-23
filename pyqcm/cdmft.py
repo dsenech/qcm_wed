@@ -361,7 +361,7 @@ def cdmft(
     print('minimization method = ', method)
     pyqcm.new_model_instance()
     _mixing = pyqcm.mixing()
-    print('_mixing state = ', _mixing)
+    print('mixing state = ', _mixing)
     Gdim = pyqcm.Green_function_dimension()
     nsites, nbands, clusters, bath_size, ref = pyqcm.model_size()
     clusters = np.array(clusters)
