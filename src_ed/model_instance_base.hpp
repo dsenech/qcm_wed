@@ -64,6 +64,8 @@ struct model_instance_base
   virtual void write(ostream& fout) = 0;
   virtual void read(istream& fin) = 0;
   virtual void print_wavefunction(ostream& fout) = 0;
+  virtual pair<matrix<Complex>, vector<uint64_t>>  density_matrix_mixed(vector<int> sites) = 0;
+  virtual pair<matrix<Complex>, vector<uint64_t>>  density_matrix_factorized(vector<int> sites) = 0;
 };
 
 

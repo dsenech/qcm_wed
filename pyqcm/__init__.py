@@ -2114,3 +2114,28 @@ def epsilon(y, pr=False):
         print(M)
     return M[0,-1]
 
+
+
+
+######################################################################
+def density_matrix(sites, label=0):
+    """Computes the density matrix of subsystem A, defined by the array of site indices "sites"
+    :param [int] sites: list of sites defining subsystem A
+    :return [complex], [int32], [int32]: the density matrix, the left and right bases (spins up and down)
+
+    """
+    rho, basis = qcm.density_matrix(sites, label)
+
+    L = len(sites)
+    rightmask = np.left_shift(1,L)-1
+    leftmask = np.left_shift(rightmask,32)
+    basis = np.int64(basis)
+    basisL = np.bitwise_and(basis,leftmask)
+    basisL = np.right_shift(basis,32-L)
+    basisL = np.uint(basisL)
+    basisR = np.bitwise_and(basis,rightmask)
+    basisR = np.uint(basisR)
+    basis = np.bitwise_or(basisL,basisR)
+
+    return rho, basis
+

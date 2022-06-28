@@ -38,7 +38,54 @@ static PyObject* ED_complex_HS_python(PyObject *self, PyObject *args)
     result = (int)ED::complex_HS((size_t)label);
   } catch(const string& s) {qcm_ED_catch(s);}
   return Py_BuildValue("i", result);
-}//==============================================================================
+}
+//==============================================================================
+const char* density_matrix_help =
+R"(
+computes the density_matrix from the ground state
+arguments:
+1. list of sites indices defining subsystem A (starting from 0)
+2. label of model instance
+returns:
+the density matrix and the basis used
+)";
+//------------------------------------------------------------------------------
+static PyObject* density_matrix_python(PyObject *self, PyObject *args)
+{
+  int label=0;
+  PyArrayObject *sites;
+  npy_intp dims[2];
+  pair<matrix<complex<double>>, vector<uint64_t>> g;
+
+  try{
+    if(!PyArg_ParseTuple(args,  "O|i", &sites, &label))
+      qcm_ED_throw("failed to read parameters in call to density_matrix (python)");
+  } catch(const string& s) {qcm_ED_catch(s);}
+
+  try{
+    vector<int> sitesI = intarray_from_Py(sites);
+    g = ED::density_matrix(sitesI, label);
+
+    dims[0] = dims[1] = g.first.r;
+  
+  }
+  catch(const string &s){ cerr << s << "(in density_matrix)" << endl; exit(1);}
+
+  PyObject *out = PyArray_SimpleNew(2, dims, NPY_COMPLEX128);
+  memcpy(PyArray_DATA((PyArrayObject*) out), g.first.data(), g.first.size()*sizeof(complex<double>));
+  PyArray_ENABLEFLAGS((PyArrayObject*) out, NPY_ARRAY_OWNDATA);
+
+  PyObject *out2 = PyArray_SimpleNew(1, dims, NPY_UINT64);
+  memcpy(PyArray_DATA((PyArrayObject*) out2), g.second.data(), g.second.size()*sizeof(uint64_t));
+  PyArray_ENABLEFLAGS((PyArrayObject*) out2, NPY_ARRAY_OWNDATA);
+
+  PyObject* out3 = PyTuple_New(2);
+  PyTuple_SetItem(out3, 0, out);
+  PyTuple_SetItem(out3, 1, out2);
+
+  return out3;
+}
+//==============================================================================
 const char* fidelity_help =
 R"(
 computes the fidelity of one state compared to another one

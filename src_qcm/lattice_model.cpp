@@ -1066,6 +1066,7 @@ void lattice_model::explicit_operator(const string &name, const string &type, co
   auto tmp_op = make_shared<lattice_operator>(*this, name);
   term[name] = tmp_op;
   tmp_op->type = lattice_operator::op_type_map.at(type);
+  tmp_op->is_density_wave = true;
 
   if(tmp_op->type == latt_op_type::Hubbard 
     or tmp_op->type == latt_op_type::Hund 

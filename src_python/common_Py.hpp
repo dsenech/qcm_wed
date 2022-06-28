@@ -28,6 +28,7 @@ vector3D<double> wavevector_from_Py(PyArrayObject *k_pyobj);
 vector<vector3D<double>> wavevectors_from_Py(PyArrayObject *k_pyobj);
 vector<vector3D<int64_t>> intvec3D_from_Py(PyArrayObject *k_pyobj);
 vector<int64_t> intvector_from_Py(PyArrayObject *k_pyobj);
+vector<int> intarray_from_Py(PyArrayObject *k_pyobj);
 vector<double> doublematrix_from_Py(PyArrayObject *k_pyobj);
 vector<string> strings_from_PyList(PyObject* lst);
 vector<double> doubles_from_Py(PyObject* lst);

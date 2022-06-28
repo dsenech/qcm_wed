@@ -173,6 +173,29 @@ vector<int64_t> intvector_from_Py(PyArrayObject *k_pyobj)
   return k;
 }
 //------------------------------------------------------------------------------
+vector<int> intarray_from_Py(PyArrayObject *k_pyobj)
+{
+  vector<int> k;
+  if(PyArray_Check(k_pyobj)){
+    vector<npy_intp> dims(1);
+    dims[0] = *PyArray_DIMS(k_pyobj);
+    
+    k.assign(dims[0], 0);
+    
+    int l=0;
+    for(size_t i=0; i<dims[0]; i++){
+      k[l++] = *(int*)PyArray_GETPTR1(k_pyobj, i);
+    }
+  }
+  else if(PyList_Check(k_pyobj)){
+    PyObject* PyObj = (PyObject*)k_pyobj;
+    size_t n = PyList_Size(PyObj);
+    k.assign(n, 0);
+    for(size_t i=0; i<n; i++) k[i] = PyLong_AsLong(PyList_GetItem(PyObj,i));
+  }
+  return k;
+}
+//------------------------------------------------------------------------------
 vector<double> doublematrix_from_Py(PyArrayObject *k_pyobj)
 {
   vector<double> k;

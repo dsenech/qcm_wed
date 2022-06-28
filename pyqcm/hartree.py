@@ -23,7 +23,7 @@ class hartree:
 
     size0 = 0
 
-    def __init__(self, Vm, V, eig, accur=1e-4, accur_rel=1e-3, lattice=False):
+    def __init__(self, Vm, V, eig, accur=1e-4, accur_rel=1, lattice=False):
         """
 
         :param str Vm: name of the mean-field operator

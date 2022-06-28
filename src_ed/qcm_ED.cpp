@@ -188,7 +188,19 @@ namespace ED{
   
   
   
-  
+  pair<matrix<Complex>, vector<uint64_t>>  density_matrix(const vector<int> &sites, size_t label)
+  {
+    if(model_instances.find(label) == model_instances.end()) qcm_ED_throw("The cluster instance label "+to_string(label)+" is out of range.");
+    auto& M = model_instances.at(label);
+
+    assert(M->complex_Hilbert == false);
+
+    if(M->the_model->is_factorized) return M->density_matrix_factorized(sites);
+    else return M->density_matrix_mixed(sites);
+  }
+
+
+
   void Green_function_solve(size_t label)
   {
     if(model_instances.find(label) == model_instances.end()) qcm_ED_throw("The label "+to_string(label)+" is out of range.");

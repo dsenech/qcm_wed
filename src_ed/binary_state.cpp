@@ -1,3 +1,4 @@
+#include <vector>
 #include <iostream>
 
 #include "binary_state.hpp"
@@ -140,4 +141,26 @@ uint64_t bitcount64(uint64_t x) {
 	x = (x & m16) + ((x >> 16) & m16); //put count of each 32 bits into those 32 bits
 	x = (x & m32) + ((x >> 32) & m32); //put count of each 64 bits into those 64 bits
 	return x;
+}
+
+
+
+uint64_t collapse(const uint64_t &b, const vector<int> &s)
+{
+	uint64_t c = 0L;
+	for(int i=0; i<s.size(); i++){
+		uint64_t I = (1L << i);
+		uint64_t k = (1L << s[i]);
+		if (b&k) c += I;
+		k = (k << 32);
+		I = (I << 32);
+		if (b&k) c += I;
+	}
+	// cout << "(";
+	// for(int i=0; i<s.size(); i++) cout << s[i] << ", ";
+	// cout <<  ") : ";
+	// PrintBinaryDouble(cout, b, 4); cout << "\t";
+    // PrintBinaryDouble(cout, c, s.size()); cout << "\n";
+
+	return c;
 }

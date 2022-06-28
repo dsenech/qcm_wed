@@ -8,6 +8,7 @@
 #include "Q_matrix_set.hpp"
 #include "continued_fraction_set.hpp"
 #include "ED_basis.hpp"
+#include "binary_state.hpp"
 
 extern double max_gap;
 
@@ -74,6 +75,8 @@ struct model_instance : model_instance_base
   pair<vector<double>, vector<complex<double>>> qmatrix(bool spin_down);
   pair<vector<double>, vector<complex<double>>> hybridization(bool spin_down);
   void print_wavefunction(ostream& fout);
+  pair<matrix<Complex>, vector<uint64_t>>  density_matrix_mixed(vector<int> sites);
+  pair<matrix<Complex>, vector<uint64_t>>  density_matrix_factorized(vector<int> sites);
 };
 
 
@@ -1057,4 +1060,96 @@ vector<tuple<int,int,double>> model_instance<HilbertField>::interactions()
     }
   }
   return V;
+}
+
+
+
+
+template<typename HilbertField>
+pair<matrix<Complex>, vector<uint64_t>> model_instance<HilbertField>::density_matrix_mixed(vector<int> sites)
+{
+  if(the_model->group->g > 1) qcm_ED_throw("computing the density matrix requires symmetries to be turned off!");
+
+  if(!gs_solved) low_energy_states();
+  state<HilbertField> psi = **states.begin();
+  shared_ptr<ED_mixed_basis> base = the_model->basis[psi.sec]; 
+
+  // psi.write_wavefunction(cout, *base); // ***
+
+  int nA = sites.size();
+  int nB = the_model->n_orb - sites.size();
+  vector<int> sitesB(0);
+  for(int i=0; i<the_model->n_orb; i++){
+    int j;
+    for(j=0; j<sites.size(); j++) if(sites[j] == i) break;
+    if(j == sites.size()) sitesB.push_back(i);
+  }
+
+  // constructing the masks for subsystems A and B
+  uint64_t mask_A = 0L;
+  uint64_t mask_B = 0L;
+
+  for(int i=0; i<sites.size(); i++)
+    mask_A += (1 << sites[i]);
+  mask_A = mask_A + (mask_A << 32);
+  vector<int> S(sites); S += 1;
+  S = sitesB; S+=1;
+
+  // First step: decomposing the basis into the two subsystems
+  map<uint64_t, int> index_A;
+  map<uint64_t, int> index_B;
+  vector<uint64_t> binA;
+  vector<uint64_t> binB;
+  vector<vector<int>> listA; 
+  int i=0;
+  int j=0;
+  for(int k=0; k<base->dim; k++){
+    uint64_t A = base->binlist[k].b & mask_A;
+    uint64_t B = base->binlist[k].b ^ A;
+    if (index_A.find(A) == index_A.end()){
+      index_A[A] = i++;
+      // binA.push_back(collapse(A,sites));
+      binA.push_back(A);
+    }
+    if (index_B.find(B) ==  index_B.end()){
+      index_B[B] = j++; 
+      listA.push_back(vector<int>(0));
+      // binB.push_back(collapse(B,sitesB));
+      binB.push_back(B);
+    }
+    listA[index_B[B]].push_back(index_A[A]);
+  }
+  int dim_A = i;
+  int dim_B = j;
+
+  matrix<Complex> rho(dim_A);
+  // loop over states
+  for(int j=0; j<dim_B; j++){
+    vector<int> &v = listA[j];
+    // cout << j << " : " << v << endl;
+    for(int i=0; i<v.size(); i++){
+      auto bI = binary_state(binA[v[i]] | binB[j]);
+      int I = base->index(bI);
+      for(int ip=0; ip<v.size(); ip++){
+        auto bIp = binary_state(binA[v[ip]] | binB[j]);
+        int Ip = base->index(bIp);
+        rho(v[i], v[ip]) += conj(psi.psi[I])*psi.psi[Ip];
+      }
+    }
+  }
+
+  vector<uint64_t> binA_collapsed(dim_A);
+  for(int i=0; i<dim_A; i++) binA_collapsed[i] = collapse(binA[i], sites);
+
+  return {rho, binA_collapsed};
+}
+
+
+
+
+template<typename HilbertField>
+pair<matrix<Complex>, vector<uint64_t>> model_instance<HilbertField>::density_matrix_factorized(vector<int> sites)
+{
+    // loop over states
+    return {matrix<Complex>(0), vector<uint64_t>(0)};
 }

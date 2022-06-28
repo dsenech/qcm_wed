@@ -300,6 +300,13 @@ namespace ED{
   op_name : name of operator
   */
   pair<string, vector<matrix_element<Complex>>> matrix_elements(const string& model_name, const string& op_name);
+
+  /**
+  computes the density matrix of subsystem A by tracing over subsystem B
+  sites : sites definin subsystem A
+  label : label of instance
+  */
+  pair<matrix<Complex>, vector<uint64_t>> density_matrix(const vector<int> &sites, size_t label);
 };
 
 #endif

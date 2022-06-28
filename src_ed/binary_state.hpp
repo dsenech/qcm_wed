@@ -11,6 +11,7 @@ uint32_t bitcount32(uint32_t n);
 uint64_t bitcount64(uint64_t n);
 void BinaryToString(size_t n, char *s, size_t m);
 void PrintBinaryDouble(std::ostream &flux, const uint64_t &n, size_t m);
+uint64_t collapse(const uint64_t &b, const vector<int> &s);
 
 //! The struct binary_state is used to represent basis states in the Hilbert space
 struct binary_state

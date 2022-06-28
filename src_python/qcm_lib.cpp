@@ -20,6 +20,7 @@ static PyMethodDef methods[] = {
 //-------------------- QCM_ED --------------------------------------------------------------
   { "cluster_averages", cluster_averages_python, METH_VARARGS, cluster_averages_help },
   { "ED_complex_HS", ED_complex_HS_python, METH_VARARGS, ED_complex_HS_help },
+  { "density_matrix", density_matrix_python, METH_VARARGS, density_matrix_help },
   { "fidelity", fidelity_python, METH_VARARGS, fidelity_help },
   { "Green_function_average", Green_function_average_python, METH_VARARGS, Green_function_average_help },
   { "Green_function_dimensionC", Green_function_dimensionC_python, METH_VARARGS, Green_function_dimensionC_help },
