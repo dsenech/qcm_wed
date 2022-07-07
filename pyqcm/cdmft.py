@@ -359,7 +359,6 @@ def cdmft(
         raise ValueError('CDMFT requires at least one variational parameter...Aborting.')
 
     print('minimization method = ', method)
-    pyqcm.new_model_instance()
     _mixing = pyqcm.mixing()
     print('mixing state = ', _mixing)
     Gdim = pyqcm.Green_function_dimension()

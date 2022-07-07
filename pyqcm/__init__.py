@@ -109,7 +109,8 @@ class model_instance:
     def print(self, filename='record.py'):
         global parameter_set
         with open(filename, 'w') as f:
-            f.write('from pyqcm import *\nset_global_parameter("nosym")\n' + self.model.record + parameter_set_str + self.record)
+            # f.write('from pyqcm import *\nset_global_parameter("nosym")\n' + self.model.record + parameter_set_str + self.record)
+            f.write('from pyqcm import *\n' + self.model.record + parameter_set_str + self.record)
 
 
 the_model = model()
@@ -631,8 +632,8 @@ def new_model_instance(label=0, record=False):
         nclus = len(mod[2])
         the_instance.record += '\nsolution=[None]*'+str(nclus)+'\n'
         for i in range(nclus):
-            if cinfo[i][4] > 1:
-                raise ValueError('symmetries must be off when recording the model instance!')
+            # if cinfo[i][4] > 1:
+            #     raise ValueError('symmetries must be off when recording the model instance!')
             if mod[4][i] != i:
                 continue
             clabel = label*nclus+i

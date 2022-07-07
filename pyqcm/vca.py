@@ -472,6 +472,111 @@ def __altNR(func=None, start=None, step=None, accur=None, max=10, gtol=1e-4, max
 
     return np.array([xp]), np.array([der1]), np.array([[1.0/der2]])
 
+################################################################################
+# minimax method
+
+def __minimax(names, var_max_start, start=None, step=None, accur=None, max=10,  max_iteration=30, hartree=None):
+    """Applies a minimization of a subset of variables and a maximization on the remainder
+    
+    :param ['str'] names : names of variational parameters (minimal ones first, then maximal ones)
+    :param int var_max_start : label of the first maximal variational parameter (= number of minimal variational parameters)
+    :param [float] start: the starting values
+    :param [float] step: the steps used to computed the numerical second derivatives
+    :param [float] accur: the required accuracy for each variable
+    :param [float] max: maximum absolute value of each parameter
+    :param int max_iterations:  maximum number of iterations, beyond which an exception is raised
+    :returns [float]: the value of the variables
+
+    """
+
+    ftol = 2*pyqcm.qcm.get_global_parameter('accur_SEF')
+    nvar_max = len(names) - var_max_start
+    nvar_min = var_max_start
+    steps_min = step[0:nvar_min]
+    steps_max = step[nvar_min:nvar_min+nvar_max]
+    iter = 0
+    nvar_tot = nvar_min+nvar_max
+
+    def F_min(x):
+        global SEF_eval
+        for i in range(nvar_min): 
+            pyqcm.set_parameter(names[i], x[i])
+        print('(min) x = ', x) # new
+        SEF_eval += 1
+        pyqcm.new_model_instance()
+        return pyqcm.Potthoff_functional(hartree)
+    def F_max(x):
+        global SEF_eval
+        for i in range(nvar_max): 
+            pyqcm.set_parameter(names[i+nvar_min], x[i])
+        print('(max) x = ', x) # new
+        SEF_eval += 1
+        pyqcm.new_model_instance()
+        return -pyqcm.Potthoff_functional(hartree)
+
+
+    X0 = np.array(start)
+
+    while iter < max_iteration:
+        P = pyqcm.parameters()
+        x_min = [P[names[i]] for i in range(nvar_min)]
+        x_max = [P[names[i]] for i in range(nvar_min, nvar_tot)]
+
+        if iter > 0:
+            steps_min = np.abs(diff[0:nvar_min])
+            steps_max = np.abs(diff[nvar_min:nvar_min+nvar_max])
+
+        nvar = nvar_min
+        steps = steps_min
+        initial_simplex = np.zeros((nvar+1,nvar))
+        for i in range(nvar+1):
+            initial_simplex[i, :] = x_min
+        for i in range(nvar):
+            initial_simplex[i+1, i] += steps[i]
+        if type(accur) == list:
+            accur = accur[0]
+        solution = minimize(F_min, x_min, method='Nelder-Mead', options={'maxfev':100, 'xatol': accur, 'fatol':ftol, 'initial_simplex': initial_simplex, 'adaptive': True, 'disp':True})
+        iter_done = solution.nit
+        sol_min = solution.x
+        for i in range(nvar_min):
+            pyqcm.set_parameter(names[i], sol_min[i])
+        
+        nvar = nvar_max
+        steps = steps_max
+        initial_simplex = np.zeros((nvar+1,nvar))
+        for i in range(nvar+1):
+            initial_simplex[i, :] = x_max
+        for i in range(nvar):
+            initial_simplex[i+1, i] += steps[i]
+        if type(accur) == list:
+            accur = accur[0]
+        solution = minimize(F_max, x_max, method='Nelder-Mead', options={'maxfev':100, 'xatol': accur, 'fatol':ftol, 'initial_simplex': initial_simplex, 'adaptive': True, 'disp':True})
+        iter_done = solution.nit
+        sol_max = solution.x
+        for i in range(nvar_max):
+            pyqcm.set_parameter(names[i+nvar_min], sol_max[i])
+
+        sol = np.concatenate((sol_min, sol_max))
+
+        hartree_converged = True
+        if hartree != None:
+            hartree_converged = True
+            for C in hartree:
+                C.update(pr=True)
+                hartree_converged  = hartree_converged and C.converged()
+
+        diff = sol - X0
+        X0 = sol
+        iter += 1
+        converged = True
+        for i in range(nvar_tot):
+            if np.abs(diff[i]) > accur: converged = False
+
+        if converged and hartree_converged:
+            return sol
+    
+    raise(pyqcm.TooManyIterationsError(max_iteration))
+    return sol
 
 ################################################################################
 # PUBLIC FUNCTIONS
@@ -493,7 +598,8 @@ def vca(
     method='NR', 
     hartree=None, 
     hartree_self_consistent=False,
-    symmetrized_operator=None
+    symmetrized_operator=None,
+    var_max_start = None
 ):
     """Performs a VCA with the QN or NR method
     
@@ -506,10 +612,11 @@ def vca(
     :param float accur_grad: max value of gradient for convergence
     :param int max_iter: maximum number of iterations in the procedure
     :param float max_iter_diff: optional maximum value of the maximum step in the quasi-Newton method
-    :param str method: method used to optimize ('SYMR1', 'NR', 'BFGS', 'altNR', 'Nelder-Mead', 'COBYLA', 'Powell', 'CG')
+    :param str method: method used to optimize ('SYMR1', 'NR', 'BFGS', 'altNR', 'Nelder-Mead', 'COBYLA', 'Powell', 'CG', 'minimax')
     :param (class hartree) hartree: Hartree approximation couplings (see pyqcm/hartree.py)
     :param boolean hartree_self_consistent: True if the Hartree approximation is treated in the self-consistent, rather than variational, way.
     :param str symmetrized_operator: name of an operator wrt which the functional must be symmetrized
+    :param int var_max_start: label of the first variable for which the function is a maximum (minimal vars first, maximal vars last)
     :return: None
     
     """
@@ -613,7 +720,7 @@ def vca(
     print(var_val)
 
     scipy_minimization = False
-    if method == 'Nelder-Mead' or method == 'COBYLA' or method == 'Powell'  or method == 'CG'  or method == 'BFGS':
+    if method == 'Nelder-Mead' or method == 'COBYLA' or method == 'Powell'  or method == 'CG'  or method == 'BFGS'  or method == 'minimax':
         scipy_minimization = True
 
     if scipy_minimization and hartree_self_consistent:
@@ -673,6 +780,9 @@ def vca(
             solution = minimize(var2x, start, method='COBYLA', options={'rhobeg':steps[0], 'maxiter':3*max_iter, 'tol': ftol, 'disp':True})
             iter_done = solution.nfev
             sol = solution.x
+
+        elif method == 'minimax':
+            sol = __minimax(names, var_max_start, start, steps, accur, max, max_iteration=max_iter, hartree=hartree)
         else:
             raise ValueError('method {:s} unknown in VCA'.format(method))
 
