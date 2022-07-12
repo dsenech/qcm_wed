@@ -106,6 +106,10 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
     
     fin.readline()
     elements = []
+    spin = {}
+    Si = {}
+    hop = {}
+
     while True:
         L = fin.readline()
         if L == '\n' or 'elements' in L: break
@@ -119,34 +123,84 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
             v = float(X[3])
         X[0] = X[0][1:]
 
-        if X[0][-1] == '-': continue
         I = int(X[0][0:-1])
         J = int(X[1][0:-1])
         neighbor = int(X[2])
         if neighbor : continue
-        # if I > J : continue
-        elements += [(I-1,J-1,v)]
+
+        K = '{:d},{:d}'.format(I,J)
+        Si[K] = (I-1,J-1)
+        if 'Hubbard' in op_type:
+            if K in hop:
+                hop[K] += v
+            else:
+                hop[K] = v
+            continue
+
+
+        if X[0][-1] == '+' and X[1][-1] == '+':
+            sz = 1
+            if K in hop:
+                hop[K] += v
+            else:
+                hop[K] = v
+            if K in spin:
+                spin[K] += np.array([0,v])
+            else:
+                spin[K] = np.array([0,v])
+        elif X[0][-1] == '-' and X[1][-1] == '-': 
+            if K in hop:
+                hop[K] += v
+            else:
+                hop[K] = v
+            if K in spin:
+                spin[K] += np.array([0,-v])
+            else:
+                spin[K] = np.array([0,-v])
+        elif (X[0][-1] == '+' and X[1][-1] == '-') or (X[0][-1] == '-' and X[1][-1] == '+'): 
+            if K in spin:
+                spin[K] += np.array([2*v,0])
+            else:
+                spin[K] = np.array([2*v,0])
 
     fin.close()
+    print('Si : ', Si)
+    print('hopping : ', hop)
+    print('spin : ', spin)
 
     #-------------------------------------------------------------------------
     # plotting the elements
-    for e in elements:
-        if np.abs(S[e[0],2]-S[e[1],2]) > 0.001:
+    for e in hop:
+        if np.abs(hop[e])<0.001: continue
+        s1 = Si[e][0]
+        s2 = Si[e][1]
+        if np.abs(S[s1,2]-S[s2,2]) > 0.001:
             pf = 'r--'
         else:
             pf = 'r-'
-        if cluster[e[0]] == cluster[e[1]]:
+        if cluster[s1] == cluster[s2]:
             alpha = 1.0
         else:
             alpha = 0.5
-        if np.linalg.norm(S[e[0],0:2] -  S[e[1],0:2]) < 0.0001 :
-            plt.plot([S[e[0],0]], [S[e[0],1]], 'o', ms = 18, c='w', mec='r', mew=2, alpha = alpha)
+        if np.linalg.norm(S[s1,0:2] -  S[s2,0:2]) < 0.0001 :
+            plt.plot([S[s1,0]], [S[s1,1]], 'o', ms = 18, c='w', mec='r', mew=2, alpha = alpha)
         else:
-            plt.plot([S[e[0],0], S[e[1],0]], [S[e[0],1], S[e[1],1]], pf, mew=2, alpha = alpha)
+            plt.plot([S[s1,0], S[s2,0]], [S[s1,1], S[s2,1]], pf, mew=2, alpha = alpha)
             if values:
-                plt.text(0.5*(S[e[0],0]+S[e[1],0]), 0.5*(S[e[0],1]+S[e[1],1]), f'${np.round(e[2],5)}$', va='bottom', ha='center', c='r')
-    
+                plt.text(0.5*(S[s1,0]+S[s2,0]), 0.5*(S[s1,1]+S[s2,1]), f'${np.round(hop[e],5)}$', va='bottom', ha='center', c='r')
+
+    fac = 0.15
+    for e in spin:
+        s1 = Si[e][0]
+        s2 = Si[e][1]
+        if s1 != s2: continue
+        if np.abs(S[s1,2]-S[s2,2]) > 0.001:
+            pf = 'r--'
+        else:
+            pf = 'r-'
+        plt.arrow(S[s1,0]-fac*spin[e][0], S[s1,1]-fac*spin[e][1], 2*fac*spin[e][0], 2*fac*spin[e][1], color='r', width=0.01, head_width=0.1)
+
+
     #-------------------------------------------------------------------------
     # plotting the sites
     bcol = ['k', 'r', 'b', 'g', 'c', 'm', 'y']
