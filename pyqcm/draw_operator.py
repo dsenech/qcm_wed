@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import re
 import pyqcm
 
-def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False, offset = 0.05, band_offset=0.05, z_offset=0.0):
+def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False, offset = 0.05, band_offset=0.05, z_offset=0.0, alpha_inter=0.2):
 
     file = 'tmp_model.out'
     pyqcm.print_model(file)
@@ -181,7 +181,7 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
         if cluster[s1] == cluster[s2]:
             alpha = 1.0
         else:
-            alpha = 0.5
+            alpha = alpha_inter
         if np.linalg.norm(S[s1,0:2] -  S[s2,0:2]) < 0.0001 :
             plt.plot([S[s1,0]], [S[s1,1]], 'o', ms = 18, c='w', mec='r', mew=2, alpha = alpha)
         else:
