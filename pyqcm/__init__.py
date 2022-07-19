@@ -53,6 +53,12 @@ class OutOfBoundsError(Exception):
         else:
             return 'a variable is out of bounds'
 
+class SolverError(Exception):
+    def __init__(self):
+        pass
+    def __str__(self):
+        return 'The impurity solver failed to converge to a solution'
+
 class TooManyIterationsError(Exception):
     pass
 
@@ -618,7 +624,10 @@ def new_model_instance(label=0, record=False):
     qcm.new_model_instance(label)
     if solver=='dvmc':
         import pyqcm.dvmc
-        pyqcm.dvmc.dvmc_solver()
+        try:
+            pyqcm.dvmc.dvmc_solver()
+        except:
+            raise SolverError()
 
     if record:
         cinfo = cluster_info()

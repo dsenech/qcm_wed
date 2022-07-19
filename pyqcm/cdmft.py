@@ -141,6 +141,13 @@ def __set_Hyb(spin_down=False):
 
     return Hyb
 
+def __print_Hyb(Hyb):
+    global w, Gdim, nclus, nmixed
+    print('\nHost function:')
+    for i,f in enumerate(w):
+        print('w = ', f)
+        print(Hyb[0][i,:,:])
+
 ######################################################################
 def __frequency_grid(type='sharp', beta='50', wc=2):
     """
@@ -290,7 +297,8 @@ def cdmft(
     grid_type = 'sharp', 
     counterterms=None, 
     SEF=False, 
-    observables=None
+    observables=None,
+    verb=False
 ):
     """Performs the CDMFT procedure
 
@@ -316,6 +324,7 @@ def cdmft(
     :param [str] counterterms: list of counterterms names (cluster operators that should strive to have zero average)
     :param boolean SEF: if True, computes the Potthoff functional at the end
     :param [class observable]: list of observables used to assess convergence
+    :param boolean verb: If True, prints debugging information
     :returns: None
 
     """
@@ -398,7 +407,6 @@ def cdmft(
     time_MIN = 0.0
     while True:
         pyqcm.new_model_instance()
-
         params = pyqcm.parameters() # params is a dict
 
         # puts the values only of the parameters into array params_array
@@ -416,12 +424,12 @@ def cdmft(
         dist_function = __frequency_grid(grid_type, beta, wc)
         qcm.CDMFT_host(wr, weight)
         Hyb = __set_Hyb()
+        # if verb: __print_Hyb(Hyb)
         if _mixing == 4:
             Hyb_down = __set_Hyb(True)
 
         t2 = timeit.default_timer()
         time_ED += t2 - t1
-
         if type(method) == tuple:
             sol = __dual_minimization(params_array, nvar_E, method, initial_step=initial_step, accur=accur, accur_dist=accur_dist, nsteps=12)
             iter_done = sol.nfev

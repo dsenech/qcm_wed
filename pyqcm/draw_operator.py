@@ -164,9 +164,6 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
                 spin[K] = np.array([2*v,0])
 
     fin.close()
-    print('Si : ', Si)
-    print('hopping : ', hop)
-    print('spin : ', spin)
 
     #-------------------------------------------------------------------------
     # plotting the elements
