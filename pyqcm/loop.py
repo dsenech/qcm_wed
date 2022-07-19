@@ -388,7 +388,7 @@ def fade(F, p1, p2, n):
 
 
 ################################################################################
-def Hartree(F, couplings, maxiter=10, eps_algo=0):
+def Hartree(F, couplings, maxiter=10, eps_algo=0, file='hartree.tsv'):
 	"""Performs the Hartree approximation
 
 	:param F: task to perform wihtin the loop
@@ -431,8 +431,7 @@ def Hartree(F, couplings, maxiter=10, eps_algo=0):
 		print('total difference = {:g}'.format(diff_tot))
 
 		if hartree_converged:
-			# pyqcm.write_summary('hartree.tsv', first = first_time)
-			pyqcm.write_summary('hartree.tsv')
+			pyqcm.write_summary(file)
 			first_time = False
 			break
 
