@@ -3,11 +3,13 @@ import matplotlib.pyplot as plt
 import re
 import pyqcm
 
-def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False, offset = 0.05, band_offset=0.05, z_offset=0.0, alpha_inter=0.2):
+def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False, offset = 0.05, band_offset=0.05, z_offset=0.0, alpha_inter=0.2, plt_ax = None):
 
     file = 'tmp_model.out'
     pyqcm.print_model(file)
     fin = open(file, 'r')
+
+    if plt_ax is not None: plt.sca(plt_ax)
 
     #-------------------------------------------------------------------------
     # reading positions of sites
@@ -197,6 +199,19 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
             pf = 'r-'
         plt.arrow(S[s1,0]-fac*spin[e][0], S[s1,1]-fac*spin[e][1], 2*fac*spin[e][0], 2*fac*spin[e][1], color='r', width=0.01, head_width=0.1)
 
+    for e in spin:
+        s1 = Si[e][0]
+        s2 = Si[e][1]
+        if s1 == s2: continue
+        if cluster[s1] == cluster[s2]:
+            alpha = 1.0
+        else:
+            alpha = alpha_inter
+        if np.abs(S[s1,2]-S[s2,2]) > 0.001:
+            pf = 'r--'
+        else:
+            pf = 'r-'
+            plt.plot([S[s1,0], S[s2,0]], [S[s1,1], S[s2,1]], pf, mew=2, alpha = alpha)
 
     #-------------------------------------------------------------------------
     # plotting the sites
@@ -232,13 +247,15 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
 
     #-------------------------------------------------------------------------
     plt.title(f'${op_name}$', pad=18)
-    plt.show()
+    if plt_ax is None: plt.show()
 
 
 
 #=============================================================================
 
-def draw_cluster_operator(clus_name, op_name, show_labels=True, values=False):
+def draw_cluster_operator(clus_name, op_name, show_labels=True, values=False, plt_ax = None):
+
+    if plt_ax is not None: plt.sca(plt_ax)
 
     file = 'tmp_model.out'
     info = pyqcm.cluster_info()
@@ -417,7 +434,7 @@ def draw_cluster_operator(clus_name, op_name, show_labels=True, values=False):
 
     #-------------------------------------------------------------------------
     plt.title(f'${op_name}$', pad=18)
-    plt.show()
+    if plt_ax is None: plt.show()
 
 
     
