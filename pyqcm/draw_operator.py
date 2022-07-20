@@ -111,6 +111,7 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
     spin = {}
     Si = {}
     hop = {}
+    anom = {}
 
     while True:
         L = fin.readline()
@@ -128,48 +129,53 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
         I = int(X[0][0:-1])
         J = int(X[1][0:-1])
         neighbor = int(X[2])
-        if neighbor : continue
+        # if neighbor : continue
 
-        K = '{:d},{:d}'.format(I,J)
-        Si[K] = (I-1,J-1)
-        if 'Hubbard' in op_type:
+        K = '{:d},{:d};{:d}'.format(I,J,neighbor)
+        Si[K] = (I-1,J-1,neighbor)
+        if 'Hubbard' in op_type or 'one-body' in op_type:
             if K in hop:
                 hop[K] += v
             else:
                 hop[K] = v
-            continue
 
+            if X[0][-1] == '+' and X[1][-1] == '+':
+                sz = 1
+                if K in hop:
+                    hop[K] += v
+                else:
+                    hop[K] = v
+                if K in spin:
+                    spin[K] += np.array([0,v])
+                else:
+                    spin[K] = np.array([0,v])
+            elif X[0][-1] == '-' and X[1][-1] == '-': 
+                if K in hop:
+                    hop[K] += v
+                else:
+                    hop[K] = v
+                if K in spin:
+                    spin[K] += np.array([0,-v])
+                else:
+                    spin[K] = np.array([0,-v])
+            elif (X[0][-1] == '+' and X[1][-1] == '-') or (X[0][-1] == '-' and X[1][-1] == '+'):
+                if K in spin:
+                    spin[K] += np.array([2*v,0])
+                else:
+                    spin[K] = np.array([2*v,0])
 
-        if X[0][-1] == '+' and X[1][-1] == '+':
-            sz = 1
-            if K in hop:
-                hop[K] += v
-            else:
-                hop[K] = v
-            if K in spin:
-                spin[K] += np.array([0,v])
-            else:
-                spin[K] = np.array([0,v])
-        elif X[0][-1] == '-' and X[1][-1] == '-': 
-            if K in hop:
-                hop[K] += v
-            else:
-                hop[K] = v
-            if K in spin:
-                spin[K] += np.array([0,-v])
-            else:
-                spin[K] = np.array([0,-v])
-        elif (X[0][-1] == '+' and X[1][-1] == '-') or (X[0][-1] == '-' and X[1][-1] == '+'): 
-            if K in spin:
-                spin[K] += np.array([2*v,0])
-            else:
-                spin[K] = np.array([2*v,0])
+        if 'singlet' in op_type or 'dz' in op_type:
+            if (X[0][-1] == '+' and X[1][-1] == '-') or (X[0][-1] == '-' and X[1][-1] == '+'):
+                if K in anom:
+                    anom[K] += v
+                else:
+                    anom[K] = v
 
     fin.close()
-
     #-------------------------------------------------------------------------
     # plotting the elements
     for e in hop:
+        if ';0' not in e: continue
         if np.abs(hop[e])<0.001: continue
         s1 = Si[e][0]
         s2 = Si[e][1]
@@ -190,6 +196,7 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
 
     fac = 0.15
     for e in spin:
+        if ';0' not in e: continue
         s1 = Si[e][0]
         s2 = Si[e][1]
         if s1 != s2: continue
@@ -199,7 +206,8 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
             pf = 'r-'
         plt.arrow(S[s1,0]-fac*spin[e][0], S[s1,1]-fac*spin[e][1], 2*fac*spin[e][0], 2*fac*spin[e][1], color='r', width=0.01, head_width=0.1)
 
-    for e in spin:
+    for e in anom:
+        if ';0' not in e: continue
         s1 = Si[e][0]
         s2 = Si[e][1]
         if s1 == s2: continue
@@ -212,6 +220,7 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
         else:
             pf = 'r-'
             plt.plot([S[s1,0], S[s2,0]], [S[s1,1], S[s2,1]], pf, mew=2, alpha = alpha)
+
 
     #-------------------------------------------------------------------------
     # plotting the sites
@@ -244,6 +253,19 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
         for j in range(Neigh.shape[0]):
             for i in range(S.shape[0]):
                 plt.plot(S[i,0]+Neigh[j,0], S[i,1]+Neigh[j,1], 'ko', ms = 6, alpha=0.5)
+        for e in hop:
+            if ';0' in e: continue
+            if np.abs(hop[e])<0.001: continue
+            s1 = Si[e][0]
+            s2 = Si[e][1]
+            neighbor = Si[e][2]-1
+            plt.plot([S[s1,0], S[s2,0] + Neigh[neighbor][0]], [S[s1,1], S[s2,1] + Neigh[neighbor][1]], 'r:', lw=1)
+        for e in anom:
+            if ';0' in e: continue
+            s1 = Si[e][1]
+            s2 = Si[e][0]
+            neighbor = Si[e][2]-1
+            plt.plot([S[s1,0], S[s2,0] + Neigh[neighbor][0]], [S[s1,1], S[s2,1] + Neigh[neighbor][1]], 'r:', lw=1)
 
     #-------------------------------------------------------------------------
     plt.title(f'${op_name}$', pad=18)
@@ -323,7 +345,7 @@ def draw_cluster_operator(clus_name, op_name, show_labels=True, values=False, pl
     while clus_name+' ' not in L:
         L = fin.readline()
         if not L:
-            raise ValueError('file ended without findind cluster {:s}'.format(clus_name))
+            raise ValueError('file ended without finding cluster {:s}'.format(clus_name))
 
     #-------------------------------------------------------------------------
     # reading operator
