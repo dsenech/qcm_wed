@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import re
 import pyqcm
 
-def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False, offset = 0.05, band_offset=0.05, z_offset=0.0, alpha_inter=0.2, plt_ax = None):
+def draw_operator(op_name, show_labels=False, show_band_labels=True, show_neighbors=False, values=False, offset = 0.05, band_offset=0.05, z_offset=0.0, alpha_inter=0.2, plt_ax = None):
 
     file = 'tmp_model.out'
     pyqcm.print_model(file)
@@ -238,13 +238,15 @@ def draw_operator(op_name, show_labels=True, show_neighbors=False, values=False,
             plt.plot(S[i,0], S[i,1], 'o', ms = 6 + 6*(S[i,2]-zmin)/(zmax-zmin+0.1), mfc='w', c=bcol[band[i]%ncol])
             if show_labels: 
                 plt.text(S[i,0], S[i,1]+offset, f'${i+1}$', va='bottom', ha='center', color='b', fontsize=8)
-                plt.text(S[i,0]+band_offset, S[i,1]+ z_offset*(S[i,2]-zmin), f'${band[i]+1}$', va='center', ha='left', color='g', fontsize=12)
+            if show_band_labels: 
+                plt.text(S[i,0]+band_offset, S[i,1]+ z_offset*(S[i,2]-zmin), f'${band[i]+1}$', va='center', ha='left', color='g', fontsize=8)
     for i in range(S.shape[0]):
         if S[i,2]-0.001 < zmin:
             plt.plot(S[i,0], S[i,1], 'o', ms = 6, c=bcol[band[i]%ncol])
             if show_labels: 
                 plt.text(S[i,0], S[i,1]-offset, f'${i+1}$', va='top', ha='center', color='b', fontsize=8)
-                plt.text(S[i,0]+band_offset, S[i,1]+ z_offset*(S[i,2]-zmin), f'${band[i]+1}$', va='center', ha='left', color='g', fontsize=12)
+            if show_band_labels: 
+                plt.text(S[i,0]+band_offset, S[i,1]+ z_offset*(S[i,2]-zmin), f'${band[i]+1}$', va='center', ha='left', color='g', fontsize=8)
 
     #-------------------------------------------------------------------------
     # plotting the neighbors

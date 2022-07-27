@@ -23,14 +23,13 @@ class hartree:
 
     size0 = 0
 
-    def __init__(self, Vm, V, eig, accur=1e-4, accur_rel=1, lattice=False):
+    def __init__(self, Vm, V, eig, accur=1e-4, lattice=False):
         """
 
         :param str Vm: name of the mean-field operator
         :param str V: name of the interaction operator
         :param float eig: eigenvalue
         :param float accur: required accuracy of the self-consistent procedure
-        :param float accur_rel: required relative accuracy of the self-consistent procedure
         :param boolean lattice: if True, the lattice average is used, otherwise the cluster average
 
         """
@@ -45,7 +44,6 @@ class hartree:
         self.diff_rel = 1e6
         self.ave = 0
         self.accur = accur
-        self.accur_rel = accur_rel
         self.epsilon = False
         self.iter = 0
 
@@ -119,7 +117,7 @@ class hartree:
         
         """
 
-        if np.abs(self.diff) < self.accur and self.diff_rel < self.accur_rel:
+        if np.abs(self.diff) < self.accur:
             return True
         else:
             return False

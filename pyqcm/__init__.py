@@ -1624,7 +1624,7 @@ def print_parameters(P):
         print(x, ' = ', P[x])
 
 
-def write_summary(f, suppl_descr=None, suppl_values=None):
+def write_summary(f, suppl_descr=None, suppl_values=None, first_of_series=False):
     global description_line
     first_in_file =False
     des, val = properties()
@@ -1634,7 +1634,7 @@ def write_summary(f, suppl_descr=None, suppl_values=None):
         des_dict[f] = ''
         des_prev = ''
         first_in_file =True
-    if des == des_prev: 
+    if des == des_prev and first_of_series == False: 
         first = False
     else: 
         first = True

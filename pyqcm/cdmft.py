@@ -319,7 +319,7 @@ def cdmft(
     :param int eps_algo: number of elements in the epsilon algorithm convergence accelerator = 2*eps_algo + 1 (0 = no acceleration)
     :param float initial_step: initial step in the minimization routine
     :param [class hartree] hartree: mean-field hartree couplings to incorportate in the convergence procedure
-    :param [str] check_sectors: the ground state is checked against the ground states of the sectors contained in target_sectors
+    :param boolean check_sectors: the ground state is checked against the ground states of the sectors contained in target_sectors
     :param str grid_type: type of frequency grid along the imaginary axis : 'sharp', 'ifreq', 'self'
     :param [str] counterterms: list of counterterms names (cluster operators that should strive to have zero average)
     :param boolean SEF: if True, computes the Potthoff functional at the end
@@ -464,9 +464,9 @@ def cdmft(
         initial_step = diff_param
         if superiter > 0:
             diffH = __diff_hybrid(Hyb, Hyb0)
-            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}, diff hybrid = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, diffH, iter_done, time_MIN/time_ED))
+            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}, diff hybrid = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, diffH, iter_done, time_MIN/time_ED), flush=True)
         else:
-            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, iter_done, time_MIN/time_ED))
+            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, iter_done, time_MIN/time_ED), flush=True)
 
         #--------------------------------- Hartree step ---------------------------------
         if hartree != None:
@@ -492,8 +492,7 @@ def cdmft(
         # writing the parameters in a progress file
         des = 'distance\tdiff_param\tdiff_hybrid\t'
         val = '{: #.2e}\t{: #.2e}\t{: #.2e}\t'.format(dist_value, diff_param, diffH)
-        # pyqcm.write_summary('cdmft_iter.tsv', first = first_time2, suppl_descr = des, suppl_values = val)
-        pyqcm.write_summary('cdmft_iter.tsv', suppl_descr = des, suppl_values = val)
+        pyqcm.write_summary('cdmft_iter.tsv', suppl_descr = des, suppl_values = val, first_of_series=first_time2)
         first_time2 = False
 
 
@@ -559,9 +558,10 @@ def cdmft(
         print(var_val)
 
         GS0 = pyqcm.ground_state()
-        if check_sectors != None:
-            pyqcm.set_target_sectors(check_sectors)
+        if check_sectors:
             GS = pyqcm.ground_state()
+            if GS != GS0:
+                raise ValueError(f'Ground state inconsistent : {GS} from the converged parameters and {GS0} initially')
 
         if skip_averages is False:
             ave = pyqcm.averages()
@@ -579,14 +579,14 @@ def cdmft(
                     val += '{: #.6e}\t'.format(x.ave)
                 des += 'series_length\t'
                 val += '{:d}\t'.format(observable_series_length)
-            # pyqcm.write_summary(file, first = first_time, suppl_descr = des, suppl_values = val)
-            pyqcm.write_summary(file, suppl_descr = des, suppl_values = val)
+            pyqcm.write_summary(file, suppl_descr = des, suppl_values = val, first_of_series=first_time)
             first_time = False
             first_time2 = True
 
         # writing the frequency grid to a file
         if 'self' in dist_function:
-            pyqcm.write_summary('cdmft_grid.tsv', suppl_descr = des, suppl_values = val)
+            pyqcm.write_summary('cdmft_grid.tsv', suppl_descr = des, suppl_values = val, first_of_series=first_time)
+            first_time = False
             with open('cdmft_grid.tsv','a') as gridfile:
                 np.savetxt(gridfile, np.stack((w.imag, weight),axis=-1),header='w\tweight', fmt='%.8f', delimiter='\t')
                 gridfile.close()

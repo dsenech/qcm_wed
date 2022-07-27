@@ -18,6 +18,8 @@
 
 double small_scale;
 double large_scale;
+bool integrand_verb = false;
+int integrand_count = 0;
 
 
 //------------------------------------------------------------------------------
@@ -126,7 +128,8 @@ void QCM::wk_integral(int dim, function<void (Complex w, vector3D<double> &k, co
   large_scale = global_double("large_scale");
   double cutoff_scale = global_double("cutoff_scale");
   iw_cutoff = 1.0/cutoff_scale;
-
+  integrand_verb = verb;
+	integrand_count = 0;
 	//------------------------------------------------------------------------------
 	// first region : frequencies below small_scale
 	neval=0;
@@ -340,6 +343,9 @@ int low_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
 		}
 	}
+	integrand_count += *nvec;
+	if(integrand_count%1000 == 0 and integrand_verb) cout << integrand_count << " points" << endl;
+
 	return 0;
 }
 
@@ -386,6 +392,8 @@ int mid_freq_cuba_integrand(const int *dim, const double x[], const int *nv, dou
 			wk_integrand(w,k,nv,&I[(*nv)*i]);
 		}
 	}
+	integrand_count += *nvec;
+	if(integrand_count%1000 == 0 and integrand_verb) cout << integrand_count << " points" << endl;
 	return 0;
 }
 
@@ -462,6 +470,8 @@ int high_freq_cuba_integrand(const int *dim, const double x[], const int *nv, do
       }
     }
   }
+	integrand_count += *nvec;
+	if(integrand_count%1000 == 0 and integrand_verb) cout << integrand_count << " points" << endl;
   return 0;
 }
 
