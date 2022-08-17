@@ -160,9 +160,9 @@ def draw_operator(op_name, show_labels=False, show_band_labels=True, show_neighb
                     spin[K] = np.array([0,-v])
             elif (X[0][-1] == '+' and X[1][-1] == '-') or (X[0][-1] == '-' and X[1][-1] == '+'):
                 if K in spin:
-                    spin[K] += np.array([2*v,0])
+                    spin[K] += np.array([v,0])
                 else:
-                    spin[K] = np.array([2*v,0])
+                    spin[K] = np.array([v,0])
 
         if 'singlet' in op_type or 'dz' in op_type:
             if (X[0][-1] == '+' and X[1][-1] == '-') or (X[0][-1] == '-' and X[1][-1] == '+'):
@@ -195,6 +195,7 @@ def draw_operator(op_name, show_labels=False, show_band_labels=True, show_neighb
                 plt.text(0.5*(S[s1,0]+S[s2,0]), 0.5*(S[s1,1]+S[s2,1]), f'${np.round(hop[e],5)}$', va='bottom', ha='center', c='r')
 
     fac = 0.15
+    print(spin)
     for e in spin:
         if ';0' not in e: continue
         s1 = Si[e][0]

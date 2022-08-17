@@ -287,7 +287,7 @@ def cdmft(
     accur_dist=1e-10,
     alpha = 0.0,
     displaymin=False, 
-    method='CG', 
+    method='Nelder-Mead', 
     file='cdmft.tsv', 
     skip_averages=False, 
     eps_algo=0, 
@@ -568,7 +568,7 @@ def cdmft(
             pyqcm.print_averages(ave)    
 
         if SEF:
-            pyqcm.Potthoff_functional()
+            pyqcm.Potthoff_functional(hartree)
 
         if file != None:
             des = 'iterations\tdist_function\tdistance\tdiff_hybrid\t'
