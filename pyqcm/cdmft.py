@@ -247,7 +247,7 @@ def __optimize(F, x, method='Nelder-Mead', initial_step=0.1, accur = 1e-4, accur
         iter_done = sol.nit
 
     elif method == 'CG':
-        sol = scipy.optimize.minimize(F, x, method='CG', jac=False, tol = accur, options={'eps':1e-8})
+        sol = scipy.optimize.minimize(F, x, method='CG', jac=False, tol = accur, options={'gtol':1e-6, 'eps':1e-6})
         iter_done = sol.nit
 
     elif method == 'BFGS':
@@ -568,11 +568,14 @@ def cdmft(
             pyqcm.print_averages(ave)    
 
         if SEF:
-            pyqcm.Potthoff_functional(hartree)
+            omegaH=pyqcm.Potthoff_functional(hartree)
 
         if file != None:
             des = 'iterations\tdist_function\tdistance\tdiff_hybrid\t'
             val = '{:d}\t{:s}\t{: #.2e}\t{: #.2e}\t'.format(superiter, dist_function, dist_value, diffH)
+            if SEF : 
+                des += 'omegaH\t'
+                val += '{: #.8g}\t'.format(omegaH)
             if observables != None:
                 for x in observables:
                     des += 'ave_'+x.name+'_obs\t'
