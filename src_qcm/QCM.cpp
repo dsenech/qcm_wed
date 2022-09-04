@@ -840,8 +840,7 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
    */
   void switch_cluster_model(const string &name)
   {
-    if(models.find(name)==models.end())
-      qcm_throw("cluster model "+name+" does not exist!");
+    if(models.find(name)==models.end()) qcm_throw("cluster model "+name+" does not exist!");
     qcm_model->clusters[0].name = name;
     if (!models[name]->is_closed) qcm_model->close_model(true);
   }
@@ -849,6 +848,7 @@ vector<complex<double>> periodized_Green_function_element(int r, int c, const co
 
     bool complex_HS(size_t label)
   {
+    if(lattice_model_instances.find(label) == lattice_model_instances.end()) qcm_throw("The instance # "+to_string(label)+" does not exist.");
     return lattice_model_instances.at(label)->complex_HS;
   }
 

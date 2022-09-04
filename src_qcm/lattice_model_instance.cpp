@@ -117,8 +117,8 @@ vector<pair<double,string>> lattice_model_instance::ground_state()
   }
 
   for(size_t i = 0; i<n_clus; i++){
-    auto I = model->inequiv[i];
-    if(ED::complex_HS(n_clus*label+I)) complex_HS = true;
+    if(i != model->clusters[i].ref) continue;
+    if(ED::complex_HS(n_clus*label+i)) complex_HS = true;
   }
 
   gs_solved = true;
@@ -340,7 +340,8 @@ void lattice_model_instance::cluster_self_energy(Green_function& G)
   if(!gf_solved) Green_function_solve();
 	G.sigma.block.assign(n_clus, matrix<Complex>());
   for(size_t i = 0; i<n_clus; i++){
-    auto S =  cluster_self_energy(i, G.w, G.spin_down);
+    auto I = model->clusters[i].ref;
+    auto S =  cluster_self_energy(I, G.w, G.spin_down);
     G.sigma.block[i].assign(S);
   }
   G.sigma.set_size();
@@ -364,13 +365,15 @@ Green_function lattice_model_instance::cluster_Green_function(Complex w, bool si
 	G.G.block.resize(n_clus);
 
   for(size_t i = 0; i<n_clus; i++){
-    G.G.block[i].assign(cluster_Green_function(i, w, spin_down, false));
+    auto I = model->clusters[i].ref;
+    G.G.block[i].assign(cluster_Green_function(I, w, spin_down, false));
   }
   G.G.set_size();
   if(sig){
     G.sigma.block.resize(n_clus);
     for(size_t i = 0; i<n_clus; i++){
-      G.sigma.block[i].assign(cluster_self_energy(i, w, spin_down));
+      auto I = model->clusters[i].ref;
+      G.sigma.block[i].assign(cluster_self_energy(I, w, spin_down));
     }
     G.sigma.set_size();
   }
@@ -378,7 +381,8 @@ Green_function lattice_model_instance::cluster_Green_function(Complex w, bool si
   if(model->bath_exists){
     G.gamma.block.resize(n_clus);
     for(size_t i = 0; i<n_clus; i++){
-      G.gamma.block[i].assign(hybridization_function(i, w, spin_down));
+      auto I = model->clusters[i].ref;
+      G.gamma.block[i].assign(hybridization_function(I, w, spin_down));
     }
     G.gamma.set_size();
   }

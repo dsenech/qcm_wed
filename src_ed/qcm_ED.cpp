@@ -161,6 +161,7 @@ namespace ED{
     
   bool complex_HS(size_t label)
   {
+    if(model_instances.find(label) == model_instances.end()) qcm_ED_throw("The cluster instance label "+to_string(label)+" is out of range.");
     return model_instances.at(label)->complex_Hilbert;
   }
   
