@@ -1624,10 +1624,27 @@ def print_parameters(P):
         print(x, ' = ', P[x])
 
 
+
+def __dependent_parameter_string():
+    D = parameter_set()
+    S = ''
+    for x in D:
+        if D[x][1] != None:
+            if D[x][2] == 1:
+                S += '{:s}={:s};'.format(D[x][1], x)
+            elif D[x][2] == -1:
+                S += '{:s}=-{:s};'.format(D[x][1], x)
+            else:
+                S += '{:s}={:1.1g}*{:s};'.format(D[x][1], D[x][2], x)
+    if len(S) == 0:
+        S = 'none '
+    return S[:-1]
+
+
 def write_summary(f, suppl_descr=None, suppl_values=None, first_of_series=False):
-    global description_line
     first_in_file =False
     des, val = properties()
+    dependent_parameters = __dependent_parameter_string()
     try:
         des_prev = des_dict[f]
     except:
@@ -1646,10 +1663,10 @@ def write_summary(f, suppl_descr=None, suppl_values=None, first_of_series=False)
     if first:
         if suppl_descr != None:
             des = suppl_descr + des
-        des += 'time'
+        des += 'time\tdependent_parameters\t'
         if first_in_file is False: fout.write('\n')
         fout.write(des + '\n')
-    fout.write(val + '\n')
+    fout.write(val + '\t' + dependent_parameters + '\n')
     fout.close()
 
 
