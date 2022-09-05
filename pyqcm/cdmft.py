@@ -27,7 +27,7 @@ nclus = 0
 nmixed = 1
 _mixing = 0
 clusters = None
-maxfev = 500000
+maxfev = 5000000
 
 
 ################################################################################
@@ -298,7 +298,8 @@ def cdmft(
     counterterms=None, 
     SEF=False, 
     observables=None,
-    verb=False
+    verb=False,
+    max_function_eval = 5000000
 ):
     """Performs the CDMFT procedure
 
@@ -325,11 +326,13 @@ def cdmft(
     :param boolean SEF: if True, computes the Potthoff functional at the end
     :param [class observable]: list of observables used to assess convergence
     :param boolean verb: If True, prints debugging information
+    :param int max_function_eval: maximum number of distance function evaluations when minimizing distance
     :returns: None
 
     """
     global w, wr, weight, var, _mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
 
+    maxfev = max_function_eval
     if type(hartree) is not list and hartree is not None:
         hartree = [hartree] # quick fix to protect against hartree=`obj` behavior
 
