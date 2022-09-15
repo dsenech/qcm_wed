@@ -423,20 +423,8 @@ double one_body_operator<op_field>::uncorrelated_average(matrix<Complex>& Gave, 
   matrix<op_field>& EE = E;
   if(spin_down) EE = E_down;
   int d = Gave.c - EE.c;
-
-  switch(target){
-    case 1:
-      EE.move_sub_matrix(EE.r,EE.c,0,0,0,0,Efull);
-      break;
-    case 2:
-      EE.move_sub_matrix(EE.r,EE.c,0,0,d,d,Efull);
-      break;
-    case 3:
-      EE.move_sub_matrix(EE.r,EE.c,0,0,0,d,Efull);
-      EE.move_sub_matrix_HC(EE.r,EE.c,0,0,d,0,Efull);
-      break;
-  }
-
+  if (target != 1) return(0.0);
+  EE.move_sub_matrix(EE.r,EE.c,0,0,0,0,Efull);
   Complex z = Gave.trace_product(Efull, true);
   return real(z);
 }

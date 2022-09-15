@@ -147,7 +147,7 @@ pair<double, double> model_instance<HilbertField>::cluster_averages(shared_ptr<H
 
 
 /**
- erases all the states vectors in the density matrix
+ erases all the state vectors in the density matrix
  */
 template<typename HilbertField>
 void model_instance<HilbertField>::clear_states(){
@@ -961,7 +961,8 @@ void model_instance<HilbertField>::read(istream& fin)
 
 
   // reading the states
-  states.clear();
+  // states.clear();
+  clear_states();
   while(true){
     parser::next_line(fin);
     vector<string> input = read_strings(fin);
