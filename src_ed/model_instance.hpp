@@ -335,12 +335,9 @@ void model_instance<HilbertField>::set_hopping_matrix(bool spin_down)
 		
 		// contribution of the  bath to the Potthoff functional
 		for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
-		if(mixing&HS_mixing::up_down and spin_down){
-			for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
-		}
-		else if(mixing==HS_mixing::normal) SEF_bath *= 2.0;
 	}
   if((mixing & HS_mixing::up_down) and spin_down == false) set_hopping_matrix(true);
+  else if(mixing==HS_mixing::normal) SEF_bath *= 2.0;
   hopping_solved = true;
 }
 
