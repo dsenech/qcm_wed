@@ -124,8 +124,8 @@ pair<double, double> model_instance<HilbertField>::cluster_averages(shared_ptr<H
   if(value.find(h->name)==value.end()) qcm_ED_throw("operator "+h->name+" is not activated in instance "+to_string(label));
   double ave=0.0, var=0.0;
   if(!is_correlated or gf_read){
-    ave = h->uncorrelated_average(M,false);
-    if(mixing&HS_mixing::up_down) ave += h->uncorrelated_average(M_down,true);
+    ave = h->average_from_GF(M,false);
+    if(mixing&HS_mixing::up_down) ave += h->average_from_GF(M_down,true);
     if(mixing == HS_mixing::normal) ave *= 2.0;
     if(mixing == HS_mixing::anomalous) ave += h->nambu_correction;
     if(mixing == HS_mixing::full) {
@@ -163,20 +163,23 @@ void model_instance<HilbertField>::clear_states(){
 template<typename HilbertField>
 pair<double, string> model_instance<HilbertField>::low_energy_states()
 {
+  if(gs_solved) return {GS_energy, GS_string()};
+  gs_solved = true;
   bool is_complex = (typeid(HilbertField) == typeid(Complex));
 
-  // if(!is_correlated or gf_read){ // doing this causes a bug if U=0, in move_submatrix...
-  if(gf_read){
+  if(!is_correlated) one_body_solve(); // computes also M, the average cluster GF
+
+  // computing the cluster averages in the cases "uncorrelated" and "read from file"
+  if(!is_correlated or gf_read){ // doing this causes a bug if U=0, in move_submatrix...
     averages.reserve(value.size());
     for(auto& x : value){
       auto X = cluster_averages(the_model->term.at(x.first));
       averages.push_back(tuple<string,double,double>(x.first, X.first, X.second));
     }
+    return {GS_energy, GS_string()};
   }
-  
-  if(gs_solved or gf_read) return {GS_energy, GS_string()};
-  if(!is_correlated) return one_body_solve();
 
+  // Now solving by ED
   // building a set of trial sectors according to the target sector;
   
   if(global_bool("verb_ED")) cout << "computing low-energy state for cluster instance " << full_name() << endl;
@@ -224,8 +227,6 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
     auto X = cluster_averages(the_model->term.at(x.first));
     averages.push_back(tuple<string,double,double>(x.first, X.first, X.second));
   }
-
-  gs_solved = true;
   return {GS_energy, GS_string()};
 }
 
@@ -386,7 +387,6 @@ void model_instance<HilbertField>::Green_function_solve()
   if(gf_solved or gf_read) return;
   if(!is_correlated){
     one_body_solve();
-  	gf_solved = true;
     return;
   }
 	if(!gs_solved) low_energy_states();
@@ -895,6 +895,8 @@ double model_instance<HilbertField>::tr_sigma_inf()
 template<typename HilbertField>
 string model_instance<HilbertField>::GS_string() const
 {
+  if(!is_correlated) return "uncorrelated";
+
   ostringstream sout;
   map<sector, double> weight;
   for(auto& s : states){

@@ -49,7 +49,7 @@ struct Hermitian_operator
   }
 
 
-  virtual double uncorrelated_average(matrix<Complex>& Gave, bool spin_down) = 0;
+  virtual double average_from_GF(matrix<Complex>& Gave, bool spin_down) = 0;
   virtual shared_ptr<HS_Hermitian_operator> build_HS_operator(sector sec, bool complex_Hilbert_space) = 0;
   virtual string type() = 0;
   virtual vector<matrix_element<Complex>> matrix_elements() = 0;

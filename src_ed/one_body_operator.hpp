@@ -27,7 +27,7 @@ struct one_body_operator : Hermitian_operator
   void set_target(vector<bool> &in_bath);
   void set_hopping_matrix(double value, matrix<double>& tc, bool spin_down, int sys_mixing);
   void set_hopping_matrix(double value, matrix<Complex>& tc, bool spin_down, int sys_mixing);
-  double uncorrelated_average(matrix<Complex>& Gave, bool spin_down);
+  double average_from_GF(matrix<Complex>& Gave, bool spin_down);
  
   shared_ptr<HS_Hermitian_operator> build_HS_operator(sector sec, bool complex_HS_op);
   void print(ostream& fout);
@@ -417,14 +417,26 @@ void one_body_operator<op_field>::set_hopping_matrix_templ(double value, matrix<
 
 
 template<typename op_field>
-double one_body_operator<op_field>::uncorrelated_average(matrix<Complex>& Gave, bool spin_down)
+double one_body_operator<op_field>::average_from_GF(matrix<Complex>& Gave, bool spin_down)
 {
   matrix<Complex> Efull(Gave.r);
   matrix<op_field>& EE = E;
   if(spin_down) EE = E_down;
   int d = Gave.c - EE.c;
-  if (target != 1) return(0.0);
-  EE.move_sub_matrix(EE.r,EE.c,0,0,0,0,Efull);
+
+  switch(target){
+    case 1:
+      EE.move_sub_matrix(EE.r,EE.c,0,0,0,0,Efull);
+      break;
+    case 2:
+      EE.move_sub_matrix(EE.r,EE.c,0,0,d,d,Efull);
+      break;
+    case 3:
+      EE.move_sub_matrix(EE.r,EE.c,0,0,0,d,Efull);
+      EE.move_sub_matrix_HC(EE.r,EE.c,0,0,d,0,Efull);
+      break;
+  }
+
   Complex z = Gave.trace_product(Efull, true);
   return real(z);
 }
