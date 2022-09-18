@@ -59,6 +59,16 @@ class variable_parameter:
             print('<{:s}> = {:1.3g},  {:s} --> {:1.3g}, diff = {:1.3g}'.format(self.obs, self.ave, self.param, P, self.diff))
 
 
+    def compute_obs(self):
+        """Computes the observable
+        """
+
+        if not self.lattice:
+            self.ave = pyqcm.cluster_averages()[self.obs][0]
+        else:
+            self.ave = pyqcm.averages()[self.obs]
+        
+
     def converged(self):
         """Tests whether the self-consistent procedure has converged
 
@@ -77,46 +87,82 @@ class variable_parameter:
 
 
 ################################################################################
-def variable_parameter_self_consistency(F, var_params, maxiter=10, eps_algo=0, file='hartree.tsv'):
-	"""Performs the Hartree approximation
+def variable_parameter_self_consistency(F, var_params, maxiter=10, file='var_param.tsv'):
+    """Performs a task with parameters that depend on an observable (like density) and self-consistently
+    finds the correct value of the parameters that is self-consistent with the observable
 
-	:param F: task to perform within the loop
-	:param [class variable_parameter] var_params: list of variable_parameters (or single variable_parameters)
-	:param int maxiter: maximum number of iterations in the self-consistent procedure
+    :param F: task to perform within the loop
+    :param [class variable_parameter] var_params: list of variable_parameters (or single variable_parameters)
+    :param int maxiter: maximum number of iterations in the self-consistent procedure
 
-	"""
+    """
 
-	global first_time
+    global first_time
 
-	if type(var_params) is not list:
-		var_params = [var_params]
+    if type(var_params) is not list:
+        var_params = [var_params]
 
-	pyqcm.banner('Variable parameter self-consistency', c='*', skip=1)
-	SC_converged = False
-	diff_tot = 1e6
+    pyqcm.banner('Variable parameter self-consistency', c='*', skip=1)
+    SC_converged = False
+    diff_tot = 1e6
 
-	iter = 0
-	while True:
-		pyqcm.new_model_instance()
-		F()
-		iter += 1
-		pyqcm.banner('self-consistent iteration {:d}'.format(iter), '-')
-		diff_tot = 0
-		SC_converged = True
-		for i,C in enumerate(var_params):
-			C.update(pr=True)
-			diff_tot += np.abs(C.diff)
-			SC_converged = SC_converged and C.converged()
+    iter = 0
+    while True:
+        pyqcm.new_model_instance()
+        F()
+        iter += 1
+        pyqcm.banner('self-consistent iteration {:d}'.format(iter), '-')
+        diff_tot = 0
+        SC_converged = True
+        for i,C in enumerate(var_params):
+            C.update(pr=True)
+            diff_tot += np.abs(C.diff)
+            SC_converged = SC_converged and C.converged()
 
-		print('total difference = {:g}'.format(diff_tot))
+        print('total difference = {:g}'.format(diff_tot))
 
-		if SC_converged:
-			pyqcm.write_summary(file)
-			first_time = False
-			break
+        if SC_converged:
+            pyqcm.write_summary(file)
+            first_time = False
+            break
 
-		if iter > maxiter :
-			raise RuntimeError('Maximum number of iterations exceeded in self-consistency for variable parameters! Aborting...')
+        if iter > maxiter :
+            raise RuntimeError('Maximum number of iterations exceeded in self-consistency for variable parameters! Aborting...')
 
-	pyqcm.banner('Variable parameter procedure has converged', c='*')
-	
+    pyqcm.banner('Variable parameter procedure has converged', c='*')
+    
+
+################################################################################
+def variable_parameter_search(F, var_param, bracket, file='var_param.tsv'):
+    """Performs a root search (Brent algorithm) to find the correct value of the variable parameter
+    that matches the observable
+
+    :param F: task to perform within the loop
+    :param class variable_parameter var_param: variable_parameter
+    :param [float] bracket: list of two values of var_param that bracket the solution
+
+    """
+
+    from scipy.optimize import brentq
+    global first_time
+
+    pyqcm.banner('Variable parameter search (Brent method)', c='*', skip=1)
+
+    def G(x):
+        pyqcm.set_parameter(var_param.param, x)
+        pyqcm.new_model_instance()
+        var_param.compute_obs()
+        return x - var_param.F(var_param.ave)
+
+    x0, r = brentq(G, bracket[0], bracket[1], xtol=var_param.accur, maxiter=100, full_output=True, disp=True)
+
+    print(r.flag)
+    if not r.converged:
+        raise RuntimeError('the root finding routine could not find a solution!')
+    else:
+        pyqcm.write_summary(file)
+        first_time = False
+        pyqcm.banner('Variable parameter procedure has converged to {:s} = {:4g}'.format(var_param.param, x0), c='*')
+        pyqcm.set_parameter(var_param.param, x0)
+        pyqcm.new_model_instance()
+    
