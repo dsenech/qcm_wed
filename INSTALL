@@ -3,7 +3,12 @@
 ## Defaut installation using pip
 
 This is the easiest installation of PyQCM suitable for all user.
-It build the PyQCM library and download dependencies automatically using default system compiler and library.
+It builds the PyQCM library and download runtime dependencies automatically using default system compiler and library.
+
+0. Install build system CMake (may change depending of your system):
+```
+sudo apt install cmake #for Ubuntu
+```
 
 1. Open a terminal and clone PyQCM Git repository:
 
@@ -73,7 +78,7 @@ CUBA configure step (2):
 QCM configure step (3) with CMake:
 
 ```
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1 -DCMAKE_CXX_COMPILER=`which icc` -DBLA_VENDOR=Intel10_64lp_seq -DCMAKE_INCLUDE_PATH=${MKLLROOT}/lib/intel64_lin/
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.2 -DCMAKE_CXX_COMPILER=`which icc` -DBLA_VENDOR=Intel10_64lp_seq -DCMAKE_INCLUDE_PATH=${MKLLROOT}/lib/intel64_lin/
 ```
 
 ### Compilation with FlexiBLAS
@@ -81,8 +86,8 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1 -DCMAKE_CXX_COMPILE
 QCM configure step (3) with CMake 3.21.4: 
 
 ```
-module load cmake/3.21.4 flexiblas
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.1 -DBLA_VENDOR=FlexiBLAS
+module load cmake/3.21.4 flexiblas/3.0.4 scipy-stack
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCUBA_DIR=../CUBA-4.2.2 -DBLA_VENDOR=FlexiBLAS
 ```
 
 

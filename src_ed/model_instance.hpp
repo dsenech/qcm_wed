@@ -4,14 +4,18 @@
 #include <fstream>
 #include <memory>
 #include "model_instance_base.hpp"
-#include "Hamiltonian.hpp"
 #include "Q_matrix_set.hpp"
 #include "continued_fraction_set.hpp"
 #include "ED_basis.hpp"
 #include "binary_state.hpp"
 
-extern double max_gap;
+#include "Hamiltonian/Hamiltonian_base.hpp"
+#include "Hamiltonian/Hamiltonian_Dense.hpp"
+#include "Hamiltonian/Hamiltonian_CSR.hpp"
+#include "Hamiltonian/Hamiltonian_OnTheFly.hpp"
+#include "Hamiltonian/Hamiltonian_Factorized.hpp"
 
+extern double max_gap;
 
 void polynomial_fit(
   vector<double> &xa, //!< array of abcissas
@@ -43,6 +47,11 @@ struct model_instance : model_instance_base
   set<shared_ptr<state<HilbertField>>> states; //!< set of states forming the density matrix
 
   model_instance(size_t _label, shared_ptr<model> _the_model, const map<string,double> _value, const string &_sectors);
+  Hamiltonian<HilbertField> create_hamiltonian(
+    shared_ptr<model> the_model,
+    const map<string, double> &value, 
+    sector s
+  );
 
   void build_cf(state<HilbertField> &Omega, bool spin_down);
   void build_qmatrix(state<HilbertField> &Omega, bool spin_down);
@@ -156,6 +165,39 @@ void model_instance<HilbertField>::clear_states(){
 }
 
 
+/**
+ Create Hamiltonian in the right format
+ */
+template<typename HilbertField>
+Hamiltonian<HilbertField> model_instance<HilbertField>::create_hamiltonian(
+    shared_ptr<model> the_model,
+    const map<string, double> &value, 
+    sector s
+) {
+    Hamiltonian<HilbertField> H;
+    //enforced Hamiltonian format
+    if(the_model->is_factorized) {
+        H = Hamiltonian_Factorized<HilbertField>(the_model, value, s);
+    }
+    else if (the_model->provide_basis(s)->dim < global_int("max_dim_full")) {
+        H = Hamiltonian_Dense<HilbertField>(the_model, value, s);
+    }
+    else {
+        switch(Hamiltonian_format) {
+            case H_format_csr:
+                H = Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                break;
+            case H_format_dense:
+                H = Hamiltonian_Dense<HilbertField>(the_model, value, s);
+                break;
+            case H_format_onthefly:
+                H = Hamiltonian_OnTheFly<HilbertField>(the_model, value, s);
+                break;
+        }
+    }
+    return H;
+}
+
 
 /**
  Computes the low-energy states
@@ -189,7 +231,7 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
   
   for(auto& s:sector_set){
     the_model->build_HS_operators(s, is_complex);
-    Hamiltonian<HilbertField> H(the_model, value, s);
+    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, s);
     if(H.dim == 0) continue;
     
     vector<shared_ptr<state<HilbertField>>> gs = H.states(GS_energy); // finds the low-energy states for this sector and adds them to the list
@@ -553,7 +595,7 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     }
     if(skip_sector) continue;
     // Assembling the Hamiltonian and Band Lanczos procedure
-    Hamiltonian<HilbertField> H(the_model, value, target_sec);
+    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, target_sec);
     if(H.dim==0) continue;
     
     Q_matrix<HilbertField> Qtmp;
@@ -625,7 +667,7 @@ vector<Complex> model_instance<HilbertField>::susceptibility(shared_ptr<Hermitia
   vector<Complex> chi(w.size(),0.0);
   
   for(auto& sec : sector_set){
-    Hamiltonian<HilbertField> H(the_model, value, sec);
+    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, sec);
     if(H.dim==0) continue;
     for(auto& gs : states){
       if(gs->sec != sec) continue;
@@ -663,7 +705,7 @@ vector<pair<double,double>> model_instance<HilbertField>::susceptibility_poles(s
   chi.reserve(20);
   
   for(auto& sec : sector_set){
-    Hamiltonian<HilbertField> H(the_model, value, sec);
+    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, sec);
     if(H.dim==0) continue;
     for(auto& gs : states){
       if(gs->sec != sec) continue;

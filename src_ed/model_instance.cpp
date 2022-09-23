@@ -42,7 +42,7 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
       if(!the_model->group->sector_is_valid(target_sec)) continue; // target sector is null
       
       // Assembling the Hamiltonian
-      Hamiltonian<double> H(the_model, value, target_sec);       
+      Hamiltonian<double> H = create_hamiltonian(the_model, value, target_sec);       
       vector<symmetric_orbital>& sorb = sym_orb[r];
       if(H.B->dim==0) continue;
       
@@ -104,10 +104,6 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
 }
 
 
-
-
-
-
 template<>
 void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
 {
@@ -125,7 +121,7 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
       if(!the_model->group->sector_is_valid(target_sec)) continue; // target sector is null
       
       // Assembling the Hamiltonian
-      Hamiltonian<Complex> H(the_model, value, target_sec);
+      Hamiltonian<Complex> H = create_hamiltonian(the_model, value, target_sec);
       if(H.B->dim==0) continue;
       
       vector<symmetric_orbital>& sorb = sym_orb[r];
