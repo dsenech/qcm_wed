@@ -808,7 +808,7 @@ pair<double, string> model_instance<HilbertField>::one_body_solve()
 
   }
 
-/*
+
   // Nambu correction to the ground state energy
   double nambu_corr = 0.0;
   if(mixing == HS_mixing::anomalous){
@@ -824,7 +824,7 @@ pair<double, string> model_instance<HilbertField>::one_body_solve()
   else if(mixing == HS_mixing::full) GS_energy *= 0.5;
   S->energy = GS_energy;
   S->weight = 1.0;
-  */
+  
   states.insert(S);
   gf_solved = true;
   gs_solved = true;
