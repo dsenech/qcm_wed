@@ -6,7 +6,6 @@ import model_1D_2_4b
 np.set_printoptions(precision=4, linewidth=512, suppress=True)
 
 sec = 'R0:N6:S0'
-set_global_parameter('verbose',0)
 set_target_sectors([sec])
 
 set_parameters("""
@@ -19,7 +18,7 @@ set_parameters("""
     eb2_1=-1
 """)
 
-# pyqcm.solver='dvmc'
+pyqcm.solver='dvmc'
 pyqcm.new_model_instance()
 obs_mu = observable('mu_1', 1e-4, 4)
 obs_t = observable('t_1', 1e-4, 4)

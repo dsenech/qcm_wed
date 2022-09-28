@@ -432,7 +432,7 @@ def gap(k, band = 1, threshold=1e-3):
 
 
 ################################################################################
-def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=None, file=None, plt_ax=None, **kwargs):
+def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=None, file=None, data_file='dos.tsv', plt_ax=None, **kwargs):
     """Plots the density of states (DoS) as a function of frequency
 
     :param float wmax: the frequency range is from -wmax to wmax if w is a float. If wmax is a tuple then the range is (wmax[0], wmax[1]). wmax can also be an explicit list of real frequencies
@@ -483,7 +483,7 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
         head += 'up_{:d}\tdown_{:d}\t'.format(i+1, i+1)
     for i in range(d//2):
         head += 'cumul_up_{:d}\tcumul_down_{:d}\t'.format(i+1, i+1)
-    np.savetxt('dos.tsv', np.hstack((np.reshape(np.real(w), (nw, 1)), A, accum)), header=head, delimiter='\t', fmt='%1.6g', comments='')
+    np.savetxt(data_file, np.hstack((np.reshape(np.real(w), (nw, 1)), A, accum)), header=head, delimiter='\t', fmt='%1.6g', comments='')
     print('DoS totals: ', total)
     mix = pyqcm.mixing()
 
