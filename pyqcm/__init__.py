@@ -39,6 +39,11 @@ np.set_printoptions(precision=6, linewidth=200, suppress=True, sign=' ')
 ################################################################################
 # GLOBAL MODULE VARIABLES
 solver = 'ED'
+
+# special wavevectors
+wavevector_M = (2/3)*np.array([1,0,0])
+wavevector_K = (2/3)*np.array([1,1/np.sqrt(3),0])
+
 ################################################################################
 # EXCEPTIONS
 

@@ -151,6 +151,7 @@ def variable_parameter_search(F, var_param, bracket, file='var_param.tsv'):
     def G(x):
         pyqcm.set_parameter(var_param.param, x)
         pyqcm.new_model_instance()
+        F()
         var_param.compute_obs()
         return x - var_param.F(var_param.ave)
 

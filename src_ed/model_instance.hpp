@@ -980,7 +980,10 @@ pair<vector<double>, vector<complex<double>>> model_instance<HilbertField>::qmat
 {
   if(GF_solver != GF_format_BL) qcm_ED_throw("Green function format is not Lehmann! Cannot output the Q matrix.");
   if(!gf_solved) Green_function_solve();
-  if(states.size() > 1)  qcm_ED_throw("The ground state is not a pure state! Cannot output the Q matrix.");
+  if(states.size() > 1){
+    for(auto& s : states) cout << s->sec << '\t' << s->weight << endl;
+    qcm_ED_throw("The ground state is not a pure state! ("+to_string(states.size())+" states). Cannot output the Q matrix.");
+  }
   shared_ptr<Green_function_set> gf;
   if(spin_down) gf = (*states.begin())->gf_down;
   else gf = (*states.begin())->gf;
