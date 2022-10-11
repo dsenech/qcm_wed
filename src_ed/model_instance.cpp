@@ -42,9 +42,9 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
       if(!the_model->group->sector_is_valid(target_sec)) continue; // target sector is null
       
       // Assembling the Hamiltonian
-      Hamiltonian<double> H = create_hamiltonian(the_model, value, target_sec);       
+      Hamiltonian<double>* H = create_hamiltonian(the_model, value, target_sec);       
       vector<symmetric_orbital>& sorb = sym_orb[r];
-      if(H.B->dim==0) continue;
+      if(H->B->dim==0) continue;
       
       // building the list of pairs
       vector<pair<size_t,size_t> > sorb_pair;
@@ -60,7 +60,7 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
       for(size_t s=0; s< sorb_pair.size(); s++){ // double loop over symmetric operators
         size_t o1 = sorb_pair[s].first;
         size_t o2 = sorb_pair[s].second;
-        vector<double> psi(H.B->dim);
+        vector<double> psi(H->B->dim);
         double norm;
         
         if(global_bool("verb_ED")) cout << "element " << sorb[o1].str() << " , " << sorb[o2].str() << endl;
@@ -79,7 +79,7 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
           psi *= 1.0/sqrt(norm);
           
           // tridiagonalisation and calculation of the projection
-          pair<vector<double>, vector<double>> V = LanczosGreen(H, psi);
+          pair<vector<double>, vector<double>> V = LanczosGreen(*H, psi);
           continued_fraction cont_fraction(V.first, V.second, Omega.energy, norm*Omega.weight, pm==1);
           if(pm == 1){
             cf->e[r](o1,o2) = cont_fraction;
@@ -121,8 +121,8 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
       if(!the_model->group->sector_is_valid(target_sec)) continue; // target sector is null
       
       // Assembling the Hamiltonian
-      Hamiltonian<Complex> H = create_hamiltonian(the_model, value, target_sec);
-      if(H.B->dim==0) continue;
+      Hamiltonian<Complex> *H = create_hamiltonian(the_model, value, target_sec);
+      if(H->B->dim==0) continue;
       
       vector<symmetric_orbital>& sorb = sym_orb[r];
       
@@ -140,7 +140,7 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
       for(size_t s=0; s< sorb_pair.size(); s++){ // double loop over symmetric operators
         size_t o1 = sorb_pair[s].first;
         size_t o2 = sorb_pair[s].second;
-        vector<Complex> psi(H.B->dim);
+        vector<Complex> psi(H->B->dim);
         double norm;
         
         if(global_bool("verb_ED")) cout << "element " << sorb[o1].str() << " , " << sorb[o2].str() << endl;
@@ -163,7 +163,7 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
           psi *= 1.0/sqrt(norm);
           
           // tridiagonalisation and calculation of the projection
-          pair<vector<double>, vector<double>> V = LanczosGreen(H, psi);
+          pair<vector<double>, vector<double>> V = LanczosGreen(*H, psi);
           continued_fraction cont_fraction(V.first, V.second, Omega.energy,norm*Omega.weight,pm==1);
           if(pm == 1){
             cf->e[r](o1,o2) = cont_fraction;

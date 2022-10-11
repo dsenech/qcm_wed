@@ -42,7 +42,7 @@ class Hamiltonian
         virtual void print(ostream& fout) {};
         //virtual matrix<HilbertField> to_dense();
         
-        Q_matrix<HilbertField> build_Q_matrix(vector<vector<HilbertField>> &phi) {
+        virtual Q_matrix<HilbertField> build_Q_matrix(vector<vector<HilbertField>> &phi) {
             return Q_matrix<HilbertField>(0,0);
         };
         

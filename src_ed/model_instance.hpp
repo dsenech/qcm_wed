@@ -47,7 +47,7 @@ struct model_instance : model_instance_base
   set<shared_ptr<state<HilbertField>>> states; //!< set of states forming the density matrix
 
   model_instance(size_t _label, shared_ptr<model> _the_model, const map<string,double> _value, const string &_sectors);
-  Hamiltonian<HilbertField> create_hamiltonian(
+  Hamiltonian<HilbertField>* create_hamiltonian(
     shared_ptr<model> the_model,
     const map<string, double> &value, 
     sector s
@@ -169,29 +169,34 @@ void model_instance<HilbertField>::clear_states(){
  Create Hamiltonian in the right format
  */
 template<typename HilbertField>
-Hamiltonian<HilbertField> model_instance<HilbertField>::create_hamiltonian(
+Hamiltonian<HilbertField>* model_instance<HilbertField>::create_hamiltonian(
     shared_ptr<model> the_model,
     const map<string, double> &value, 
     sector s
 ) {
-    Hamiltonian<HilbertField> H;
+    Hamiltonian<HilbertField> *H;
     //enforced Hamiltonian format
     if(the_model->is_factorized) {
-        H = Hamiltonian_Factorized<HilbertField>(the_model, value, s);
+        H = new Hamiltonian_Factorized<HilbertField>(the_model, value, s);
+        //std::cout << "Hamiltonian Factorized" << std::endl;
     }
     else if (the_model->provide_basis(s)->dim < global_int("max_dim_full")) {
-        H = Hamiltonian_Dense<HilbertField>(the_model, value, s);
+        H = new Hamiltonian_Dense<HilbertField>(the_model, value, s);
+        //std::cout << "Hamiltonian Dense1" << std::endl;
     }
     else {
         switch(Hamiltonian_format) {
             case H_format_csr:
-                H = Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                H = new Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian CSR" << std::endl;
                 break;
             case H_format_dense:
-                H = Hamiltonian_Dense<HilbertField>(the_model, value, s);
+                H = new Hamiltonian_Dense<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian DENSe2" << std::endl;
                 break;
             case H_format_onthefly:
-                H = Hamiltonian_OnTheFly<HilbertField>(the_model, value, s);
+                H = new Hamiltonian_OnTheFly<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian OTF" << std::endl;
                 break;
         }
     }
@@ -231,10 +236,10 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
   
   for(auto& s:sector_set){
     the_model->build_HS_operators(s, is_complex);
-    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, s);
-    if(H.dim == 0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, s);
+    if(H->dim == 0) continue;
     
-    vector<shared_ptr<state<HilbertField>>> gs = H.states(GS_energy); // finds the low-energy states for this sector and adds them to the list
+    vector<shared_ptr<state<HilbertField>>> gs = H->states(GS_energy); // finds the low-energy states for this sector and adds them to the list
     for(auto& x : gs) states.insert(x);
   }
   
@@ -353,7 +358,7 @@ void model_instance<HilbertField>::set_hopping_matrix(bool spin_down)
     }
   }
 
-	if(spin_down == false) SEF_bath = 0.0;
+  if(spin_down == false) SEF_bath = 0.0;
 	
   // diagonalize the bath
   if(the_model->n_bath){
@@ -375,13 +380,13 @@ void model_instance<HilbertField>::set_hopping_matrix(bool spin_down)
       my_tcb.product(tcb_tmp,Sb);
     }
 		
-		// contribution of the  bath to the Potthoff functional
-		for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
-		if(mixing&HS_mixing::up_down and spin_down){
-			for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
-		}
-		else if(mixing==HS_mixing::normal) SEF_bath *= 2.0;
-	}
+    // contribution of the  bath to the Potthoff functional
+    for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
+    if(mixing&HS_mixing::up_down and spin_down){
+      for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
+    }
+    else if(mixing==HS_mixing::normal) SEF_bath *= 2.0;
+  }
   if((mixing & HS_mixing::up_down) and spin_down == false) set_hopping_matrix(true);
   hopping_solved = true;
 }
@@ -431,10 +436,10 @@ void model_instance<HilbertField>::Green_function_solve()
   if(gf_solved or gf_read) return;
   if(!is_correlated){
     one_body_solve();
-  	gf_solved = true;
+    gf_solved = true;
     return;
   }
-	if(!gs_solved) low_energy_states();
+  if(!gs_solved) low_energy_states();
   
   if(global_bool("verb_ED")) cout << "GF solver for cluster instance " << full_name() << endl;
 
@@ -450,7 +455,7 @@ void model_instance<HilbertField>::Green_function_solve()
       else build_qmatrix(*x,true);
     }
   }
-	gf_solved = true;
+  gf_solved = true;
 }
 
 
@@ -595,11 +600,11 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     }
     if(skip_sector) continue;
     // Assembling the Hamiltonian and Band Lanczos procedure
-    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, target_sec);
-    if(H.dim==0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, target_sec);
+    if(H->dim==0) continue;
     
     Q_matrix<HilbertField> Qtmp;
-    Qtmp = H.build_Q_matrix(phi);
+    Qtmp = H->build_Q_matrix(phi);
     
     Qtmp.e -= Omega.energy; // adjust the eigenvalues by adding/subtracting the GS energy
     if(pm == -1){
@@ -667,14 +672,14 @@ vector<Complex> model_instance<HilbertField>::susceptibility(shared_ptr<Hermitia
   vector<Complex> chi(w.size(),0.0);
   
   for(auto& sec : sector_set){
-    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, sec);
-    if(H.dim==0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, sec);
+    if(H->dim==0) continue;
     for(auto& gs : states){
       if(gs->sec != sec) continue;
       vector<vector<HilbertField>> b(1);
-      b[0].resize(H.dim);
+      b[0].resize(H->dim);
       h->HS_operator.at(sec)->multiply_add(gs->psi, b[0], 1.0);
-      Q_matrix<HilbertField> Q = H.build_Q_matrix(b);
+      Q_matrix<HilbertField> Q = H->build_Q_matrix(b);
       Q.e -= gs->energy; 	// adjust the eigenvalues by subtracting the GS energy
       matrix<Complex> g(1);
       for(size_t j=0; j<w.size(); j++){
@@ -705,14 +710,14 @@ vector<pair<double,double>> model_instance<HilbertField>::susceptibility_poles(s
   chi.reserve(20);
   
   for(auto& sec : sector_set){
-    Hamiltonian<HilbertField> H = create_hamiltonian(the_model, value, sec);
-    if(H.dim==0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, sec);
+    if(H->dim==0) continue;
     for(auto& gs : states){
       if(gs->sec != sec) continue;
       vector<vector<HilbertField>> b(1);
-      b[0].resize(H.dim);
+      b[0].resize(H->dim);
       h->HS_operator.at(sec)->multiply_add(gs->psi, b[0], 1.0);
-      Q_matrix<HilbertField> Q = H.build_Q_matrix(b);
+      Q_matrix<HilbertField> Q = H->build_Q_matrix(b);
       Q.e -= gs->energy; 	// adjust the eigenvalues by subtracting the GS energy
       for(size_t i = 0; i<Q.M; i++){
         if(Q.e[i] < 1e-8) continue;
