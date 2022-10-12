@@ -14,6 +14,7 @@
 #include "Hamiltonian/Hamiltonian_CSR.hpp"
 #include "Hamiltonian/Hamiltonian_OnTheFly.hpp"
 #include "Hamiltonian/Hamiltonian_Factorized.hpp"
+#include "Hamiltonian/Hamiltonian_Operator.hpp"
 
 extern double max_gap;
 
@@ -174,7 +175,7 @@ Hamiltonian<HilbertField>* model_instance<HilbertField>::create_hamiltonian(
     const map<string, double> &value, 
     sector s
 ) {
-    Hamiltonian<HilbertField> *H;
+    Hamiltonian<HilbertField> *H = nullptr;
     //enforced Hamiltonian format
     if(the_model->is_factorized) {
         H = new Hamiltonian_Factorized<HilbertField>(the_model, value, s);
@@ -196,6 +197,10 @@ Hamiltonian<HilbertField>* model_instance<HilbertField>::create_hamiltonian(
                 break;
             case H_format_onthefly:
                 H = new Hamiltonian_OnTheFly<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian OTF" << std::endl;
+                break;
+            case H_format_ops:
+                H = new Hamiltonian_Operator<HilbertField>(the_model, value, s);
                 //std::cout << "Hamiltonian OTF" << std::endl;
                 break;
         }
@@ -241,6 +246,7 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
     
     vector<shared_ptr<state<HilbertField>>> gs = H->states(GS_energy); // finds the low-energy states for this sector and adds them to the list
     for(auto& x : gs) states.insert(x);
+    delete H;
   }
   
   compute_weights();
@@ -606,6 +612,9 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     Q_matrix<HilbertField> Qtmp;
     Qtmp = H->build_Q_matrix(phi);
     
+    delete H; //delete Hamiltonian to prevent memory leak
+    H = nullptr;
+    
     Qtmp.e -= Omega.energy; // adjust the eigenvalues by adding/subtracting the GS energy
     if(pm == -1){
       Qtmp.e *= -1.0;
@@ -690,6 +699,7 @@ vector<Complex> model_instance<HilbertField>::susceptibility(shared_ptr<Hermitia
         chi[j] += gs->weight*g(0,0);
       }
     }
+    delete H; H=nullptr;
   }
   return chi;
 }
@@ -726,6 +736,7 @@ vector<pair<double,double>> model_instance<HilbertField>::susceptibility_poles(s
         if(r > 1e-6) chi.push_back({Q.e[i],r});
       }
     }
+    delete H; H=nullptr;
   }
   // consolidation
   vector<pair<double,double>> chi2;
@@ -946,13 +957,9 @@ template<typename HilbertField>
 string model_instance<HilbertField>::GS_string() const
 {
   ostringstream sout;
-  map<sector, double> weight;
   for(auto& s : states){
-    weight[s->sec] += s->weight;
-  }
-  for(auto& s : weight){
-    if(s.second < 0.001) continue;
-    sout << s.first << ':' << setprecision(3) << s.second << '/';
+    if(s->weight < 0.001) continue;
+    sout << s->sec << ':' << setprecision(3) << s->weight  << '/';
   }
   string out = sout.str();
   out.pop_back();

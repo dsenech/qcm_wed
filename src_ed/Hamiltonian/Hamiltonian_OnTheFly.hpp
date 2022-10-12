@@ -18,6 +18,7 @@ class Hamiltonian_OnTheFly: public Hamiltonian<HilbertField>
             const map<string, double> &value,
             sector _sec
         );
+        void mult_add(vector<HilbertField> &x, vector<HilbertField> &y);
     
     private:
     
@@ -42,11 +43,26 @@ Hamiltonian_OnTheFly<HilbertField>::Hamiltonian_OnTheFly(
     ops_map(value);
 }
 
-//mult_add
+
+/**
+ Applies the Hamiltonian: y = y +H.x
+ @param y vector to which H.x is added to
+ @param x input vector
+ */
+template<typename HilbertField>
+void Hamiltonian_OnTheFly<HilbertField>::mult_add(vector<HilbertField> &x, vector<HilbertField> &y)
+{
+    for(auto& h : ops){
+        h.first->multiply_add_OTF(x, y, h.second, this->B);
+    }
+    return;
+}
+
 //GS_energy
 //states
 //print
 //to_dense
+
 
 /**
  returns a map of Hermitian operators to value
@@ -54,11 +70,10 @@ Hamiltonian_OnTheFly<HilbertField>::Hamiltonian_OnTheFly(
 template<typename HilbertField>
 void Hamiltonian_OnTheFly<HilbertField>::ops_map(const map<string, double> &value)
 {
-  map<shared_ptr<Hermitian_operator>, double> ops;
-  for(auto& x : value){
-    ops[this->the_model->term.at(x.first)] = value.at(x.first);
-  }
-  return;
+    for(auto& x : value){
+      ops[this->the_model->term.at(x.first)] = value.at(x.first);
+    }
+    return;
 }
 
 #endif

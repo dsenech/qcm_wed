@@ -42,9 +42,7 @@ class Hamiltonian
         virtual void print(ostream& fout) {};
         //virtual matrix<HilbertField> to_dense();
         
-        virtual Q_matrix<HilbertField> build_Q_matrix(vector<vector<HilbertField>> &phi) {
-            return Q_matrix<HilbertField>(0,0);
-        };
+        virtual Q_matrix<HilbertField> build_Q_matrix(vector<vector<HilbertField>> &phi);
         
     
     private:
@@ -121,6 +119,39 @@ vector<shared_ptr<state<HilbertField>>> Hamiltonian<HilbertField>::states(double
         low_energy_states.push_back(gs);
     }
     return low_energy_states;
+}
+
+
+/**
+ Constructs the Q_matrix (Lehmann representation) from the Band Lanczos method,
+ or full diagonalization if the dimension is small enough.
+ @param phi the initial vectors
+ */
+template<typename HilbertField>
+Q_matrix<HilbertField> Hamiltonian<HilbertField>::build_Q_matrix(
+    vector<vector<HilbertField>> &phi
+) {
+    if(this->dim == 0 or phi.size()==0){
+        return Q_matrix<HilbertField>(0,0);
+    }
+  
+    int max_banditer = (int)(14*phi.size()*log(1.0*this->dim));
+    int M = max_banditer; // essai
+    assert(M>1);
+
+    vector<double> eval; // eigenvalues of the reduced Hamiltonian
+    matrix<HilbertField> U;  // eigenvectors of the reduced Hamiltonian
+    matrix<HilbertField> P; // matrix of inner products <b[i]|v[j]>
+  
+    if(BandLanczos(*this, phi, eval, U, P, M,  global_bool("verb_ED"))){
+        Q_matrix<HilbertField> Q(phi.size(),M);
+        if(Q.M > 0) {
+            Q.e = eval; 
+            Q.v.product(P,U,phi.size()); //  tempo
+        }
+        return Q;
+    }
+    else return Q_matrix<HilbertField>(phi.size(),0);
 }
 
 
