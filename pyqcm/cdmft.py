@@ -27,8 +27,10 @@ nclus = 0
 nmixed = 1
 _mixing = 0
 clusters = None
-maxfev = 500000
-
+maxfev = 5000000
+E0_VMC = 0.0
+E0_err_VMC = 0.0
+min_iter_E0 = 5
 
 ################################################################################
 # PRIVATE FUNCTIONS
@@ -285,6 +287,7 @@ def cdmft(
     accur=1e-3, 
     accur_hybrid=1e-4, 
     accur_dist=1e-10,
+    accur_E0=1e-10,
     alpha = 0.0,
     displaymin=False, 
     method='Nelder-Mead', 
@@ -298,7 +301,8 @@ def cdmft(
     counterterms=None, 
     SEF=False, 
     observables=None,
-    verb=False
+    verb=False,
+    max_function_eval = 5000000
 ):
     """Performs the CDMFT procedure
 
@@ -311,6 +315,7 @@ def cdmft(
     :param float accur: the procedure converges if parameters do not change by more than accur
     :param float accur_hybrid: the procedure converges on the hybridization function with this accuracy
     :param float accur_dist: convergence criterion when minimizing the distance function.
+    :param float accur_E0: convergence criterion on the impurity ground state energy.
     :param float alpha: damping parameter (fraction of the previous iteration in the new one) OR (float,int) with number of iterations where damping is used (at the beginning if positive, at the end if negative)
     :param boolean displaymin: displays the minimum distance function when minimized
     :param str method: method to use, as used in scipy.optimize.minimize()
@@ -325,11 +330,13 @@ def cdmft(
     :param boolean SEF: if True, computes the Potthoff functional at the end
     :param [class observable]: list of observables used to assess convergence
     :param boolean verb: If True, prints debugging information
+    :param int max_function_eval: maximum number of distance function evaluations when minimizing distance
     :returns: None
 
     """
-    global w, wr, weight, var, _mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down
+    global w, wr, weight, var, _mixing, first_time, first_time2, Gdim, nclus, nmixed, clusters, maxfev, Hyb, Hyb_down, E0_VMC, E0_err_VMC, min_iter_E0
 
+    maxfev = max_function_eval
     if type(hartree) is not list and hartree is not None:
         hartree = [hartree] # quick fix to protect against hartree=`obj` behavior
 
@@ -381,6 +388,12 @@ def cdmft(
     # counterterms
     CT_converged = True
     
+    # storing the GS energy and error (the error is relevant for the DVMC solver)
+    E0 = np.zeros(maxiter)
+    E0_err = np.ones(maxiter)
+    moving_ave = np.zeros(maxiter)
+
+
     # convergence criterion in the bath parameters
     superiter = 0
     diff_hartree = 0.0
@@ -403,6 +416,7 @@ def cdmft(
     # CDMFT loop
     converged = False
     diffH=1e6
+    diff_E0 = 0.0
     time_ED = 0.0
     time_MIN = 0.0
     while True:
@@ -414,6 +428,31 @@ def cdmft(
             params_array[i] = params[var[i]]
         var_data[:, superiter] = params_array
         __check_bounds(params_array, 1000.0, v=var)
+
+
+        # check convergence in the DVMC case
+        if pyqcm.solver == 'dvmc':
+            print('E0_VMC = ', E0_VMC, '\tE0_err_VMC = ', E0_err_VMC)
+            E0[superiter] = E0_VMC
+            E0_err[superiter] = E0_err_VMC
+        else:
+            gs = pyqcm.ground_state()
+            for x in gs:
+                E0[superiter] += x[0]
+        if superiter >= min_iter_E0-1:
+            moving_ave[superiter] = 0.0
+            tmp_norm = 0.0
+            for i in range(min_iter_E0):
+                tmp_norm += 1.0/E0_err[superiter-i]
+                moving_ave[superiter] += E0[superiter-i]/E0_err[superiter-i]
+            moving_ave[superiter] /= tmp_norm
+        if superiter >= min_iter_E0:
+            diff_E0 = np.abs(moving_ave[superiter]-moving_ave[superiter-1])
+            if diff_E0 < accur_E0:
+                converged = True
+                # print('moving averages of E0 : ', moving_ave[0:superiter+1])
+                pyqcm.banner('CDMFT converged on the ground state energy', '=')
+                break
 
         # initializes G_host
         t1 = timeit.default_timer()
@@ -464,7 +503,7 @@ def cdmft(
         initial_step = diff_param
         if superiter > 0:
             diffH = __diff_hybrid(Hyb, Hyb0)
-            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}, diff hybrid = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, diffH, iter_done, time_MIN/time_ED), flush=True)
+            print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}, diff hybrid = {: #.2e}, diff E0 = {: #.2g}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, diffH, diff_E0, iter_done, time_MIN/time_ED), flush=True)
         else:
             print('\nCDMFT iteration {:d}, distance = {: #.2e}, diff param = {: #.2e}\n{:d} minimization steps, time(MIN)/time(ED)={:.5f}'.format(superiter+1, dist_value, diff_param, iter_done, time_MIN/time_ED), flush=True)
 

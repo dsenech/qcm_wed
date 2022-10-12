@@ -1069,7 +1069,7 @@ static PyObject* parameter_set_python(PyObject *self, PyObject *args)
       string name;
       if(x.second->ref){
         name = x.second->ref->name;
-        if(x.second->ref->label) name += x.second->separator + to_string(x.second->ref->label);
+        // if(x.second->ref->label) name += x.second->separator + to_string(x.second->ref->label);
       }
       PyObject* elem = PyTuple_New(3);
       PyTuple_SetItem(elem, 0, Py_BuildValue("d", x.second->value));

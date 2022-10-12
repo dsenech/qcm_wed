@@ -134,8 +134,8 @@ pair<double, double> model_instance<HilbertField>::cluster_averages(shared_ptr<H
   if(value.find(h->name)==value.end()) qcm_ED_throw("operator "+h->name+" is not activated in instance "+to_string(label));
   double ave=0.0, var=0.0;
   if(!is_correlated or gf_read){
-    ave = h->uncorrelated_average(M,false);
-    if(mixing&HS_mixing::up_down) ave += h->uncorrelated_average(M_down,true);
+    ave = h->average_from_GF(M,false);
+    if(mixing&HS_mixing::up_down) ave += h->average_from_GF(M_down,true);
     if(mixing == HS_mixing::normal) ave *= 2.0;
     if(mixing == HS_mixing::anomalous) ave += h->nambu_correction;
     if(mixing == HS_mixing::full) {
@@ -157,7 +157,7 @@ pair<double, double> model_instance<HilbertField>::cluster_averages(shared_ptr<H
 
 
 /**
- erases all the states vectors in the density matrix
+ erases all the state vectors in the density matrix
  */
 template<typename HilbertField>
 void model_instance<HilbertField>::clear_states(){
@@ -215,20 +215,23 @@ Hamiltonian<HilbertField>* model_instance<HilbertField>::create_hamiltonian(
 template<typename HilbertField>
 pair<double, string> model_instance<HilbertField>::low_energy_states()
 {
+  if(gs_solved) return {GS_energy, GS_string()};
+  gs_solved = true;
   bool is_complex = (typeid(HilbertField) == typeid(Complex));
 
-  // if(!is_correlated or gf_read){ // doing this causes a bug if U=0, in move_submatrix...
-  if(gf_read){
+  if(!is_correlated) one_body_solve(); // computes also M, the average cluster GF
+
+  // computing the cluster averages in the cases "uncorrelated" and "read from file"
+  if(!is_correlated or gf_read){ // doing this causes a bug if U=0, in move_submatrix...
     averages.reserve(value.size());
     for(auto& x : value){
       auto X = cluster_averages(the_model->term.at(x.first));
       averages.push_back(tuple<string,double,double>(x.first, X.first, X.second));
     }
+    return {GS_energy, GS_string()};
   }
-  
-  if(gs_solved or gf_read) return {GS_energy, GS_string()};
-  if(!is_correlated) return one_body_solve();
 
+  // Now solving by ED
   // building a set of trial sectors according to the target sector;
   
   if(global_bool("verb_ED")) cout << "computing low-energy state for cluster instance " << full_name() << endl;
@@ -277,8 +280,6 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
     auto X = cluster_averages(the_model->term.at(x.first));
     averages.push_back(tuple<string,double,double>(x.first, X.first, X.second));
   }
-
-  gs_solved = true;
   return {GS_energy, GS_string()};
 }
 
@@ -385,15 +386,12 @@ void model_instance<HilbertField>::set_hopping_matrix(bool spin_down)
       my_tb.diagonal(d);
       my_tcb.product(tcb_tmp,Sb);
     }
-		
-    // contribution of the  bath to the Potthoff functional
-    for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
-    if(mixing&HS_mixing::up_down and spin_down){
-      for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
-    }
-    else if(mixing==HS_mixing::normal) SEF_bath *= 2.0;
-  }
+    
+		// contribution of the  bath to the Potthoff functional
+		for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
+	}
   if((mixing & HS_mixing::up_down) and spin_down == false) set_hopping_matrix(true);
+  else if(mixing==HS_mixing::normal) SEF_bath *= 2.0;
   hopping_solved = true;
 }
 
@@ -442,7 +440,6 @@ void model_instance<HilbertField>::Green_function_solve()
   if(gf_solved or gf_read) return;
   if(!is_correlated){
     one_body_solve();
-    gf_solved = true;
     return;
   }
   if(!gs_solved) low_energy_states();
@@ -869,7 +866,7 @@ pair<double, string> model_instance<HilbertField>::one_body_solve()
 
   }
 
-/*
+
   // Nambu correction to the ground state energy
   double nambu_corr = 0.0;
   if(mixing == HS_mixing::anomalous){
@@ -885,7 +882,7 @@ pair<double, string> model_instance<HilbertField>::one_body_solve()
   else if(mixing == HS_mixing::full) GS_energy *= 0.5;
   S->energy = GS_energy;
   S->weight = 1.0;
-  */
+  
   states.insert(S);
   gf_solved = true;
   gs_solved = true;
@@ -956,6 +953,8 @@ double model_instance<HilbertField>::tr_sigma_inf()
 template<typename HilbertField>
 string model_instance<HilbertField>::GS_string() const
 {
+  if(!is_correlated) return "uncorrelated";
+
   ostringstream sout;
   for(auto& s : states){
     if(s->weight < 0.001) continue;
@@ -1015,7 +1014,8 @@ void model_instance<HilbertField>::read(istream& fin)
 
 
   // reading the states
-  states.clear();
+  // states.clear();
+  clear_states();
   while(true){
     parser::next_line(fin);
     vector<string> input = read_strings(fin);
@@ -1034,7 +1034,10 @@ pair<vector<double>, vector<complex<double>>> model_instance<HilbertField>::qmat
 {
   if(GF_solver != GF_format_BL) qcm_ED_throw("Green function format is not Lehmann! Cannot output the Q matrix.");
   if(!gf_solved) Green_function_solve();
-  if(states.size() > 1)  qcm_ED_throw("The ground state is not a pure state! Cannot output the Q matrix.");
+  if(states.size() > 1){
+    for(auto& s : states) cout << s->sec << '\t' << s->weight << endl;
+    qcm_ED_throw("The ground state is not a pure state! ("+to_string(states.size())+" states). Cannot output the Q matrix.");
+  }
   shared_ptr<Green_function_set> gf;
   if(spin_down) gf = (*states.begin())->gf_down;
   else gf = (*states.begin())->gf;

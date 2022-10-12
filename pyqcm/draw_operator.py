@@ -134,10 +134,10 @@ def draw_operator(op_name, show_labels=False, show_band_labels=True, show_neighb
         K = '{:d},{:d};{:d}'.format(I,J,neighbor)
         Si[K] = (I-1,J-1,neighbor)
         if 'Hubbard' in op_type or 'one-body' in op_type:
-            if K in hop:
-                hop[K] += v
-            else:
-                hop[K] = v
+            # if K in hop:
+            #     hop[K] += v
+            # else:
+            #     hop[K] = v
 
             if X[0][-1] == '+' and X[1][-1] == '+':
                 sz = 1
@@ -150,10 +150,10 @@ def draw_operator(op_name, show_labels=False, show_band_labels=True, show_neighb
                 else:
                     spin[K] = np.array([0,v])
             elif X[0][-1] == '-' and X[1][-1] == '-': 
-                if K in hop:
-                    hop[K] += v
-                else:
-                    hop[K] = v
+                # if K in hop:
+                #     hop[K] += v
+                # else:
+                #     hop[K] = v
                 if K in spin:
                     spin[K] += np.array([0,-v])
                 else:

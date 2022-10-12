@@ -101,9 +101,6 @@ template <typename T> struct matrix {
   //! extracts a rectangular submatrix of size (R,C), starting at (i,j) of this, and copies it to position (I, J) of A
   template <typename S>
   void move_sub_matrix(size_t R, size_t C, size_t i, size_t j, size_t I, size_t J, matrix<S> &A, double z = 1.0) {
-    if(!(j + C <= c and i + R <= r and I + R <= A.r and J + C <= A.c)){
-      cout << R << '\t' << C << '\t' <<  i << '\t' <<  j << '\t' << I << '\t' << J << endl;
-    }
     assert(j + C <= c and i + R <= r and I + R <= A.r and J + C <= A.c);
     for (size_t k = 0; k < R; ++k) {
       for (size_t l = 0; l < C; ++l) { A(I + k, J + l) += z * v[i + k + r * (j + l)]; }

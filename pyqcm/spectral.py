@@ -412,6 +412,8 @@ def gap(k, band = 1, threshold=1e-3):
     returns: an array of gap values
     """
 
+    if len(k.shape)==1:
+        k = np.array([k])
     G = pyqcm.Lehmann_Green_function(k, band)
     g = [None]*len(k)
     for i in range(len(k)):
@@ -432,7 +434,7 @@ def gap(k, band = 1, threshold=1e-3):
 
 
 ################################################################################
-def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=None, file=None, plt_ax=None, **kwargs):
+def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=None, file=None, data_file='dos.tsv', plt_ax=None, **kwargs):
     """Plots the density of states (DoS) as a function of frequency
 
     :param float wmax: the frequency range is from -wmax to wmax if w is a float. If wmax is a tuple then the range is (wmax[0], wmax[1]). wmax can also be an explicit list of real frequencies
@@ -461,7 +463,10 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
     w = __frequency_array(w, eta)
 
     nw = len(w)
-    d = 2 * pyqcm.model_size()[1]
+    mix = pyqcm.mixing()
+    nsites = pyqcm.model_size()[1]
+    d = nsites
+    if mix != 0: d *=2
     # reserves space for the DoS
     A = np.zeros((nw, d))
     accum = np.zeros((nw, d))
@@ -470,7 +475,7 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
     # computes the DoS
     eps = (w[1]-w[0]).real
     for i in range(nw):
-        z = pyqcm.dos(w[i], label)
+        z = pyqcm.dos(w[i], label)[0:d]
         total += z*eps
         A[i, :] = z
         if i > 0:
@@ -479,25 +484,32 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
             print(np.round(w[i],4), A[i, :])
 
     head = 'w\t'
-    for i in range(d//2):
-        head += 'up_{:d}\tdown_{:d}\t'.format(i+1, i+1)
-    for i in range(d//2):
-        head += 'cumul_up_{:d}\tcumul_down_{:d}\t'.format(i+1, i+1)
-    np.savetxt('dos.tsv', np.hstack((np.reshape(np.real(w), (nw, 1)), A, accum)), header=head, delimiter='\t', fmt='%1.6g', comments='')
+    
+    for i in range(nsites):
+        head += 'up_{:d}\t'.format(i+1)
+    if mix > 0:
+        for i in range(nsites):
+            head += 'down_{:d}\t'.format(i+1)
+    for i in range(nsites):
+        head += 'cumul_up_{:d}\t'.format(i+1)
+    if mix > 0:
+        for i in range(nsites):
+            head += 'cumul_down_{:d}\t'.format(i+1)
+    np.savetxt(data_file, np.hstack((np.reshape(np.real(w), (nw, 1)), A, accum)), header=head, delimiter='\t', fmt='%1.6g', comments='')
     print('DoS totals: ', total)
     mix = pyqcm.mixing()
 
     if colors != None:
         plt.rc('axes', prop_cycle=cycler(color=colors))
     if labels is None:
-        labels = [str(i+1) for i in range(d//2)]
+        labels = [str(i+1) for i in range(nsites)]
     plt.xlim(w[0].real, w[-1].real)
-    for i in range(d//2):
+    for i in range(nsites):
         plt.plot(np.real(w), A[:, i], '-', label=labels[i], linewidth=1.6, **kwargs)
         if mix == 1 or mix == 5:
-            plt.plot(-np.real(w), A[:, i+d//2], '-', label=labels[i], linewidth=0.8, **kwargs)
-        else:
-            plt.plot(np.real(w), A[:, i+d//2], '-', label=labels[i]+'$\downarrow$', linewidth=0.8, **kwargs)
+            plt.plot(-np.real(w), A[:, i+nsites], '-', label=labels[i], linewidth=0.8, **kwargs)
+        elif mix>0:
+            plt.plot(np.real(w), A[:, i+nsites], '-', label=labels[i]+'$\downarrow$', linewidth=0.8, **kwargs)
     if sum:
         plt.plot(np.real(w), np.sum(A, 1), 'r-', label = 'total', **kwargs)
     plt.xlabel(r'$\omega$')
