@@ -16,6 +16,13 @@
 #include "Hamiltonian/Hamiltonian_Factorized.hpp"
 #include "Hamiltonian/Hamiltonian_Operator.hpp"
 
+#ifdef EIGEN_HAMILTONIAN
+#include "Hamiltonian/Hamiltonian_Eigen.hpp"
+#endif
+#ifdef PETSC_HAMILTONIAN
+#include "Hamiltonian/Hamiltonian_PETSc.hpp"
+#endif
+
 extern double max_gap;
 
 void polynomial_fit(
@@ -187,6 +194,7 @@ Hamiltonian<HilbertField>* model_instance<HilbertField>::create_hamiltonian(
     }
     else {
         switch(Hamiltonian_format) {
+            //native implementation
             case H_format_csr:
                 H = new Hamiltonian_CSR<HilbertField>(the_model, value, s);
                 //std::cout << "Hamiltonian CSR" << std::endl;
@@ -203,6 +211,29 @@ Hamiltonian<HilbertField>* model_instance<HilbertField>::create_hamiltonian(
                 H = new Hamiltonian_Operator<HilbertField>(the_model, value, s);
                 //std::cout << "Hamiltonian OTF" << std::endl;
                 break;
+            //implementation with dependencies
+            case H_format_eigen:
+#ifdef EIGEN_HAMILTONIAN
+                H = new Hamiltonian_Eigen<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian CSR" << std::endl;
+                break;
+#else
+                cout << "Warning! qcm_wed not configured with Eigen! Fallback to native CSR implementation" << endl;
+                Hamiltonian_format = H_format_csr;
+                H = new Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                break;
+#endif
+            case H_format_petsc:
+#ifdef PETSC_HAMILTONIAN
+                H = new Hamiltonian_PETSc<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian CSR" << std::endl;
+                break;
+#else
+                cout << "Warning! qcm_wed not configured with PETSc! Fallback to native CSR implementation" << endl;
+                Hamiltonian_format = H_format_csr;
+                H = new Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                break;
+#endif
         }
     }
     return H;

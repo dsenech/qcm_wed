@@ -73,6 +73,29 @@ else()
     execute_process (COMMAND ${Python3_EXECUTABLE} -c "import numpy; print(numpy.get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
+#------------------
+# External Dependencies for Hamiltonian
+#------------------
+
+if (EIGEN_HAMILTONIAN)
+    find_package(Eigen3 REQUIRED)
+    target_include_directories(qcm PUBLIC ${EIGEN3_INCLUDE_DIR})
+    message(STATUS "Compile with Eigen Hamiltonian format 'E'")
+    message(STATUS "Eigen3 directory: ${EIGEN3_INCLUDE_DIR}")
+    add_compile_definitions(EIGEN_HAMILTONIAN)
+endif()
+
+if (PETSC_HAMILTONIAN)
+    find_package(PETSc REQUIRED)
+    target_link_libraries(qcm ${PETSC_LIBRARIES})
+    target_include_directories(qcm ${PETSC_INCLUDE_DIR})
+    message(STATUS "PETSc lib: ${PETSC_LIBRARIES}")
+    add_compile_definitions(PETSC_HAMILTONIAN)
+endif()
+
+#------------------
+# BLAS / LAPACK
+#------------------
 
 include(FindLAPACK)
 message(STATUS "LAPACK lib: ${LAPACK_LIBRARIES}")
