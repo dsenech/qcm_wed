@@ -506,9 +506,11 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
     plt.xlim(w[0].real, w[-1].real)
     for i in range(nsites):
         plt.plot(np.real(w), A[:, i], '-', label=labels[i], linewidth=1.6, **kwargs)
-        if mix == 1 or mix == 5:
+    if mix == 1 or mix == 5:
+        for i in range(nsites):
             plt.plot(-np.real(w), A[:, i+nsites], '-', label=labels[i], linewidth=0.8, **kwargs)
-        elif mix>0:
+    elif mix>0:
+        for i in range(nsites):
             plt.plot(np.real(w), A[:, i+nsites], '-', label=labels[i]+'$\downarrow$', linewidth=0.8, **kwargs)
     if sum:
         plt.plot(np.real(w), np.sum(A, 1), 'r-', label = 'total', **kwargs)
