@@ -54,7 +54,7 @@ Hamiltonian_Eigen<HilbertField>::Hamiltonian_Eigen(
     
     //create the element
     map<index_pair,HilbertField> E;
-    bool sym_store = false;
+    bool sym_store = true;
     std::vector<double> diag(this->dim);
     for(auto& h : sparse_ops){
         h.first->CSR_map(E, diag, h.second, sym_store);
