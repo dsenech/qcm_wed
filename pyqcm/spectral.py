@@ -31,7 +31,7 @@ def __frequency_array(wmax=6.0, eta=0.05, matsubara=False):
     elif type(wmax) is float or type(wmax) is int:
         w = np.arange(-wmax, wmax + 1e-6, eta/4.0)  # defines the array of frequencies
     else:
-        raise TypeError('the type of argument "wmax" in spectral_function() is wrong')
+        raise TypeError('the type of argument "wmax" in __frequency_array() is wrong')
 
     if matsubara:
         wc = w*1j
@@ -437,7 +437,7 @@ def gap(k, band = 1, threshold=1e-3):
 def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=None, file=None, data_file='dos.tsv', plt_ax=None, **kwargs):
     """Plots the density of states (DoS) as a function of frequency
 
-    :param float wmax: the frequency range is from -wmax to wmax if w is a float. If wmax is a tuple then the range is (wmax[0], wmax[1]). wmax can also be an explicit list of real frequencies
+    :param float w: the frequency range is from -w to w if w is a float. If w is a tuple then the range is (wmax[0], wmax[1]). w can also be an explicit list of real frequencies
     :param float eta: Lorentzian broadening, if w is real
     :param int label: label of the model instance 
     :param boolean sum: if True, the sum of the DoS of all bands is plotted in addition to each band individually
@@ -452,13 +452,19 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
     """
     from cycler import cycler
 
-    if plt_ax is None:
-        plt.figure()
-        plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
-        ax = plt.gca()
-        plt.title('DoS: '+pyqcm.parameter_string())
-    else:
-        ax = plt_ax
+    plot = True
+    if type(plt_ax) == int:
+        if plt_ax == 0:
+            plot = False
+    
+    if plot:
+        if plt_ax is None:
+            plt.figure()
+            plt.gcf().set_size_inches(13.5/2.54, 9/2.54)
+            ax = plt.gca()
+            plt.title('DoS: '+pyqcm.parameter_string())
+        else:
+            ax = plt_ax
 
     w = __frequency_array(w, eta)
 
@@ -499,6 +505,8 @@ def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=N
     print('DoS totals: ', total)
     mix = pyqcm.mixing()
 
+    if plot == False: return
+    
     if colors != None:
         plt.rc('axes', prop_cycle=cycler(color=colors))
     if labels is None:
