@@ -30,6 +30,8 @@ def __frequency_array(wmax=6.0, eta=0.05, matsubara=False):
         w = np.arange(wmax[0], wmax[1] + 1e-6, eta/4.0)  # defines the array of frequencies
     elif type(wmax) is float or type(wmax) is int:
         w = np.arange(-wmax, wmax + 1e-6, eta/4.0)  # defines the array of frequencies
+    elif type(wmax) is np.ndarray and wmax.dtype == complex:
+        return wmax
     else:
         raise TypeError('the type of argument "wmax" in __frequency_array() is wrong')
 
@@ -437,7 +439,7 @@ def gap(k, band = 1, threshold=1e-3):
 def DoS(w, eta = 0.1, label=0, sum=False, progress = True, labels=None, colors=None, file=None, data_file='dos.tsv', plt_ax=None, **kwargs):
     """Plots the density of states (DoS) as a function of frequency
 
-    :param float w: the frequency range is from -w to w if w is a float. If w is a tuple then the range is (wmax[0], wmax[1]). w can also be an explicit list of real frequencies
+    :param float w: the frequency range is from -w to w if w is a float. If w is a tuple then the range is (wmax[0], wmax[1]). w can also be an explicit list of real frequencies, or of complex frequencies (in which case eta is ignored)
     :param float eta: Lorentzian broadening, if w is real
     :param int label: label of the model instance 
     :param boolean sum: if True, the sum of the DoS of all bands is plotted in addition to each band individually
