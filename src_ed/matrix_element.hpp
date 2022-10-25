@@ -8,6 +8,7 @@ using namespace std;
 
 
 //! used to store a matrix element, location and value
+//Moise: this definition is compliant with Eigen Triplet class
 template<typename T>
 struct matrix_element
 {
@@ -38,6 +39,9 @@ struct matrix_element
 		else return false;
 	}
 	
+  const size_t& row() const { return r; }
+  const size_t& col() const { return c; }
+  const T& value() const { return v; }
 	
 };
 

@@ -53,26 +53,10 @@ Hamiltonian_Eigen<HilbertField>::Hamiltonian_Eigen(
 
     HS_ops_map(value);
     
-    //create the element
-    map<index_pair,HilbertField> E;
+    vector<matrix_element<HilbertField>> tripletList;
     bool sym_store = true;
-    std::vector<double> diag(this->dim);
-    for(auto& h : sparse_ops){
-        h.first->CSR_map(E, diag, h.second, sym_store);
-    }
-    
-    std::vector< Eigen::Triplet<HilbertField> > tripletList;
-    tripletList.reserve(E.size()+this->dim);
-    //set up diagonal elements
-    for (size_t i=0; i<this->dim; i++) {
-        Eigen::Triplet<HilbertField> T(i,i,diag[i]);
-        tripletList.push_back(T);
-    }
-    diag.resize(0); //clear vector
-    //set non-diag element
-    for(auto &x : E) {
-        Eigen::Triplet<HilbertField> T(x.first.r,x.first.c,x.second);
-        tripletList.push_back(T);
+    for (auto& h : sparse_ops) {
+        h.first->Triplet_COO_map(tripletList, h.second, sym_store);
     }
     //create matrix
     H_eigen.resize(this->dim,this->dim);
@@ -122,7 +106,7 @@ void Hamiltonian_Eigen<HilbertField>::HS_ops_map(const map<string, double> &valu
     for (auto& x : value) {
         keys.push_back(x.first);
     }
-    //construct the operator in parallel
+    //construct the hamiltonian in parallel
     #pragma omp parallel for schedule(guided)
     //for (auto& x : value){
     for (auto& x : keys) {

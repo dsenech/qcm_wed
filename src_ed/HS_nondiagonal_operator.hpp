@@ -21,6 +21,8 @@ struct HS_nondiagonal_operator : HS_Hermitian_operator
   void CSR_map(map<index_pair,double> &elem, vector<double> &diag, double z, bool sym_store);
   void CSR_map(map<index_pair,Complex> &elem, vector<double> &diag, double z, bool sym_store);
   void diag(vector<double> &Y, double z);
+  void Triplet_COO_map(vector<matrix_element<double>>& E, double z, bool sym_store);
+  void Triplet_COO_map(vector<matrix_element<Complex>>& E, double z, bool sym_store);
   void insert(uint32_t I, uint32_t J, HS_field z);
   void sort_elements();
 };
@@ -171,8 +173,6 @@ void HS_nondiagonal_operator<HS_field>::CSR_map(map<index_pair,Complex> &E, vect
 }
 
 
-
-
 /**
  populates an array Y with the diagonal elements of the operator
  useful for prepraring the Hamiltonian for the Davidson  method
@@ -181,6 +181,62 @@ template<typename HS_field>
 void HS_nondiagonal_operator<HS_field>::diag(vector<double> &Y, double z)
 {
   for(auto& e : diag_elem) Y[e.r] += z*e.v;
+}
+
+
+/**
+ populates a vector of matrix_element to build the Hamiltonian
+ */
+template<typename HS_field>
+void HS_nondiagonal_operator<HS_field>::Triplet_COO_map(vector<matrix_element<double>>& E, double z, bool sym_store)
+{
+    //diag element
+    for(auto& e : diag_elem) {
+        matrix_element<double> T(e.r,e.r,z*e.v);
+        E.push_back(T);
+    }
+    //off-diag element
+    for(auto& w : v){
+        double z2=real(w.first*z);
+        for(auto& e : w.second) {
+            matrix_element<double> T(e.first,e.second,z2);
+            E.push_back(T);
+        }
+        if(sym_store){
+            for(auto& e : w.second) {
+                matrix_element<double> T(e.second,e.first,z2);
+                E.push_back(T);
+            }
+        }
+    }
+}
+
+/**
+ populates a vector of matrix_element to build the Hamiltonian
+ */
+template<typename HS_field>
+void HS_nondiagonal_operator<HS_field>::Triplet_COO_map(vector<matrix_element<Complex>>& E, double z, bool sym_store)
+{
+    //diag element
+    for(auto& e : diag_elem) {
+        matrix_element<Complex> T(e.r,e.r,z*e.v);
+        E.push_back(T);
+    }
+    //off-diag element
+    for(auto& w : v){
+        Complex z2=w.first*z;
+        for(auto& e : w.second) {
+            matrix_element<Complex> T(e.first,e.second,z2);
+            E.push_back(T);
+        }
+        if(sym_store){
+            z2 = conjugate(z2);
+            for(auto& e : w.second) {
+                matrix_element<Complex> T(e.second,e.first,z2);
+                E.push_back(T);
+            }
+        }
+    }
 }
 
 
