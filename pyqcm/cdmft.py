@@ -391,9 +391,9 @@ def cdmft(
     CT_converged = True
     
     # storing the GS energy and error (the error is relevant for the DVMC solver)
-    E0 = np.zeros(maxiter)
-    E0_err = np.ones(maxiter)
-    moving_ave = np.zeros(maxiter)
+    E0 = np.zeros(maxiter+1)
+    E0_err = np.ones(maxiter+1)
+    moving_ave = np.zeros(maxiter+1)
 
 
     # convergence criterion in the bath parameters
