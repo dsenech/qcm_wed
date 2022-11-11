@@ -117,12 +117,26 @@ void Hamiltonian_CSR<HilbertField>::HS_ops_map(const map<string, double> &value)
 {
     bool is_complex = false;
     if(typeid(HilbertField) == typeid(Complex)) is_complex = true;
-    for(auto& x : value){
-        Hermitian_operator& op = *this->the_model->term.at(x.first);
+    //create a vector of values keys to have random access iterator
+    vector<string> keys;
+    keys.reserve(value.size());
+    for (auto& x : value) {
+        keys.push_back(x.first);
+    }
+    //construct the hamiltonian in parallel
+    #pragma omp parallel for schedule(guided)
+    //for (auto& x : value){
+    for (auto& x : keys) {
+        Hermitian_operator& op = *this->the_model->term.at(x);
         if(op.HS_operator.find(this->sec) == op.HS_operator.end()){
             op.HS_operator[this->sec] = op.build_HS_operator(this->sec, is_complex); // ***TEMPO***
         }
-        sparse_ops[op.HS_operator.at(this->sec)] = value.at(x.first);
+    }
+    keys.resize(0);
+    //then add it to sparse_ops
+    for(const auto& x : value){
+        Hermitian_operator& op = *this->the_model->term.at(x.first);
+        sparse_ops[op.HS_operator.at(this->sec)] = x.second; //value.at(x.first);
     }
 }
 
