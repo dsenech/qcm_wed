@@ -1,6 +1,6 @@
 #include <fstream>
 #include "model_instance_base.hpp"
-#include "Hermitian_operator.hpp"
+#include "Operators/Hermitian_operator.hpp"
 
 //==============================================================================
 // implementation of model_instance_base

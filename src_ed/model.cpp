@@ -1,5 +1,5 @@
 #include "model.hpp"
-#include "Hermitian_operator.hpp"
+#include "Operators/Hermitian_operator.hpp"
 #include <fstream>
 #ifdef _OPENMP
   #include <omp.h>

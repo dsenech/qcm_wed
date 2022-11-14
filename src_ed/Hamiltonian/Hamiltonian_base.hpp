@@ -10,7 +10,7 @@ Also provide default method that could be overwrite by implementation
 
 #include "model.hpp"
 #include "state.hpp"
-#include "Hermitian_operator.hpp"
+#include "../Operators/Hermitian_operator.hpp"
 #include "Q_matrix.hpp"
 #include "Lanczos.hpp"
 

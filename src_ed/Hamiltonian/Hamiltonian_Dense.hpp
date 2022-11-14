@@ -6,7 +6,6 @@
 #define Hamiltonian_dense
 
 #include "Hamiltonian_base.hpp"
-#include "Hermitian_operator.hpp"
 #include "model.hpp"
 #include "state.hpp"
 #include "Q_matrix.hpp"

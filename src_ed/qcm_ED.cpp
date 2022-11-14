@@ -8,11 +8,11 @@
 #include <tuple>
 #include "qcm_ED.hpp"
 #include "model_instance.hpp"
-#include "one_body_operator.hpp"
-#include "anomalous_operator.hpp"
-#include "interaction_operator.hpp"
-#include "Hund_operator.hpp"
-#include "Heisenberg_operator.hpp"
+#include "Operators/one_body_operator.hpp"
+#include "Operators/anomalous_operator.hpp"
+#include "Operators/interaction_operator.hpp"
+#include "Operators/Hund_operator.hpp"
+#include "Operators/Heisenberg_operator.hpp"
 #ifdef _OPENMP
   #include <omp.h>
 #endif

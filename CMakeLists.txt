@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -march=native")
 
 message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
@@ -31,13 +31,13 @@ add_library(qcm SHARED
     src_qcm/parameter_set.cpp
     src_qcm/profile.cpp
     src_ed/ED_basis.cpp
-    src_ed/Heisenberg_operator.cpp
-    src_ed/Hund_operator.cpp
+    src_ed/Operators/Heisenberg_operator.cpp
+    src_ed/Operators/Hund_operator.cpp
     src_ed/Hamiltonian/Lanczos.cpp
     src_ed/binary_state.cpp
     src_ed/continued_fraction.cpp
     src_ed/continued_fraction_set.cpp
-    src_ed/destruction_operator.cpp
+    src_ed/Operators/destruction_operator.cpp
     src_ed/model.cpp
     src_ed/model_instance.cpp
     src_ed/model_instance_base.cpp
