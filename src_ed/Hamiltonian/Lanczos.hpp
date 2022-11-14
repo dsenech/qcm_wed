@@ -382,28 +382,32 @@ bool BandLanczos(
 		if(j>= 4*phi.size() and j%phi.size()==0){
 			matrix<HilbertField> Hpr(j);
 			Hpr.assign(t);
-			evec_red.set_size(j);
-			evec_red.assign(Hpr);
+			//Moise: in the loop, we don't need the eigen vector, we need it only on output.
+			//So we will compute it latter to save some time
+			//evec_red.set_size(j);
+			//evec_red.assign(Hpr);
 			vector<double> evalues_tmp(j);
-			evalues.resize(j);
-			Hpr.eigensystem(evalues, evec_red);
+			evalues_tmp.resize(j);
+			Hpr.eigenvalues(evalues_tmp);
+			//TODO: we don't need all the eigenvalue nor the eigen vector, to optimize:
+			//Only 2 eigenvalues are actually used
 			
 #ifdef BL_test
-			for(size_t i=0; i<j; i++) fev << j << setprecision(10) << '\t' << evalues[i] << endl;
+			for(size_t i=0; i<j; i++) fev << j << setprecision(10) << '\t' << evalues_tmp[i] << endl;
 			fev << endl;
 #endif
 			
-			evalue_test = abs(evalues[0]-ev_old); ev_old = evalues[0];
-		if(evalue_test < accur_band_lanczos) converged = true;
+			evalue_test = abs(evalues_tmp[0]-ev_old); ev_old = evalues_tmp[0];
+		  if(evalue_test < accur_band_lanczos) converged = true;
 			
 			int num=0;
 			for(size_t i=0; i<v.size(); i++) if(v[i].size()>0) num++;
 			if(verb){
 				cout.precision(10);
-				cout << "--> iteration " << j << ",\tdelta E = " << evalue_test << "\tgap = " << evalues[1]-evalues[0] << endl;
+				cout << "--> iteration " << j << ",\tdelta E = " << evalue_test << "\tgap = " << evalues_tmp[1]-evalues_tmp[0] << endl;
 			}
 			
-			if (evalues[1]-evalues[0] < band_lanczos_minimum_gap and no_degenerate_BL){
+			if (evalues_tmp[1]-evalues_tmp[0] < band_lanczos_minimum_gap and no_degenerate_BL){
         		qcm_ED_throw("Band Lanczos: the gap between the first two eigenvalues is smaller than " + to_string(band_lanczos_minimum_gap));
 			}
 			if(converged) break;
@@ -412,7 +416,8 @@ bool BandLanczos(
 	M0 = j;
 	if(j==0) return false;
 	
-	if(!converged){
+	//if(!converged)
+	{
 		matrix<HilbertField> Hpr(j);
 		Hpr.assign(t);
 		evec_red.set_size(j);
