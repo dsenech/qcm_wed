@@ -16,7 +16,6 @@ class Hamiltonian_Eigen : public Hamiltonian<HilbertField>
 {
     public:
     
-        	
         Eigen::SparseMatrix<HilbertField,Eigen::RowMajor> H_eigen;
         
         Hamiltonian_Eigen(
@@ -26,7 +25,6 @@ class Hamiltonian_Eigen : public Hamiltonian<HilbertField>
         );
         void mult_add(vector<HilbertField> &x, vector<HilbertField> &y);
         void diag(vector<double> &d);
-        Q_matrix<HilbertField> build_Q_matrix(vector<vector<HilbertField>> &phi);
         //vector<shared_ptr<state<HilbertField>>> states(double& GS_energy);
         
     private:
@@ -61,6 +59,7 @@ Hamiltonian_Eigen<HilbertField>::Hamiltonian_Eigen(
     //create matrix
     H_eigen.resize(this->dim,this->dim);
     H_eigen.setFromTriplets(tripletList.begin(), tripletList.end());
+    this->H_ptr = &H_eigen;
 }
 
 
@@ -74,7 +73,6 @@ void Hamiltonian_Eigen<HilbertField>::mult_add(
     vector<HilbertField> &x, 
     vector<HilbertField> &y
 ) {
-     //TODO see some optimization
      Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > xe(x.data(), x.size());
      Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > ye(y.data(), y.size());
      ye += H_eigen*xe; //this change value of ye in place, so for y
@@ -123,40 +121,5 @@ void Hamiltonian_Eigen<HilbertField>::HS_ops_map(const map<string, double> &valu
     }
 }
 
-
-/**
- Constructs the Q_matrix (Lehmann representation) from the Band Lanczos method,
- or full diagonalization if the dimension is small enough.
- @param phi the initial vectors
- */
-template<typename HilbertField>
-Q_matrix<HilbertField> Hamiltonian_Eigen<HilbertField>::build_Q_matrix(
-    vector<vector<HilbertField>> &phi
-) {
-    if(this->dim == 0 or phi.size()==0){
-        return Q_matrix<HilbertField>(0,0);
-    }
-  
-    //-----------------------------------------------------------------------------
-    // Setting the maximum number of iterations
-  
-    int max_banditer = (int)(14*phi.size()*log(1.0*this->dim));
-    int M = max_banditer; // essai
-    assert(M>1);
-
-    vector<double> eval; // eigenvalues of the reduced Hamiltonian
-    matrix<HilbertField> U;  // eigenvectors of the reduced Hamiltonian
-    matrix<HilbertField> P; // matrix of inner products <b[i]|v[j]>
-  
-    if(BandLanczos(*this, phi, eval, U, P, M,  global_bool("verb_ED"))){
-        Q_matrix<HilbertField> Q(phi.size(),M);
-        if(Q.M > 0) {
-            Q.e = eval; 
-            Q.v.product(P,U,phi.size()); //  tempo
-        }
-        return Q;
-    }
-    else return Q_matrix<HilbertField>(phi.size(),0);
-}
 
 #endif

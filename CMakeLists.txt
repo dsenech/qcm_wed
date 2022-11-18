@@ -33,6 +33,7 @@ add_library(qcm SHARED
     src_ed/ED_basis.cpp
     src_ed/Operators/Heisenberg_operator.cpp
     src_ed/Operators/Hund_operator.cpp
+    src_ed/Hamiltonian/PRIMME_solver.cpp
     src_ed/Hamiltonian/Lanczos.cpp
     src_ed/binary_state.cpp
     src_ed/continued_fraction.cpp
@@ -91,6 +92,18 @@ if (PETSC_HAMILTONIAN)
     target_include_directories(qcm ${PETSC_INCLUDE_DIR})
     message(STATUS "PETSc lib: ${PETSC_LIBRARIES}")
     add_compile_definitions(PETSC_HAMILTONIAN)
+endif()
+
+if (WITH_PRIMME)
+    find_library(
+        PRIMME_LIBRARIES REQUIRED
+        NAMES libprimme.so 
+        HINTS ${PRIMME_DIR}/lib
+    )
+    target_link_libraries(qcm ${PRIMME_LIBRARIES})
+    target_include_directories(qcm PUBLIC ${PRIMME_DIR}/include)
+    message(STATUS "PRIMME lib: ${PRIMME_LIBRARIES}")
+    add_compile_definitions(WITH_PRIMME)
 endif()
 
 #------------------

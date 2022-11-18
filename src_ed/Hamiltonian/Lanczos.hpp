@@ -12,18 +12,15 @@ extern std::normal_distribution<double> normal_dis;
 template<typename T, typename HilbertField>
 void Lanczos(T &hamil, size_t dim, double &val, vector<HilbertField> &x, bool verb=false)
 {
-	if(global_bool("modified_Lanczos")) Modified_Lanczos(hamil, dim, val, x, verb);
-	else{
-		vector<double> energy;
-		vector<double> alpha;
-		vector<double> beta;
-		size_t niter = 0;
-		random(x, normal_dis);
+	vector<double> energy;
+	vector<double> alpha;
+	vector<double> beta;
+	size_t niter = 0;
+	random(x, normal_dis);
 
-		LanczosEigenvalue(hamil, x, alpha, beta, energy, niter, verb);
-		val = energy[0];
-		LanczosEigenvector(hamil, x, alpha, beta, verb);
-	}
+	LanczosEigenvalue(hamil, x, alpha, beta, energy, niter, verb);
+	val = energy[0];
+	LanczosEigenvector(hamil, x, alpha, beta, verb);
 }
 
 

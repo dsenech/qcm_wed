@@ -7,8 +7,6 @@
 
 #include "Hamiltonian_base.hpp"
 #include "CSR_hermitian.hpp"
-#include "Lanczos.hpp"
-#include "Davidson.hpp"
 
 
 template<typename HilbertField>
@@ -82,6 +80,7 @@ Hamiltonian_CSR<HilbertField>::Hamiltonian_CSR(
         count++;
     }
     H_csr.Iptr.push_back(count);
+    this->H_ptr = &H_csr;
 }
 
 

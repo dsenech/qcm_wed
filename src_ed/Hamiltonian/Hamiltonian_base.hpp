@@ -13,6 +13,11 @@ Also provide default method that could be overwrite by implementation
 #include "../Operators/Hermitian_operator.hpp"
 #include "Q_matrix.hpp"
 #include "Lanczos.hpp"
+#include "Davidson.hpp"
+
+#ifdef WITH_PRIMME
+#include "PRIMME_solver.hpp"
+#endif
 
 extern double max_gap;
 extern std::normal_distribution<double> normal_dis;
@@ -27,6 +32,7 @@ class Hamiltonian
     
     public:
     
+        void* H_ptr; //base pointer to the hamiltonian
         size_t dim; //!< dimension of the HS sector on which the Hamiltonian acts
         //this should not be belonging to the Hamiltonian class
         sector sec; //!< sector of the HS on which the Hamiltonian acts
@@ -50,12 +56,9 @@ class Hamiltonian
         vector<double> alpha; //!< main diagonal of the projected Hamiltonian in the Lanczos basis
         vector<double> beta; //!< second diagonal of the projected Hamiltonian in the Lanczos basis
 
-
-    // ??? what's below ?
-    
-    map<shared_ptr<HS_Hermitian_operator>, double> HS_ops_map(const map<string, double> &value);
-    map<shared_ptr<Hermitian_operator>, double> ops_map(const map<string, double> &value);
-    //void dense_form();
+        map<shared_ptr<HS_Hermitian_operator>, double> HS_ops_map(const map<string, double> &value);
+        map<shared_ptr<Hermitian_operator>, double> ops_map(const map<string, double> &value);
+        //void dense_form();
     
 };
 
@@ -96,21 +99,35 @@ vector<shared_ptr<state<HilbertField>>> Hamiltonian<HilbertField>::states(double
   
     vector<double> evalues;
     vector<vector<HilbertField> > evectors;
-    size_t Davidson_states = global_int("Davidson_states");
-    if(Davidson_states > 1) {
+    char method = global_char("Ground_state_method");
+    evalues.resize(1);
+    evectors.resize(1);
+    evectors[0].resize(dim);
+    if (method == 'D') { //Davidson method
+        size_t Davidson_states = global_int("Davidson_states");
         Davidson(*this, dim, Davidson_states, evalues, evectors, global_double("accur_Davidson"),  global_bool("verb_ED"));
-        if(evalues[0] < GS_energy) GS_energy = evalues[0];
-        if(evalues.back()-GS_energy < max_gap and global_bool("verb_warning")) {
-            cout << "ED WARNING! : not enough Davidson states (" << Davidson_states << ") in sector " << sec.name() << endl;
+        if(Davidson_states > 1) {
+            if(evalues.back()-evalues[0] < max_gap and global_bool("verb_warning")) {
+                cout << "ED WARNING! : not enough Davidson states (" << Davidson_states << ") in sector " << sec.name() << endl;
+            }
         }
     }
-    else {
-        evalues.resize(1);
-        evectors.resize(1);
-        evectors[0].resize(dim);
+    else if (method == 'L') { //Default Lanczos method
         Lanczos(*this, dim, evalues[0], evectors[0],  global_bool("verb_ED"));
-        if(evalues[0] < GS_energy) GS_energy = evalues[0];
     }
+    else if (method == 'M') { //modified Lanczos method
+        Modified_Lanczos(*this, dim, evalues[0], evectors[0],  global_bool("verb_ED"));
+    }
+#ifdef WITH_PRIMME
+    else if (method == 'P') { //call PRIMME eigensolver
+        PRIMME_state_solver(this, dim, evalues[0], evectors[0],  global_bool("verb_ED"));
+    }
+#endif
+    else {
+        qcm_ED_throw("Unknown method in Ground_state_method global parameter. If you set Ground_state_method to 'P', please compiled qcm_wed with PRIMME support (see installation documentation)");
+    }
+    //change GS_energy value
+    if(evalues[0] < GS_energy) GS_energy = evalues[0];
     for(size_t i=0; i<evectors.size(); i++){
         if(evalues[i]-GS_energy > max_gap) continue;
         auto gs = make_shared<state<HilbertField>>(sec,dim);
