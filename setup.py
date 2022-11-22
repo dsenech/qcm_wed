@@ -27,7 +27,7 @@ skbuild.setup(
     author="David Sénéchal",
     license="GPL",
     packages=find_packages(),
-    cmake_args=["-DDOWNLOAD_CUBA=1", '-DCMAKE_BUILD_TYPE="Release"'],
+    cmake_args=["-DDOWNLOAD_CUBA=1"],
     # package_dir={"": "."},
     # cmake_install_dir=".",
     include_package_data=True,

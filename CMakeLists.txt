@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -march=native -ftree-vectorize")
 
 message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
@@ -94,16 +94,42 @@ if (PETSC_HAMILTONIAN)
     add_compile_definitions(PETSC_HAMILTONIAN)
 endif()
 
+
+#------------------
+# PRIMME Eigensolver
+#------------------
+
 if (WITH_PRIMME)
-    find_library(
-        PRIMME_LIBRARIES REQUIRED
-        NAMES libprimme.so 
-        HINTS ${PRIMME_DIR}/lib
-    )
-    target_link_libraries(qcm ${PRIMME_LIBRARIES})
-    target_include_directories(qcm PUBLIC ${PRIMME_DIR}/include)
-    message(STATUS "PRIMME lib: ${PRIMME_LIBRARIES}")
+    if (NOT EIGEN_HAMILTONIAN)
+        message(FATAL_ERROR "PRIMME eigensolver require qcm_wed to be build with Eigen Hamiltonian. Add -DEIGEN_HAMILTONIAN=1 to CMake.")
+    endif()
+    if (DOWNLOAD_PRIMME)
+        include(ExternalProject)
+        ExternalProject_Add(PRIMME
+            PREFIX ${CMAKE_SOURCE_DIR}/external
+            SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/primme
+            URL https://github.com/primme/primme/archive/refs/tags/v3.2.tar.gz
+            URL_HASH MD5=b26968d0ea8aa2e6feefc89f3c863062
+            CONFIGURE_COMMAND COMMAND ""#${CMAKE_SOURCE_DIR}/external/cuba/configure "CFLAGS=-O3 -fPIC -ffast-math -fomit-frame-pointer"
+            BUILD_COMMAND COMMAND make "lib"
+            BUILD_IN_SOURCE 1
+            INSTALL_COMMAND ""
+            STEP_TARGETS build
+            BUILD_BYPRODUCTS ${CMAKE_SOURCE_DIR}/external/primme/lib/libprimme.a
+        )
+        add_dependencies(qcm PRIMME)
+        set(PRIMME_LIBRARY ${CMAKE_SOURCE_DIR}/external/primme/lib/libprimme.a)
+    else()
+        find_library(
+            PRIMME_LIBRARIES REQUIRED
+            NAMES libprimme.a
+            HINTS "/usr/local/lib" ${PRIMME_DIR}/lib
+        )
+    endif()
+    get_filename_component(PRIMME_DIR ${PRIMME_LIBRARY} DIRECTORY)
+    set(PRIMME_DIR "${PRIMME_DIR}/..")
     add_compile_definitions(WITH_PRIMME)
+    message(STATUS "PRIMME lib: ${PRIMME_LIBRARY}")
 endif()
 
 #------------------
@@ -146,9 +172,9 @@ message(STATUS "CUBA lib: ${CUBA_LIBRARY}")
 #------------------
 # Link dependencies
 #------------------
-target_link_libraries(qcm ${PYTHON_LIBRARIES} ${CUBA_LIBRARY} ${LAPACK_LIBRARIES})
+target_link_libraries(qcm ${PYTHON_LIBRARIES} ${LAPACK_LIBRARIES} ${CUBA_LIBRARY} ${PRIMME_LIBRARY})
 
-target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy ${CUBA_DIR})
+target_include_directories(qcm PUBLIC src_qcm src_ed src_python src_util ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR}/numpy ${CUBA_DIR} ${PRIMME_DIR}/include)
 
 
 #------------------
