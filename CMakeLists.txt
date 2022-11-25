@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -march=native -ftree-vectorize")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -g -march=native -ftree-vectorize")
 
 message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
@@ -105,13 +105,16 @@ if (WITH_PRIMME)
     endif()
     if (DOWNLOAD_PRIMME)
         include(ExternalProject)
+        set(cmd_make_primme "make")
+        list(APPEND cmd_make_primme "lib")
+        list(APPEND cmd_make_primme "CFLAGS=${CMAKE_CXX_FLAGS_RELEASE} -fPIC -DNDEBUG")
         ExternalProject_Add(PRIMME
             PREFIX ${CMAKE_SOURCE_DIR}/external
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/primme
             URL https://github.com/primme/primme/archive/refs/tags/v3.2.tar.gz
             URL_HASH MD5=b26968d0ea8aa2e6feefc89f3c863062
-            CONFIGURE_COMMAND COMMAND ""#${CMAKE_SOURCE_DIR}/external/cuba/configure "CFLAGS=-O3 -fPIC -ffast-math -fomit-frame-pointer"
-            BUILD_COMMAND COMMAND make "lib"
+            CONFIGURE_COMMAND COMMAND ""
+            BUILD_COMMAND COMMAND ${cmd_make_primme}
             BUILD_IN_SOURCE 1
             INSTALL_COMMAND ""
             STEP_TARGETS build
@@ -121,7 +124,7 @@ if (WITH_PRIMME)
         set(PRIMME_LIBRARY ${CMAKE_SOURCE_DIR}/external/primme/lib/libprimme.a)
     else()
         find_library(
-            PRIMME_LIBRARIES REQUIRED
+            PRIMME_LIBRARY REQUIRED
             NAMES libprimme.a
             HINTS "/usr/local/lib" ${PRIMME_DIR}/lib
         )

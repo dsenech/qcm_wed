@@ -9,7 +9,7 @@ Interface to use PRIMME eigensolver for Exact Diagonalisation
 #include <vector>
 #include "global_parameter.hpp"
 #include "primme.h"
-#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
 
 /**
  Wrapper around dprimme and zprimme routine for type double and complex
@@ -30,9 +30,30 @@ void PRIMME_Eigen_matmul(
     primme_params *primme,
     int *ierr
 ) {
-     Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > xe((HilbertField*) x, primme->n);
+     const Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > xe((HilbertField*) x, primme->n);
      Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > ye((HilbertField*) y, primme->n);
-     ye = *((Eigen::SparseMatrix<double,Eigen::RowMajor>*) primme->matrix) * xe;
+     ye = *((Eigen::SparseMatrix<HilbertField,Eigen::RowMajor>*) primme->matrix) * xe;
+     *ierr = 0;
+}
+
+/**
+ Jacobi preconditionner for Eigen Hamiltonian type
+ Perform: Y = M^(-1) X when M = diag(A)
+ */
+template<typename HilbertField>
+void PRIMME_Eigen_Jacobi_preconditionner(
+    void *x, 
+    int64_t *ldx,
+    void *y,
+    int64_t *ldy,
+    int *blockSize,
+    primme_params *primme,
+    int *ierr
+) {
+     const Eigen::Map< Eigen::Array<HilbertField,Eigen::Dynamic,1> > xe((HilbertField*) x, primme->n);
+     Eigen::Map< Eigen::Array<HilbertField,Eigen::Dynamic,1> > ye((HilbertField*) y, primme->n);
+     const Eigen::Array<HilbertField,Eigen::Dynamic,1> diag = ((Eigen::SparseMatrix<HilbertField,Eigen::RowMajor>*) primme->matrix)->diagonal();
+     for (size_t i=0; i<diag.size(); i++) ye[i] = (diag[i] == 0.) ? xe[i] / diag[i] : xe[i];
      *ierr = 0;
 }
 
@@ -97,15 +118,21 @@ void PRIMME_state_solver(
         qcm_ED_throw("Diagonalisation of Hamiltonian of chosen type not implemented with PRIMME eigensolver");
     }
     
-   /* Set preconditioner (optional) */
-   //primme.applyPreconditioner = LaplacianApplyPreconditioner;
-   //primme.correctionParams.precondition = 1;
+    /* Set preconditioner (optional) */
+    if (global_int("PRIMME_preconditionning") == 0) {}
+    else if (global_int("PRIMME_preconditionning") == 1) {
+        primme.applyPreconditioner = PRIMME_Eigen_Jacobi_preconditionner<HilbertField>;
+        primme.correctionParams.precondition = 1;
+    }
+    else {
+        qcm_ED_throw("Unknown preconditionner");
+    }
 
-   /* Set method to solve the problem */
-   primme_set_method((primme_preset_method) global_int("PRIMME_algorithm"), &primme);
+    /* Set method to solve the problem */
+    primme_set_method((primme_preset_method) global_int("PRIMME_algorithm"), &primme);
 
-   /* Call primme */
-   ret = call_primme(&eval, evec.data(), &rnorm, &primme);
+    /* Call primme */
+    ret = call_primme(&eval, evec.data(), &rnorm, &primme);
    
    
    /* Reporting (optional) */
@@ -126,6 +153,8 @@ void PRIMME_state_solver(
    if (ret != 0) {
       std::cout << "Error: primme returned with nonzero exit status: " << ret << std::endl;
    }
+   
+   primme_free(&primme);
 }
 
 

@@ -6,7 +6,7 @@
 #define Hamiltonian_eigen
 
 #include "Hamiltonian_base.hpp"
-#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
 #include <Eigen/Dense>
 #include <vector>
 
@@ -73,7 +73,7 @@ void Hamiltonian_Eigen<HilbertField>::mult_add(
     vector<HilbertField> &x, 
     vector<HilbertField> &y
 ) {
-     Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > xe(x.data(), x.size());
+     const Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > xe(x.data(), x.size());
      Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > ye(y.data(), y.size());
      ye += H_eigen*xe; //this change value of ye in place, so for y
 }
@@ -105,7 +105,7 @@ void Hamiltonian_Eigen<HilbertField>::HS_ops_map(const map<string, double> &valu
         keys.push_back(x.first);
     }
     //construct the hamiltonian in parallel
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(dynamic, 1)
     //for (auto& x : value){
     for (auto& x : keys) {
         Hermitian_operator& op = *this->the_model->term.at(x);

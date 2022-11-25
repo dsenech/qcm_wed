@@ -248,7 +248,7 @@ namespace ED {
     new_global_bool(false,"print_Hamiltonian","Prints the Hamiltonian on the screen, if small enough");
     new_global_bool(false,"CSR_sym_store","stores CSR matrices fully for openMP application");
     new_global_bool(false,"strip_anomalous_self","sets to zero the anomalous part of the self-energy");
-    new_global_bool(false,"modified_Lanczos","Uses the modified Lanczos method for the ground state instead of the usual Lanczos method");
+    //new_global_bool(false,"modified_Lanczos","Uses the modified Lanczos method for the ground state instead of the usual Lanczos method");
     new_global_bool(false,"continued_fraction","Uses the continued fraction solver for the Green function instead of the band Lanczos method");
     new_global_bool(false,"verb_ED","prints ED information and progress");
 
@@ -264,7 +264,7 @@ namespace ED {
     new_global_double(1.0e-4, "Qmatrix_tolerance", "minimum value of a Qmatrix coefficient");
     new_global_double(0.0,"temperature", "Temperature of the system.");
 
-    new_global_int(1,"Davidson_states","Number of states requested in the Davidson-Liu algorithm");
+    new_global_int(2,"Davidson_states","Number of states requested in the Davidson-Liu algorithm");
     new_global_int(64,"dim_max_print","Maximum dimension for printing vectors and matrices");
     new_global_int(256,"max_dim_full","Maximum dimension for using full diagonalization");
     new_global_int(600,"max_iter_BL","Maximum number of iterations in the band Lanczos procedure");
