@@ -73,9 +73,9 @@ void Hamiltonian_Eigen<HilbertField>::mult_add(
     vector<HilbertField> &x, 
     vector<HilbertField> &y
 ) {
-     const Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > xe(x.data(), x.size());
-     Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > ye(y.data(), y.size());
-     ye += H_eigen*xe; //this change value of ye in place, so for y
+    const Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > xe(x.data(), x.size());
+    Eigen::Map< Eigen::Matrix<HilbertField,Eigen::Dynamic,1> > ye(y.data(), y.size());
+    ye += H_eigen*xe; //this change value of ye in place, so for y
 }
 
 

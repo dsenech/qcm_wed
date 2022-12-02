@@ -40,6 +40,7 @@ class Hamiltonian
         shared_ptr<model> the_model; //!< backtrace to the cluster model
         
         Hamiltonian() {};
+        virtual ~Hamiltonian() {};
     
         virtual void mult_add(vector<HilbertField> &x, vector<HilbertField> &y) {};
         virtual void diag(vector<double> &d) {};

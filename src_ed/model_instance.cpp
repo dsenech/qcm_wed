@@ -99,6 +99,7 @@ void model_instance<double>::build_cf(state<double> &Omega, bool spin_down)
           }
         }
       }
+      delete H;
     }
   }
 }
@@ -183,6 +184,7 @@ void model_instance<Complex>::build_cf(state<Complex> &Omega, bool spin_down)
           }
         }
       }
+      delete H;
     }
   }
 }
