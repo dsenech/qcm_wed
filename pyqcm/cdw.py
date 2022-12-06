@@ -323,7 +323,7 @@ def cdw_eigenstates(C, _V, plt_ax=None, basis=np.eye(3), file=None, silent=False
         fig, ax = plt.subplots((C.N+1)//2, 2, sharex=True, sharey=True)
         fig.set_size_inches(6, 3*ax.shape[0])
         if C.N > 2:
-            ax = np.reshape(ax, (C.N))
+            ax = np.reshape(ax, 2*((C.N+1)//2))
 
         for i in range(C.N):
             print('\neigenvalue ', w[i], ' :\n', v[:, i])
