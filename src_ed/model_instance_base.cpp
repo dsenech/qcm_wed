@@ -1,6 +1,6 @@
 #include <fstream>
 #include "model_instance_base.hpp"
-#include "Hermitian_operator.hpp"
+#include "Operators/Hermitian_operator.hpp"
 
 //==============================================================================
 // implementation of model_instance_base
@@ -23,7 +23,9 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
     else if(S == 'S') Hamiltonian_format = H_FORMAT::H_format_csr;
     else if(S == 'N') Hamiltonian_format = H_FORMAT::H_format_onthefly;
     else if(S == 'F') Hamiltonian_format = H_FORMAT::H_format_factorized;
-    else qcm_ED_throw("Hamiltonian_format is not one of : N, S, O or F");
+    else if(S == 'E') Hamiltonian_format = H_FORMAT::H_format_eigen;
+    else if(S == 'P') Hamiltonian_format = H_FORMAT::H_format_petsc;
+    else qcm_ED_throw("Hamiltonian_format is not one of : N, S, O, F, E or P");
   }
 
   for(auto& v : value){
@@ -58,7 +60,7 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
   // checking the factorized option
   bool factorizable = false;
   if(Hamiltonian_format == H_FORMAT::H_format_factorized and the_model->group->g != 1)
-    qcm_ED_throw("the Hamiltonian format 'factorized' is not compatibile with a nontrivial point group symmetry");
+    qcm_ED_throw("the Hamiltonian format 'factorized' is not compatible with a nontrivial point group symmetry");
   if(Hamiltonian_format == H_FORMAT::H_format_factorized and (mixing == HS_mixing::normal or mixing == HS_mixing::up_down)){
     factorizable = true;
     for(auto &s : value){

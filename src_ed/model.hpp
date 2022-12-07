@@ -7,7 +7,7 @@
 
 #include "ED_basis.hpp"
 #include "state.hpp"
-#include "destruction_operator.hpp"
+#include "Operators/destruction_operator.hpp"
 
 
 #define MIN_GAP 1.0e-6

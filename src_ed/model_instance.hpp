@@ -4,14 +4,26 @@
 #include <fstream>
 #include <memory>
 #include "model_instance_base.hpp"
-#include "Hamiltonian.hpp"
 #include "Q_matrix_set.hpp"
 #include "continued_fraction_set.hpp"
 #include "ED_basis.hpp"
 #include "binary_state.hpp"
 
-extern double max_gap;
+#include "Hamiltonian/Hamiltonian_base.hpp"
+#include "Hamiltonian/Hamiltonian_Dense.hpp"
+#include "Hamiltonian/Hamiltonian_CSR.hpp"
+#include "Hamiltonian/Hamiltonian_OnTheFly.hpp"
+#include "Hamiltonian/Hamiltonian_Factorized.hpp"
+#include "Hamiltonian/Hamiltonian_Operator.hpp"
 
+#ifdef EIGEN_HAMILTONIAN
+#include "Hamiltonian/Hamiltonian_Eigen.hpp"
+#endif
+#ifdef PETSC_HAMILTONIAN
+#include "Hamiltonian/Hamiltonian_PETSc.hpp"
+#endif
+
+extern double max_gap;
 
 void polynomial_fit(
   vector<double> &xa, //!< array of abcissas
@@ -43,6 +55,11 @@ struct model_instance : model_instance_base
   set<shared_ptr<state<HilbertField>>> states; //!< set of states forming the density matrix
 
   model_instance(size_t _label, shared_ptr<model> _the_model, const map<string,double> _value, const string &_sectors);
+  Hamiltonian<HilbertField>* create_hamiltonian(
+    shared_ptr<model> the_model,
+    const map<string, double> &value, 
+    sector s
+  );
 
   void build_cf(state<HilbertField> &Omega, bool spin_down);
   void build_qmatrix(state<HilbertField> &Omega, bool spin_down);
@@ -156,6 +173,72 @@ void model_instance<HilbertField>::clear_states(){
 }
 
 
+/**
+ Create Hamiltonian in the right format
+ */
+template<typename HilbertField>
+Hamiltonian<HilbertField>* model_instance<HilbertField>::create_hamiltonian(
+    shared_ptr<model> the_model,
+    const map<string, double> &value, 
+    sector s
+) {
+    Hamiltonian<HilbertField> *H = nullptr;
+    //enforced Hamiltonian format
+    if(the_model->is_factorized) {
+        H = new Hamiltonian_Factorized<HilbertField>(the_model, value, s);
+        //std::cout << "Hamiltonian Factorized" << std::endl;
+    }
+    else if (the_model->provide_basis(s)->dim < global_int("max_dim_full")) {
+        H = new Hamiltonian_Dense<HilbertField>(the_model, value, s);
+        //std::cout << "Hamiltonian Dense1" << std::endl;
+    }
+    else {
+        switch(Hamiltonian_format) {
+            //native implementation
+            case H_format_csr:
+                H = new Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian CSR" << std::endl;
+                break;
+            case H_format_dense:
+                H = new Hamiltonian_Dense<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian DENSe2" << std::endl;
+                break;
+            case H_format_onthefly:
+                H = new Hamiltonian_OnTheFly<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian OTF" << std::endl;
+                break;
+            case H_format_ops:
+                H = new Hamiltonian_Operator<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian OTF" << std::endl;
+                break;
+            //implementation with dependencies
+            case H_format_eigen:
+#ifdef EIGEN_HAMILTONIAN
+                H = new Hamiltonian_Eigen<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian CSR" << std::endl;
+                break;
+#else
+                cout << "Warning! qcm_wed not configured with Eigen! Fallback to native CSR implementation" << endl;
+                Hamiltonian_format = H_format_csr;
+                H = new Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                break;
+#endif
+            case H_format_petsc:
+#ifdef PETSC_HAMILTONIAN
+                H = new Hamiltonian_PETSc<HilbertField>(the_model, value, s);
+                //std::cout << "Hamiltonian CSR" << std::endl;
+                break;
+#else
+                cout << "Warning! qcm_wed not configured with PETSc! Fallback to native CSR implementation" << endl;
+                Hamiltonian_format = H_format_csr;
+                H = new Hamiltonian_CSR<HilbertField>(the_model, value, s);
+                break;
+#endif
+        }
+    }
+    return H;
+}
+
 
 /**
  Computes the low-energy states
@@ -192,11 +275,12 @@ pair<double, string> model_instance<HilbertField>::low_energy_states()
   
   for(auto& s:sector_set){
     the_model->build_HS_operators(s, is_complex);
-    Hamiltonian<HilbertField> H(the_model, value, s);
-    if(H.dim == 0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, s);
+    if(H->dim == 0) continue;
     
-    vector<shared_ptr<state<HilbertField>>> gs = H.states(GS_energy); // finds the low-energy states for this sector and adds them to the list
+    vector<shared_ptr<state<HilbertField>>> gs = H->states(GS_energy); // finds the low-energy states for this sector and adds them to the list
     for(auto& x : gs) states.insert(x);
+    delete H;
   }
   
   compute_weights();
@@ -312,7 +396,7 @@ void model_instance<HilbertField>::set_hopping_matrix(bool spin_down)
     }
   }
 
-	if(spin_down == false) SEF_bath = 0.0;
+  if(spin_down == false) SEF_bath = 0.0;
 	
   // diagonalize the bath
   if(the_model->n_bath){
@@ -333,7 +417,7 @@ void model_instance<HilbertField>::set_hopping_matrix(bool spin_down)
       my_tb.diagonal(d);
       my_tcb.product(tcb_tmp,Sb);
     }
-		
+    
 		// contribution of the  bath to the Potthoff functional
 		for(size_t i=0; i<the_model->n_bath; ++i) if(realpart(my_tb(i,i)) < 0) SEF_bath -= realpart(my_tb(i,i));
 	}
@@ -389,7 +473,7 @@ void model_instance<HilbertField>::Green_function_solve()
     one_body_solve();
     return;
   }
-	if(!gs_solved) low_energy_states();
+  if(!gs_solved) low_energy_states();
   
   if(global_bool("verb_ED")) cout << "GF solver for cluster instance " << full_name() << endl;
 
@@ -405,7 +489,7 @@ void model_instance<HilbertField>::Green_function_solve()
       else build_qmatrix(*x,true);
     }
   }
-	gf_solved = true;
+  gf_solved = true;
 }
 
 
@@ -550,11 +634,14 @@ void model_instance<HilbertField>::build_qmatrix(state<HilbertField> &Omega, boo
     }
     if(skip_sector) continue;
     // Assembling the Hamiltonian and Band Lanczos procedure
-    Hamiltonian<HilbertField> H(the_model, value, target_sec);
-    if(H.dim==0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, target_sec);
+    if(H->dim==0) continue;
     
     Q_matrix<HilbertField> Qtmp;
-    Qtmp = H.build_Q_matrix(phi);
+    Qtmp = H->build_Q_matrix(phi);
+    
+    delete H; //delete Hamiltonian to prevent memory leak
+    H = nullptr;
     
     Qtmp.e -= Omega.energy; // adjust the eigenvalues by adding/subtracting the GS energy
     if(pm == -1){
@@ -622,14 +709,14 @@ vector<Complex> model_instance<HilbertField>::susceptibility(shared_ptr<Hermitia
   vector<Complex> chi(w.size(),0.0);
   
   for(auto& sec : sector_set){
-    Hamiltonian<HilbertField> H(the_model, value, sec);
-    if(H.dim==0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, sec);
+    if(H->dim==0) continue;
     for(auto& gs : states){
       if(gs->sec != sec) continue;
       vector<vector<HilbertField>> b(1);
-      b[0].resize(H.dim);
+      b[0].resize(H->dim);
       h->HS_operator.at(sec)->multiply_add(gs->psi, b[0], 1.0);
-      Q_matrix<HilbertField> Q = H.build_Q_matrix(b);
+      Q_matrix<HilbertField> Q = H->build_Q_matrix(b);
       Q.e -= gs->energy; 	// adjust the eigenvalues by subtracting the GS energy
       matrix<Complex> g(1);
       for(size_t j=0; j<w.size(); j++){
@@ -640,6 +727,7 @@ vector<Complex> model_instance<HilbertField>::susceptibility(shared_ptr<Hermitia
         chi[j] += gs->weight*g(0,0);
       }
     }
+    delete H; H=nullptr;
   }
   return chi;
 }
@@ -660,14 +748,14 @@ vector<pair<double,double>> model_instance<HilbertField>::susceptibility_poles(s
   chi.reserve(20);
   
   for(auto& sec : sector_set){
-    Hamiltonian<HilbertField> H(the_model, value, sec);
-    if(H.dim==0) continue;
+    Hamiltonian<HilbertField> *H = create_hamiltonian(the_model, value, sec);
+    if(H->dim==0) continue;
     for(auto& gs : states){
       if(gs->sec != sec) continue;
       vector<vector<HilbertField>> b(1);
-      b[0].resize(H.dim);
+      b[0].resize(H->dim);
       h->HS_operator.at(sec)->multiply_add(gs->psi, b[0], 1.0);
-      Q_matrix<HilbertField> Q = H.build_Q_matrix(b);
+      Q_matrix<HilbertField> Q = H->build_Q_matrix(b);
       Q.e -= gs->energy; 	// adjust the eigenvalues by subtracting the GS energy
       for(size_t i = 0; i<Q.M; i++){
         if(Q.e[i] < 1e-8) continue;
@@ -676,6 +764,7 @@ vector<pair<double,double>> model_instance<HilbertField>::susceptibility_poles(s
         if(r > 1e-6) chi.push_back({Q.e[i],r});
       }
     }
+    delete H; H=nullptr;
   }
   // consolidation
   vector<pair<double,double>> chi2;
@@ -898,13 +987,9 @@ string model_instance<HilbertField>::GS_string() const
   if(!is_correlated) return "uncorrelated";
 
   ostringstream sout;
-  map<sector, double> weight;
   for(auto& s : states){
-    weight[s->sec] += s->weight;
-  }
-  for(auto& s : weight){
-    if(s.second < 0.001) continue;
-    sout << s.first << ':' << setprecision(3) << s.second << '/';
+    if(s->weight < 0.001) continue;
+    sout << s->sec << ':' << setprecision(3) << s->weight  << '/';
   }
   string out = sout.str();
   out.pop_back();

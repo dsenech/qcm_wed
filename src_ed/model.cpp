@@ -1,5 +1,5 @@
 #include "model.hpp"
-#include "Hermitian_operator.hpp"
+#include "Operators/Hermitian_operator.hpp"
 #include <fstream>
 #ifdef _OPENMP
   #include <omp.h>
@@ -85,10 +85,16 @@ shared_ptr<ED_factorized_basis> model::provide_factorized_basis(const sector& se
 */
 void model::build_HS_operators(const sector& sec, bool is_complex)
 {
-  for(auto& x : term){
-    if(!x.second->is_active) continue;
-    if(x.second->HS_operator.find(sec) == x.second->HS_operator.end())
-      x.second->HS_operator[sec] = x.second->build_HS_operator(sec, is_complex);
+  vector<shared_ptr<Hermitian_operator>> keys;
+  keys.reserve(term.size());
+  for (auto& x : term) {
+      keys.push_back(x.second);
+  }
+  #pragma omp parallel for schedule(guided)
+  for(auto& x : keys){
+    if(!x->is_active) continue;
+    if(x->HS_operator.find(sec) == x->HS_operator.end())
+      x->HS_operator[sec] = x->build_HS_operator(sec, is_complex);
   }
 }
 
