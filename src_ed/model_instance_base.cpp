@@ -60,7 +60,7 @@ model_instance_base::model_instance_base(size_t _label, shared_ptr<model> _the_m
   // checking the factorized option
   bool factorizable = false;
   if(Hamiltonian_format == H_FORMAT::H_format_factorized and the_model->group->g != 1)
-    qcm_ED_throw("the Hamiltonian format 'factorized' is not compatibile with a nontrivial point group symmetry");
+    qcm_ED_throw("the Hamiltonian format 'factorized' is not compatible with a nontrivial point group symmetry");
   if(Hamiltonian_format == H_FORMAT::H_format_factorized and (mixing == HS_mixing::normal or mixing == HS_mixing::up_down)){
     factorizable = true;
     for(auto &s : value){

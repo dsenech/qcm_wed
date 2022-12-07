@@ -7,13 +7,18 @@ project(qcm LANGUAGES CXX VERSION 1.0 DESCRIPTION "Quantum Cluster Methods share
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+message(STATUS "Architecture: ${ARCHITECTURE}")
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -g -march=native -ftree-vectorize")
 
-message(STATUS "Host processor : ${CMAKE_HOST_SYSTEM_PROCESSOR}")
-message(STATUS "Architecture: ${ARCHITECTURE}")
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O2 -g -ftree-vectorize")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O2 -g -march=native -ftree-vectorize")
+endif()
 
 #------------------
 # Define target 
